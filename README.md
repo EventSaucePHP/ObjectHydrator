@@ -7,7 +7,7 @@ and does __not__ validate input.
 
 ## TODO
 
-- [ ] Document property mappers
+- [ ] Document property casters
 - [ ] Document value converters
 - [ ] Implement reflectionless object hyrator
 
