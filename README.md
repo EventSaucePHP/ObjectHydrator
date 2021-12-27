@@ -5,6 +5,12 @@ complex object structure. The intended use of this utility is to receive request
 convert this into Command or Query object. The library is designed to follow a convention
 and does __not__ validate input.
 
+## TODO
+
+- [ ] Document property mappers
+- [ ] Document value converters
+- [ ] Implement reflectionless object hyrator
+
 ## Installation
 
 ```bash
