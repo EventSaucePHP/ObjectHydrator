@@ -1,0 +1,11 @@
+<?php
+
+declare(strict_types=1);
+
+namespace EventSauce\ObjectHydrator;
+
+use RuntimeException;
+
+class UnableToConvertProperty extends RuntimeException
+{
+}
