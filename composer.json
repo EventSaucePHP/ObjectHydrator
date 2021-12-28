@@ -1,5 +1,5 @@
 {
-    "name": "eventdsauce/object-hydrator",
+    "name": "eventsauce/object-hydrator",
     "description": "Converts structured data into strict objects.",
     "require": {
         "php": "^8.1"
