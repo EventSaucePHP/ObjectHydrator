@@ -30,12 +30,16 @@ class ReflectionObjectHydrator implements ObjectHydrator
     {
         try {
             $reflectionClass = new ReflectionClass($className);
-
             $constructor = $this->resolveConstructor($reflectionClass);
 
             if ( ! $constructor instanceof ReflectionMethod) {
                 throw new LogicException("Class $className does not have a constructor.");
             }
+
+            $classOptions = [
+                'construction_style' => $constructor->isConstructor() ? 'new' : 'static',
+                'constructor' => $constructor->isConstructor() ? $className : $this->stringifyConstructor($constructor),
+            ];
 
             $parameters = $constructor->getParameters();
             $definitions = [];
@@ -114,11 +118,10 @@ class ReflectionObjectHydrator implements ObjectHydrator
                 }
             }
 
-            if ($constructor->isConstructor() === false) {
-                return $constructor->invokeArgs(null, $properties);
-            }
-
-            return new $className(...$properties);
+            return match ($classOptions['construction_style']) {
+                'static' => $classOptions['constructor'](...$properties),
+                'new' => new $classOptions['constructor'](...$properties),
+            };
         } catch (Throwable $exception) {
             throw UnableToHydrateObject::dueToError($className, $exception);
         }
@@ -150,5 +153,13 @@ class ReflectionObjectHydrator implements ObjectHydrator
         } elseif ($type instanceof ReflectionUnionType || $type instanceof ReflectionIntersectionType) {
             return PropertyType::fromCompositeType($type);
         }
+    }
+
+    private function stringifyConstructor(ReflectionMethod $constructor): string
+    {
+        $name = $constructor->getName();
+        $className = $constructor->getDeclaringClass()->getName();
+
+        return "$className::$name";
     }
 }
