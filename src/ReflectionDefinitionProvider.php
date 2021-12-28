@@ -4,19 +4,14 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
-use EventSauce\ObjectHydrator\PropertyCasters\CastToType;
-use LogicException;
 use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionMethod;
-use ReflectionNamedType;
 use ReflectionType;
 use ReflectionUnionType;
 
-use function array_is_list;
 use function count;
 use function is_a;
-use function var_dump;
 
 class ReflectionDefinitionProvider implements DefinitionProvider
 {
@@ -25,16 +20,13 @@ class ReflectionDefinitionProvider implements DefinitionProvider
         $reflectionClass = new ReflectionClass($className);
         $constructor = $this->resolveConstructor($reflectionClass);
 
-        if ( ! $constructor instanceof ReflectionMethod) {
-            throw new LogicException("Class $className does not have a constructor.");
-        }
-
         /** @var PropertyDefinition[] $definitions */
         $definitions = [];
-        $constructionStyle =  $constructor->isConstructor() ? 'new' : 'static';
-        $constructorName =  $constructionStyle === 'new' ? $className : $this->stringifyConstructor($constructor);
 
-        $parameters = $constructor->getParameters();
+        $constructionStyle = $constructor instanceof ReflectionMethod ? $constructor->isConstructor(
+        ) ? 'new' : 'static' : 'new';
+        $constructorName = $constructionStyle === 'new' ? $className : $this->stringifyConstructor($constructor);
+        $parameters = $constructor instanceof ReflectionMethod ? $constructor->getParameters() : [];
 
         foreach ($parameters as $parameter) {
             $paramName = $parameter->getName();
