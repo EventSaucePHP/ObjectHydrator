@@ -15,14 +15,14 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithUnmappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\CustomEnum;
 use PHPUnit\Framework\TestCase;
 
-abstract class ObjectHydratorTestCase extends TestCase
+class ObjectHydratorTest extends TestCase
 {
     /**
      * @test
      */
     public function properties_can_be_mapped_from_a_specific_key(): void
     {
-        $hydrator = new ReflectionObjectHydrator();
+        $hydrator = $this->createObjectHydrator();
 
         $object = $hydrator->hydrateObject(ClassWithMappedStringProperty::class, ['my_name' => 'Frank']);
 
@@ -35,7 +35,7 @@ abstract class ObjectHydratorTestCase extends TestCase
      */
     public function properties_are_mapped_by_name_by_default(): void
     {
-        $hydrator = new ReflectionObjectHydrator();
+        $hydrator = $this->createObjectHydrator();
 
         $object = $hydrator->hydrateObject(ClassWithUnmappedStringProperty::class, ['name' => 'Frank']);
 
@@ -48,7 +48,7 @@ abstract class ObjectHydratorTestCase extends TestCase
      */
     public function properties_can_be_cast_to_a_different_type(): void
     {
-        $hydrator = new ReflectionObjectHydrator();
+        $hydrator = $this->createObjectHydrator();
 
         $object = $hydrator->hydrateObject(ClassWithPropertyCasting::class, ['age' => '1234']);
 
@@ -61,7 +61,7 @@ abstract class ObjectHydratorTestCase extends TestCase
      */
     public function objects_can_have_static_constructors(): void
     {
-        $hydrator = new ReflectionObjectHydrator();
+        $hydrator = $this->createObjectHydrator();
 
         $object = $hydrator->hydrateObject(ClassWithStaticConstructor::class, ['name' => 'Renske']);
 
@@ -144,5 +144,8 @@ abstract class ObjectHydratorTestCase extends TestCase
         $hydrator->hydrateObject('ThisClass\\DoesNotExist', []);
     }
 
-    abstract protected function createObjectHydrator(): ReflectionObjectHydrator;
+    protected function createObjectHydrator(): ObjectHydrator
+    {
+        return new ObjectHydrator();
+    }
 }

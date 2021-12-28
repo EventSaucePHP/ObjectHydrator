@@ -8,7 +8,6 @@ and does __not__ validate input.
 ## TODO
 
 - [ ] Document property casters
-- [ ] Document value converters
 - [ ] Implement reflectionless object hydrator
 
 ## Installation
@@ -96,7 +95,7 @@ When the input type and property types are not compatible, values can be cast
 to specific scalar types.
 
 ```php
-use EventSauce\ObjectHydrator\CastToType;
+use EventSauce\ObjectHydrator\PropertyCasters\CastToType;
 
 class ExampleCommand
 {

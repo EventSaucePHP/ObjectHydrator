@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator\Fixtures;
 
 use DateTimeImmutable;
-use EventSauce\ObjectHydrator\PropertyOptions;
+use EventSauce\ObjectHydrator\PropertyCasters\CastToDateTimeImmutable;
 
 class ClassWithFormattedDateTimeInput
 {
     public function __construct(
-        #[PropertyOptions(['datetime_format' => '!d-m-Y'])]
+        #[CastToDateTimeImmutable('!d-m-Y')]
         public readonly DateTimeImmutable $date
     )
     {

@@ -20,7 +20,7 @@ class PropertyType
         $this->concreteTypes = $concreteTypes;
     }
 
-    public function canBeMapped(): bool
+    public function canBeHydrated(): bool
     {
         return count($this->concreteTypes) === 1 && $this->concreteTypes[0]->isBuiltIn === false;
     }
@@ -48,9 +48,9 @@ class PropertyType
         return new static(new ConcreteType('mixed', true));
     }
 
-    public function firstTypeName(): string
+    public function firstTypeName(): ?string
     {
-        return $this->concreteTypes[0]->name;
+        return $this->concreteTypes[0]?->name;
     }
 
     public function isEnum(): bool
