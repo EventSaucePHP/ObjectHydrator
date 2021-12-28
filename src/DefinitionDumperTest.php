@@ -11,8 +11,6 @@ use PHPUnit\Framework\TestCase;
 use function file_put_contents;
 use function is_file;
 use function unlink;
-use function unserialize;
-use function var_dump;
 
 class DefinitionDumperTest extends TestCase
 {
@@ -22,7 +20,7 @@ class DefinitionDumperTest extends TestCase
      */
     public function removeTestFile(): void
     {
-        is_file(__DIR__.'/test.php') && unlink(__DIR__.'/test.php');
+        is_file(__DIR__ . '/test.php') && unlink(__DIR__ . '/test.php');
     }
 
     /**
@@ -32,9 +30,12 @@ class DefinitionDumperTest extends TestCase
     {
         $dumper = new DefinitionDumper();
 
-        $dumpedDefinition = $dumper->dump([ClassWithComplexTypeThatIsMapped::class], $className = 'Dummy\\DummyDefinitionProvider');
-        file_put_contents(__DIR__.'/test.php', $dumpedDefinition);
-        include __DIR__.'/test.php';
+        $dumpedDefinition = $dumper->dump(
+            [ClassWithComplexTypeThatIsMapped::class],
+            $className = 'Dummy\\DummyDefinitionProvider'
+        );
+        file_put_contents(__DIR__ . '/test.php', $dumpedDefinition);
+        include __DIR__ . '/test.php';
         /** @var DefinitionProvider $provider */
         $provider = new $className();
         $definition = $provider->provideDefinition(ClassWithComplexTypeThatIsMapped::class);
@@ -48,11 +49,11 @@ class DefinitionDumperTest extends TestCase
     public function dumping_all_definitions_of_a_directory(): void
     {
         $dumper = new DefinitionDumper();
-        $classes = ClassFinder::fromDirectory(__DIR__.'/Fixtures')->classes();
+        $classes = ClassFinder::fromDirectory(__DIR__ . '/Fixtures')->classes();
 
         $dumpedDefinition = $dumper->dump($classes, $className = 'Dummy\\AnotherDefinitionProvider');
-        file_put_contents(__DIR__.'/test.php', $dumpedDefinition);
-        include __DIR__.'/test.php';
+        file_put_contents(__DIR__ . '/test.php', $dumpedDefinition);
+        include __DIR__ . '/test.php';
         /** @var DefinitionProvider $provider */
         $provider = new $className();
         $definition = $provider->provideDefinition(ClassWithEnumProperty::class);
