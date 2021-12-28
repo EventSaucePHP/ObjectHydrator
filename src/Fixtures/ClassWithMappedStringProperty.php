@@ -10,7 +10,7 @@ class ClassWithMappedStringProperty
 {
     public function __construct(
         #[MapFrom('my_name')]
-        public readonly string $name,
+        public string $name,
     ) {
     }
 }

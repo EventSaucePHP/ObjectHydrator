@@ -9,7 +9,7 @@ namespace EventSauce\ObjectHydrator;
  */
 class ConcreteType
 {
-    public function __construct(public readonly string $name, public readonly bool $isBuiltIn)
+    public function __construct(public string $name, public bool $isBuiltIn)
     {
     }
 }

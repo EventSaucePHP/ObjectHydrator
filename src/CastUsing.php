@@ -12,7 +12,7 @@ class CastUsing
     /**
      * @param class-string<PropertyCaster> $className
      */
-    public function __construct(public readonly string $className, array $options = [])
+    public function __construct(public string $className, array $options = [])
     {
     }
 }

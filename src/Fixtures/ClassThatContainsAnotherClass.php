@@ -7,7 +7,7 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 class ClassThatContainsAnotherClass
 {
     public function __construct(
-        public readonly ClassWithUnmappedStringProperty $child
+        public ClassWithUnmappedStringProperty $child
     )
     {
     }

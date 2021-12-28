@@ -14,7 +14,7 @@ use Ramsey\Uuid\UuidInterface;
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class CastToUuid implements PropertyCaster
 {
-    public function __construct(private readonly string $type = 'string')
+    public function __construct(private string $type = 'string')
     {
     }
 

@@ -14,7 +14,7 @@ use function is_int;
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class CastToDateTimeImmutable implements PropertyCaster
 {
-    public function __construct(private readonly ?string $format)
+    public function __construct(private ?string $format)
     {
     }
 

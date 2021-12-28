@@ -8,7 +8,7 @@ use EventSauce\ObjectHydrator\Constructor;
 
 class ClassWithStaticConstructor
 {
-    private function __construct(public readonly string $name) {}
+    private function __construct(public string $name) {}
 
     #[Constructor]
     public static function buildMe(string $name): static

@@ -7,7 +7,7 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 class ClassWithEnumProperty
 {
     public function __construct(
-        public readonly CustomEnum $enum,
+        public CustomEnum $enum,
     )
     {
     }

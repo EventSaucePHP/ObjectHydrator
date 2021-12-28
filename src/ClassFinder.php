@@ -31,7 +31,7 @@ use const TOKEN_PARSE;
 
 class ClassFinder
 {
-    public function __construct(private readonly array $classes)
+    public function __construct(private array $classes)
     {
     }
 

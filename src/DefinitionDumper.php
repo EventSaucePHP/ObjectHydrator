@@ -54,7 +54,7 @@ class $shortName implements DefinitionProvider
 {
     
     public function __construct(
-        private readonly array \$definitions = [
+        private array \$definitions = [
             $sectionCode,
         ])
     {

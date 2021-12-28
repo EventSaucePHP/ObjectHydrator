@@ -8,7 +8,7 @@ class ClassWithComplexTypeThatIsMapped
 {
     public function __construct(
         #[CastToClassWithStaticConstructor]
-        public readonly ClassWithStaticConstructor|ClassWithUnmappedStringProperty $child
+        public ClassWithStaticConstructor|ClassWithUnmappedStringProperty $child
     )
     {
     }

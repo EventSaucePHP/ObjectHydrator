@@ -7,7 +7,7 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 class ClassThatImplementsAnInterface implements InterfaceToFilterOn
 {
     public function __construct(
-        public readonly string $name
+        public string $name
     )
     {
     }

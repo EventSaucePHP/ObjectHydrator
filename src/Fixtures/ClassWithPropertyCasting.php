@@ -11,7 +11,7 @@ class ClassWithPropertyCasting
 {
     public function __construct(
         #[CastToType('int')]
-        public readonly int $age,
+        public int $age,
     ) {
     }
 }

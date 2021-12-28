@@ -6,11 +6,11 @@ namespace EventSauce\ObjectHydrator;
 
 class ClassDefinition
 {
-    public readonly array $propertyDefinitions;
+    public array $propertyDefinitions;
 
     public function __construct(
-        public readonly string $constructor,
-        public readonly string $constructionStyle,
+        public string $constructor,
+        public string $constructionStyle,
         PropertyDefinition ... $propertyDefinitions,
     )
     {

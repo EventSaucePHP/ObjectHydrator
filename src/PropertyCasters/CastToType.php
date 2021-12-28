@@ -14,7 +14,7 @@ use function settype;
 class CastToType implements PropertyCaster
 {
     public function __construct(
-        private readonly string $type
+        private string $type
     )
     {
     }
