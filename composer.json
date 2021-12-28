@@ -2,7 +2,7 @@
     "name": "eventsauce/object-hydrator",
     "description": "Converts structured data into strict objects.",
     "require": {
-        "php": "^8.1",
+        "php": "^8.0",
         "ext-fileinfo": "*"
     },
     "require-dev": {
