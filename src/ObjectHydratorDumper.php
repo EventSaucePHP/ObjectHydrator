@@ -133,7 +133,7 @@ CODE;
 CODE;
             }
 
-            if ($enum = $definition->isEnum) {
+            if ($definition->isEnum) {
                 $body .= <<<CODE
             \$value = \\{$definition->concreteTypeName}::from(\$value);
 CODE;
