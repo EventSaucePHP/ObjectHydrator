@@ -89,10 +89,12 @@ class ExampleCommand
 }
 ```
 
-### Casting to scalar types
+### Property casting
 
 When the input type and property types are not compatible, values can be cast
 to specific scalar types.
+
+#### Casting to scalar values
 
 ```php
 use EventSauce\ObjectHydrator\PropertyCasters\CastToType;
@@ -106,9 +108,54 @@ class ExampleCommand
 }
 
 $command = $hydrator->hydrateObject(
-    ParentObject::class,
+    ExampleCommand::class,
     [
         'number' => '1234',
     ],
 );
 ```
+
+#### Casting to DateTimeImmutable objects
+
+```php
+use EventSauce\ObjectHydrator\PropertyCasters\CastToDateTimeImmutable;
+
+class ExampleCommand
+{
+    public function __construct(
+        #[CastToDateTimeImmutable('!Y-m-d')]
+        public readonly DateTimeImmutable $birthDate,
+    ) {}
+}
+
+$command = $hydrator->hydrateObject(
+    ExampleCommand::class,
+    [
+        'birthDate' => '1987-11-24',
+    ],
+);
+```
+
+#### Casting to Uuid objects (ramsey/uuid)
+
+```php
+use EventSauce\ObjectHydrator\PropertyCasters\CastToUuid;
+use Ramsey\Uuid\UuidInterface;
+
+class ExampleCommand
+{
+    public function __construct(
+        #[CastToUuid]
+        public readonly UuidInterface $id,
+    ) {}
+}
+
+$command = $hydrator->hydrateObject(
+    ExampleCommand::class,
+    [
+        'id' => '9f960d77-7c9b-4bfd-9fc4-62d141efc7e5',
+    ],
+);
+```
+
+### Creating your own casters
