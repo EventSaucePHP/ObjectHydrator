@@ -6,6 +6,8 @@
     </include>
     <exclude>
       <directory suffix="Test.php">src/</directory>
+        <directory>src/FixturesFor81</directory>
+        <directory>src/Fixtures</directory>
     </exclude>
   </coverage>
   <testsuites>
