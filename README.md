@@ -221,3 +221,76 @@ class ExampleCommand
     ) {}
 }
 ```
+
+## Static constructors
+
+Objects that require construction through static construction are supported. Mark the static method using
+the `Constructor` attribute. In these cases, the attributes should be placed on the parameters of the
+static constructor, not on `__construct`.
+
+```php
+use EventSauce\ObjectHydrator\Constructor;
+use EventSauce\ObjectHydrator\MapFrom;
+
+class ExampleCommand
+{
+    private function __construct(
+        public readonly string $value,
+    ) {}
+
+    #[Constructor]
+    public static function create(
+        #[MapFrom('some_value')]
+        string $value
+    ): static {
+        return new static($value);
+    }
+}
+```
+
+## Maximizing performance
+
+Reflection and dynamic code paths can be a performance "issue" in the hot-path. To remove the expense,
+optimized version can be dumped. These dumps are generated PHP files that perform the same construction
+of classes as the dynamic would, in an optimized way.
+
+### Dumping an optimized hydrator
+
+You can dump a fully optimized hydrator for a known set of classes. This dumper will dump the code required for
+constructing the entire object tree, it automatically resolves the nested classes it can hydrate.
+
+```php
+use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectHydratorDumper;
+
+$dumpedClassNamed = "AcmeCorp\\YourOptimizedHydrator";
+$dumper = new ObjectHydratorDumper();
+$classesToDump = [SomeCommand::class, AnotherCommand::class];
+
+$code = $dumper->dump($classesToDump, $dumpedClassNamed);
+file_put_contents('src/AcmeCorp/YourOptimizedHydrator.php');
+
+/** @var ObjectHydrator $hydrator */
+$hydrator = new AcmeCorp\YourOptimizedHydrator();
+$someObject = $hydrator->hydrateObject(SomeObject::class, $payload);
+```
+
+### Dumping an optimized definition provider
+
+When only need a cached version of the class and property definitions, you can dump those too.
+
+```php
+use EventSauce\ObjectHydrator\DefinitionProvider;
+use EventSauce\ObjectHydrator\DefinitionDumper;
+
+$dumpedClassNamed = "AcmeCorp\\YourOptimizedDefinitionProvider";
+$dumper = new DefinitionDumper();
+$classesToDump = [SomeCommand::class, AnotherCommand::class];
+
+$code = $dumper->dump($classesToDump, $dumpedClassNamed);
+file_put_contents('src/AcmeCorp/YourOptimizedDefinitionProvider.php');
+
+/** @var DefinitionProvider $hydrator */
+$hydrator = new AcmeCorp\YourOptimizedDefinitionProvider();
+$definitionForSomeObject = $hydrator->provideDefinition(SomeObject::class);
+```
