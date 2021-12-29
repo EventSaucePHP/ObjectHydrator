@@ -8,9 +8,12 @@ use EventSauce\ObjectHydrator\MapFrom;
 
 class ClassWithMappedStringProperty
 {
+    public string $name;
+
     public function __construct(
         #[MapFrom('my_name')]
-        public string $name,
+        string $name
     ) {
+        $this->name = $name;
     }
 }

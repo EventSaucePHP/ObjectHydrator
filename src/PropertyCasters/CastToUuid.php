@@ -18,7 +18,7 @@ class CastToUuid implements PropertyCaster
     {
     }
 
-    public function cast(mixed $value, ObjectHydrator $hydrator): UuidInterface
+    public function cast($value, ObjectHydrator $hydrator)
     {
         $value = (string) $value;
 

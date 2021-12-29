@@ -6,8 +6,11 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 
 class ClassWithUnmappedStringProperty
 {
+    public string $name;
+
     public function __construct(
-        public string $name,
+        string $name
     ) {
+        $this->name = $name;
     }
 }

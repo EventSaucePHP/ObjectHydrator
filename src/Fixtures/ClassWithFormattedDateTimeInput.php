@@ -9,10 +9,13 @@ use EventSauce\ObjectHydrator\PropertyCasters\CastToDateTimeImmutable;
 
 class ClassWithFormattedDateTimeInput
 {
+    public DateTimeImmutable $date;
+
     public function __construct(
         #[CastToDateTimeImmutable('!d-m-Y')]
-        public DateTimeImmutable $date
+        DateTimeImmutable $date
     )
     {
+        $this->date = $date;
     }
 }

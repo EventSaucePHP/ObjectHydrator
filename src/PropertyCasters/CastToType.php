@@ -19,7 +19,7 @@ class CastToType implements PropertyCaster
     {
     }
 
-    public function cast(mixed $value, ObjectHydrator $hydrator): mixed
+    public function cast($value, ObjectHydrator $hydrator)
     {
         settype($value, $this->type);
 

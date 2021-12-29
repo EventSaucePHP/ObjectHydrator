@@ -14,11 +14,14 @@ use function is_int;
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class CastToDateTimeImmutable implements PropertyCaster
 {
-    public function __construct(private ?string $format)
+    private ?string $format;
+
+    public function __construct(?string $format)
     {
+        $this->format = $format;
     }
 
-    public function cast(mixed $value, ObjectHydrator $hydrator): mixed
+    public function cast($value, ObjectHydrator $hydrator)
     {
         if ($this->format !== null) {
             return DateTimeImmutable::createFromFormat($this->format, $value);

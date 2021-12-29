@@ -9,9 +9,12 @@ use EventSauce\ObjectHydrator\ScalarCasting;
 
 class ClassWithPropertyCasting
 {
+    public int $age;
+
     public function __construct(
         #[CastToType('int')]
-        public int $age,
+        int $age
     ) {
+        $this->age = $age;
     }
 }

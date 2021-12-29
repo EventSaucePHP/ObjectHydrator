@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use EventSauce\ObjectHydrator\Fixtures\ClassThatContainsAnotherClass;
-use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
-use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
+use EventSauce\ObjectHydrator\FixturesFor80\ClassWithComplexTypeThatIsMapped;
 use League\ConstructFinder\Construct;
 use League\ConstructFinder\ConstructFinder;
 use PHPUnit\Framework\TestCase;

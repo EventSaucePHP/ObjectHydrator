@@ -8,10 +8,14 @@ use EventSauce\ObjectHydrator\Constructor;
 
 class ClassWithStaticConstructor
 {
-    private function __construct(public string $name) {}
+    public string $name;
+
+    private function __construct(string $name) {
+        $this->name = $name;
+    }
 
     #[Constructor]
-    public static function buildMe(string $name): static
+    public static function buildMe(string $name): self
     {
         return new static($name);
     }
