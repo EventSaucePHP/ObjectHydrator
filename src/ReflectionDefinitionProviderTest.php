@@ -7,8 +7,6 @@ namespace EventSauce\ObjectHydrator;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use PHPUnit\Framework\TestCase;
 
-use function var_dump;
-
 class ReflectionDefinitionProviderTest extends TestCase
 {
     /**

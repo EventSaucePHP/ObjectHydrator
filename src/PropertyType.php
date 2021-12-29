@@ -12,14 +12,15 @@ use ReflectionUnionType;
 use function count;
 use function enum_exists;
 use function function_exists;
-use function method_exists;
-use function var_dump;
 
+/**
+ * @internal
+ */
 class PropertyType
 {
     private array $concreteTypes;
 
-    private function __construct(ConcreteType ... $concreteTypes)
+    private function __construct(ConcreteType ...$concreteTypes)
     {
         $this->concreteTypes = $concreteTypes;
     }
@@ -38,6 +39,7 @@ class PropertyType
             $reflectionClass = new ReflectionClass($name);
             $canBeHydrated = ! $reflectionClass->isUserDefined();
         }
+
         return new static(new ConcreteType($type->getName(), $canBeHydrated));
     }
 
@@ -66,8 +68,8 @@ class PropertyType
 
     public function isEnum(): bool
     {
-        return count($this->concreteTypes) === 1
-            && function_exists('enum_exists')
-            && enum_exists($this->concreteTypes[0]->name);
+        return count($this->concreteTypes) === 1 && function_exists('enum_exists') && enum_exists(
+                $this->concreteTypes[0]->name
+            );
     }
 }

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+/**
+ * @internal
+ */
 class PropertyDefinition
 {
     public function __construct(

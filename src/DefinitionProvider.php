@@ -6,6 +6,9 @@ namespace EventSauce\ObjectHydrator;
 
 use Throwable;
 
+/**
+ * @internal
+ */
 interface DefinitionProvider
 {
     /**

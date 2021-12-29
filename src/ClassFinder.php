@@ -29,6 +29,9 @@ use const T_NEW;
 use const T_WHITESPACE;
 use const TOKEN_PARSE;
 
+/**
+ * @internal
+ */
 class ClassFinder
 {
     public function __construct(private array $classes)
