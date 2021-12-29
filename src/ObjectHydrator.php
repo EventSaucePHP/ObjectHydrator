@@ -39,32 +39,30 @@ class ObjectHydrator
             $properties = [];
 
             foreach ($classDefinition->propertyDefinitions as $definition) {
-                $property = $definition->property;
                 $value = $payload[$definition->key] ?? null;
 
                 if ($value === null) {
                     continue;
                 }
 
-                $properties[$property] = $value;
+                $property = $definition->property;
 
                 if ($definition->propertyCaster) {
                     /** @var PropertyCaster $propertyCaster */
                     $propertyCaster = $this->instances[$definition->propertyCaster]
                         ??= new $definition->propertyCaster(...$definition->castingOptions);
-                    $properties[$property] = $propertyCaster->cast(
-                        $properties[$property],
-                        $this,
-                    );
+                    $value = $propertyCaster->cast($value, $this,);
                 }
 
                 $typeName = $definition->concreteTypeName;
 
                 if ($definition->isEnum) {
-                    $properties[$property] = $typeName::from($properties[$property]);
+                    $value = $typeName::from($value);
                 } elseif ($definition->canBeHydrated && is_array($value)) {
-                    $properties[$property] = $this->hydrateObject($typeName, $value);
+                    $value = $this->hydrateObject($typeName, $value);
                 }
+
+                $properties[$property] = $value;
             }
 
             return match ($classDefinition->constructionStyle) {
