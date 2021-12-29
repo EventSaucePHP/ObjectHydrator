@@ -6,7 +6,7 @@
         "ext-fileinfo": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.5",
+        "phpunit/phpunit": "^9.5.11",
         "ramsey/uuid": "^4.2"
     },
     "autoload": {
