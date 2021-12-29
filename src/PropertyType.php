@@ -10,6 +10,8 @@ use ReflectionUnionType;
 
 use function count;
 use function enum_exists;
+use function function_exists;
+use function method_exists;
 
 class PropertyType
 {
@@ -55,6 +57,8 @@ class PropertyType
 
     public function isEnum(): bool
     {
-        return count($this->concreteTypes) === 1 && enum_exists($this->concreteTypes[0]->name);
+        return count($this->concreteTypes) === 1
+            && function_exists('enum_exists')
+            && enum_exists($this->concreteTypes[0]->name);
     }
 }
