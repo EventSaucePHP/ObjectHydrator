@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use EventSauce\ObjectHydrator\Fixtures\ClassThatContainsAnotherClass;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
-use EventSauce\ObjectHydrator\Fixtures\ClassWithEnumProperty;
+use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
 use PHPUnit\Framework\TestCase;
 
 use function file_put_contents;
@@ -45,6 +46,7 @@ class DefinitionDumperTest extends TestCase
 
     /**
      * @test
+     * @requires PHP >= 8.1
      */
     public function dumping_all_definitions_of_a_directory(): void
     {
@@ -56,9 +58,9 @@ class DefinitionDumperTest extends TestCase
         include __DIR__ . '/test.php';
         /** @var DefinitionProvider $provider */
         $provider = new $className();
-        $definition = $provider->provideDefinition(ClassWithEnumProperty::class);
+        $definition = $provider->provideDefinition(ClassThatContainsAnotherClass::class);
 
         self::assertInstanceOf(ClassDefinition::class, $definition);
-        self::assertEquals(ClassWithEnumProperty::class, $definition->constructor);
+        self::assertEquals(ClassThatContainsAnotherClass::class, $definition->constructor);
     }
 }

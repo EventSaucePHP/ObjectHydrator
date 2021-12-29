@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EventSauce\ObjectHydrator\Fixtures;
+namespace EventSauce\ObjectHydrator\FixturesFor81;
 
 class ClassWithEnumProperty
 {
