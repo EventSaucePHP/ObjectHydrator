@@ -52,12 +52,13 @@ use LogicException;
 
 class $shortName implements DefinitionProvider
 {
-    
-    public function __construct(
-        private array \$definitions = [
-            $sectionCode,
-        ])
+    private array \$definitions;
+
+    public function __construct()
     {
+        \$this->definitions = [
+            $sectionCode,
+        ];
     }
 
     public function provideDefinition(string \$className): ClassDefinition
