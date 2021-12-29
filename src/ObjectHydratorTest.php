@@ -122,6 +122,7 @@ class ObjectHydratorTest extends TestCase
 
     /**
      * @test
+     * @requires PHP >= 8.1
      */
     public function hydrating_an_object_with_an_enum(): void
     {
