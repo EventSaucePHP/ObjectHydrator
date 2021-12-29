@@ -5,11 +5,6 @@ complex object structure. The intended use of this utility is to receive request
 convert this into Command or Query object. The library is designed to follow a convention
 and does __not__ validate input.
 
-## TODO
-
-- [ ] Document property casters
-- [ ] Implement reflectionless object hydrator
-
 ## Installation
 
 ```bash
@@ -158,4 +153,71 @@ $command = $hydrator->hydrateObject(
 );
 ```
 
-### Creating your own casters
+### Creating your own property casters
+
+You can create your own property caster to handle complex cases that  cannot follow the default conventions. Common cases
+for casters are [union](https://www.php.net/manual/en/language.types.declarations.php#language.types.declarations.union)
+types or [intersection](https://wiki.php.net/rfc/pure-intersection-types) types.
+
+Property casters give you full control over how a property is constructed. Property casters are attached to properties
+using attributes, in fact, they _are_ attributes.
+
+Let's look at an example of a property caster:
+
+```php
+use Attribute;
+use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\PropertyCaster;
+
+#[Attribute(Attribute::TARGET_PARAMETER)]
+class CastToMoney implements PropertyCaster
+{
+    public function __construct(
+        private string $currency
+    ) {}
+
+    public function cast(mixed $value, ObjectHydrator $hydrator) : mixed
+    {
+        return new Money($value, Currency::fromString($this->currency));
+    }
+}
+
+// ----------------------------------------------------------------------
+
+#[Attribute(Attribute::TARGET_PARAMETER)]
+class CastUnionToType implements PropertyCaster
+{
+    public function __construct(
+        private array $typeToClassMap
+    ) {}
+
+    public function cast(mixed $value, ObjectHydrator $hydrator) : mixed
+    {
+        assert(is_array($value));
+
+        $type = $value['type'] ?? 'unknown';
+        unset($value['type']);
+        $className = $this->typeToClassMap[$type] ?? null;
+
+        if ($className === null) {
+            throw new LogicException("Unable to map type '$type' to class.");
+        }
+
+        return $hydrator->hydrateObject($className, $value);
+    }
+}
+```
+
+You can now use these as attributes on the object you wish to hydrate:
+
+```php
+class ExampleCommand
+{
+    public function __construct(
+        #[CastToMoney('EUR')]
+        public readonly Money $money,
+        #[CastUnionToType(['some' => SomeObject::class, 'other' => OtherObject::class])]
+        public readonly SomeObject|OtherObject $money,
+    ) {}
+}
+```
