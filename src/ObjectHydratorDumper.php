@@ -38,7 +38,7 @@ class ObjectHydratorDumper
             $hydrators[] = $this->dumpClassHydrator($className, $classDefinition);
         }
 
-        $hydratorMapCode = implode("\n", $hydratorMap);
+        $hydratorMapCode = implode("\n                ", $hydratorMap);
         $hydratorCode = implode("\n\n", $hydrators);
 
         return <<<CODE
@@ -49,6 +49,7 @@ declare(strict_types=1);
 namespace $namespace;
 
 use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\UnableToHydrateObject;
 
 /**
  * @template T
@@ -66,7 +67,7 @@ class $shortName extends ObjectHydrator
                 $hydratorMapCode
                 default => throw new \\LogicException("No hydration defined for \$className"),
             };
-        } catch (Throwable \$exception) {
+        } catch (\\Throwable \$exception) {
             throw UnableToHydrateObject::dueToError(\$className, \$exception);
         }
     }
@@ -108,11 +109,11 @@ CODE;
             $property = $definition->property;
             $body .= <<<CODE
 
-                \$value = \$payload['$key'] ?? null;
+            \$value = \$payload['$key'] ?? null;
 
-                if (\$value === null) {
-                    goto after_$key;
-                }
+            if (\$value === null) {
+                goto after_$key;
+            }
 
 CODE;
 
@@ -122,32 +123,33 @@ CODE;
 
             if ($caster) {
                 $body .= <<<CODE
-    global \$$casterName;
-    
-    if (\$$casterName === null) {
-        \$$casterName = new \\$caster(...$casterOptions);
-    }
-    
-    \$value = \${$casterName}->cast(\$value, \$this);
+        global \$$casterName;
+
+        if (\$$casterName === null) {
+            \$$casterName = new \\$caster(...$casterOptions);
+        }
+
+        \$value = \${$casterName}->cast(\$value, \$this);
 CODE;
             }
 
             if ($enum = $definition->isEnum) {
                 $body .= <<<CODE
-    \$value = \\{$definition->concreteTypeName}::from(\$value);
+            \$value = \\{$definition->concreteTypeName}::from(\$value);
 CODE;
             } elseif ($definition->canBeHydrated) {
                 $body .= <<<CODE
-    if (is_array(\$value)) {
-        \$value = \$this->hydrateObject('{$definition->concreteTypeName}', \$value);
-    }
+            if (is_array(\$value)) {
+                \$value = \$this->hydrateObject('{$definition->concreteTypeName}', \$value);
+            }
 CODE;
             }
 
             $body .= <<<CODE
-    \$properties['$property'] = \$value;
 
-    after_$key:
+            \$properties['$property'] = \$value;
+
+            after_$key:
 
 CODE;
         }
