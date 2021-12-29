@@ -6,19 +6,22 @@ namespace EventSauce\ObjectHydrator;
 
 use Throwable;
 
+use function array_key_exists;
 use function array_pop;
+use function array_values;
 use function explode;
 use function implode;
+use function in_array;
 use function join;
 use function var_export;
 
 class DefinitionDumper
 {
-    private DefinitionProvider $provider;
+    private DefinitionProvider $definitionProvider;
 
-    public function __construct(DefinitionProvider $provider = null)
+    public function __construct(DefinitionProvider $definitionProvider = null)
     {
-        $this->provider = $provider ?: new ReflectionDefinitionProvider();
+        $this->definitionProvider = $definitionProvider ?: new ReflectionDefinitionProvider();
     }
 
     /**
@@ -26,9 +29,10 @@ class DefinitionDumper
      */
     public function dump(array $classNames, string $dumpedClassName): string
     {
+        $classNames = $this->expandClasses($classNames);
         $sections = [];
         foreach ($classNames as $className) {
-            $definition = $this->provider->provideDefinition($className);
+            $definition = $this->definitionProvider->provideDefinition($className);
             $code = $this->dumpClassDefinition($definition);
             $sections[] = "            '$className' => $code";
         }
@@ -118,5 +122,29 @@ CODE;
                 $concreteTypeName
             )
 CODE;
+    }
+
+    private function expandClasses(array $classes): array
+    {
+        $classes = array_values($classes);
+
+        for ($i = 0; array_key_exists($i, $classes); $i++) {
+            $class = $classes[$i];
+            $classDefinition = $this->definitionProvider->provideDefinition($class);
+
+            foreach ($classDefinition->propertyDefinitions as $propertyDefinition) {
+                if ($propertyDefinition->canBeHydrated === false) {
+                    continue;
+                }
+
+                $className = (string) $propertyDefinition->concreteTypeName;
+
+                if ( ! in_array($className, $classes)) {
+                    $classes[] = $className;
+                }
+            }
+        }
+
+        return $classes;
     }
 }
