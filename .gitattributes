@@ -1,0 +1,4 @@
+.github export-ignore
+src/**/*Test.php export-ignore
+src/Fixtures export-ignore
+src/FixturesFor81 export-ignore
