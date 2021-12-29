@@ -29,7 +29,7 @@ class DefinitionDumper
         $sections = [];
         foreach ($classNames as $className) {
             $definition = $this->provider->provideDefinition($className);
-            $code = $this->dumpDefinition($definition);
+            $code = $this->dumpClassDefinition($definition);
             $sections[] = "            '$className' => $code";
         }
 
@@ -78,7 +78,7 @@ CODE;
 
     }
 
-    private function dumpDefinition(ClassDefinition $definition): string
+    private function dumpClassDefinition(ClassDefinition $definition): string
     {
         $constructor = $definition->constructor;
         $constructionStyle = $definition->constructionStyle;
