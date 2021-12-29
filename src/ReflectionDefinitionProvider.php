@@ -12,6 +12,7 @@ use ReflectionUnionType;
 
 use function count;
 use function is_a;
+use function var_dump;
 
 class ReflectionDefinitionProvider implements DefinitionProvider
 {

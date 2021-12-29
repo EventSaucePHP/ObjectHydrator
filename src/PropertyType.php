@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionUnionType;
@@ -12,6 +13,7 @@ use function count;
 use function enum_exists;
 use function function_exists;
 use function method_exists;
+use function var_dump;
 
 class PropertyType
 {
@@ -29,7 +31,14 @@ class PropertyType
 
     public static function fromNamedType(ReflectionNamedType $type): static
     {
-        return new static(new ConcreteType($type->getName(), $type->isBuiltin()));
+        $name = $type->getName();
+        $canBeHydrated = $type->isBuiltin();
+
+        if ( ! $canBeHydrated) {
+            $reflectionClass = new ReflectionClass($name);
+            $canBeHydrated = ! $reflectionClass->isUserDefined();
+        }
+        return new static(new ConcreteType($type->getName(), $canBeHydrated));
     }
 
     public static function fromCompositeType(ReflectionIntersectionType|ReflectionUnionType $type)
