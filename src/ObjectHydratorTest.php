@@ -9,6 +9,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyCasting;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyThatUsesListCasting;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithStaticConstructor;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUnmappedStringProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
@@ -54,6 +55,19 @@ class ObjectHydratorTest extends TestCase
 
         self::assertInstanceOf(ClassWithPropertyCasting::class, $object);
         self::assertEquals(1234, $object->age);
+    }
+
+    /**
+     * @test
+     */
+    public function list_type_properties_can_be_cast_to_a_different_type(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $object = $hydrator->hydrateObject(ClassWithPropertyThatUsesListCasting::class, ['ages' => ['1234', '2345']]);
+
+        self::assertInstanceOf(ClassWithPropertyThatUsesListCasting::class, $object);
+        self::assertEquals([1234, 2345], $object->ages);
     }
 
     /**
