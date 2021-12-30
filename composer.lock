@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ed46a91bd1455d794954dea30a6f91b7",
+    "content-hash": "e2a42f181085e5007418fa3e0c881d42",
     "packages": [
         {
             "name": "league/construct-finder",
@@ -202,9 +202,6 @@
             },
             "require": {
                 "php": "^7.1 || ^8.0"
-            },
-            "replace": {
-                "myclabs/deep-copy": "self.version"
             },
             "require-dev": {
                 "doctrine/collections": "^1.0",
@@ -2556,7 +2553,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.0",
+        "php": "~7.4.0 || ~8.0.0 || ~8.1.0",
         "ext-fileinfo": "*"
     },
     "platform-dev": [],
