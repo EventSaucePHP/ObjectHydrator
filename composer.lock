@@ -4,8 +4,58 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6c07d5b4d00dfec6acf152cd01f9de1c",
-    "packages": [],
+    "content-hash": "ed46a91bd1455d794954dea30a6f91b7",
+    "packages": [
+        {
+            "name": "league/construct-finder",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/construct-finder.git",
+                "reference": "c027590fdf6b0e2495806a32b4594df50c9730ce"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/construct-finder/zipball/c027590fdf6b0e2495806a32b4594df50c9730ce",
+                "reference": "c027590fdf6b0e2495806a32b4594df50c9730ce",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~8.0.0 || ~8.1.0 || ~7.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "League\\ConstructFinder\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Frank de Jonge",
+                    "email": "info@frankdejonge.nl"
+                }
+            ],
+            "description": "Finds classes, interfaces, traits, and enums.",
+            "support": {
+                "issues": "https://github.com/thephpleague/construct-finder/issues",
+                "source": "https://github.com/thephpleague/construct-finder/tree/1.0.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/frankdejonge",
+                    "type": "github"
+                }
+            ],
+            "time": "2021-12-30T10:57:55+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "brick/math",
@@ -2510,5 +2560,5 @@
         "ext-fileinfo": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }

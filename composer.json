@@ -3,7 +3,8 @@
     "description": "Converts structured data into strict objects.",
     "require": {
         "php": "^8.0",
-        "ext-fileinfo": "*"
+        "ext-fileinfo": "*",
+        "league/construct-finder": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5.11",
