@@ -5,6 +5,24 @@ complex object structure. The intended use of this utility is to receive request
 convert this into Command or Query object. The library is designed to follow a convention
 and does __not__ validate input.
 
+#### Quick links:
+
+- [**Design goals**](#design-goals)
+- [**Installation**](#installation)
+- [**Usage**](#usage)
+    - [**Custom mapping key**](#custom-mapping-key)
+    - [**Property casting**](#property-casting)
+    - [**Casting to scalar values**](#casting-to-scalar-values)
+    - [**Casting to a list of scalar values**](#casting-to-a-list-of-scalar-values)
+    - [**Casting to a list of objects**](#casting-to-a-list-of-objects)
+    - [**Casting to DateTimeImmutable objects**](#casting-to-datetimeimmutable-objects)
+    - [**Casting to Uuid objects (ramsey/uuid)**](#casting-to-uuid-objects-ramseyuuid)
+    - [**Creating your own property casters**](#creating-your-own-property-casters)
+    - [**Static constructors**](#static-constructors)
+- [**Maximizing performance**](#maximizing-performance)
+    - [**Dumping an optimized hydrator**](#dumping-an-optimized-hydrator)
+    - [**Dumping an optimized definition provider**](#dumping-an-optimized-definition-provider)
+
 ## Design goals
 
 This package was created with a couple design goals in mind. They are the following:
