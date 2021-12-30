@@ -5,6 +5,15 @@ complex object structure. The intended use of this utility is to receive request
 convert this into Command or Query object. The library is designed to follow a convention
 and does __not__ validate input.
 
+## Design goals
+
+This package was created with a couple design goals in mind. They are the following:
+
+- Object creation should not be _too_ magical (use no reflection for instantiation)
+- There should not be a hard runtime requirement on reflection
+- Constructed objects should be valid from construction
+- Construction through (static) named constructors should be supported
+
 ## Installation
 
 ```bash
@@ -106,6 +115,58 @@ $command = $hydrator->hydrateObject(
     ExampleCommand::class,
     [
         'number' => '1234',
+    ],
+);
+```
+
+#### Casting to a list of scalar values
+
+```php
+use EventSauce\ObjectHydrator\PropertyCasters\CastListToType;
+
+class ExampleCommand
+{
+    public function __construct(
+        #[CastListToType('integer')]
+        public readonly array $numbers,
+    ) {}
+}
+
+$command = $hydrator->hydrateObject(
+    ExampleCommand::class,
+    [
+        'numbers' => ['1234', '2345'],
+    ],
+);
+```
+
+#### Casting to a list of objects
+
+```php
+use EventSauce\ObjectHydrator\PropertyCasters\CastListToType;
+
+class Member
+{
+    public function __construct(
+        public readonly string $name,
+    ) {}
+}
+
+class ExampleCommand
+{
+    public function __construct(
+        #[CastListToType(Member::class)]
+        public readonly array $members,
+    ) {}
+}
+
+$command = $hydrator->hydrateObject(
+    ExampleCommand::class,
+    [
+        'members' => [
+            ['name' => 'Frank'],
+            ['name' => 'Renske'],
+        ],
     ],
 );
 ```
