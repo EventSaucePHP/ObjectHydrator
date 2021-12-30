@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use EventSauce\ObjectHydrator\Fixtures\ClassThatContainsAnotherClass;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use EventSauce\ObjectHydrator\FixturesFor80\ClassWithComplexTypeThatIsMapped;
 use League\ConstructFinder\Construct;
 use League\ConstructFinder\ConstructFinder;
@@ -34,14 +35,14 @@ class DefinitionDumperTest extends TestCase
         $dumper = new DefinitionDumper();
 
         $dumpedDefinition = $dumper->dump(
-            [ClassWithComplexTypeThatIsMapped::class],
+            [ClassWithFormattedDateTimeInput::class],
             $className = 'Dummy\\DummyDefinitionProvider'
         );
         file_put_contents(__DIR__ . '/test.php', $dumpedDefinition);
         include __DIR__ . '/test.php';
         /** @var DefinitionProvider $provider */
         $provider = new $className();
-        $definition = $provider->provideDefinition(ClassWithComplexTypeThatIsMapped::class);
+        $definition = $provider->provideDefinition(ClassWithFormattedDateTimeInput::class);
 
         self::assertInstanceOf(ClassDefinition::class, $definition);
     }

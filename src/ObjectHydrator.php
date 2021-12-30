@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use LogicException;
 use Throwable;
 
 use function is_array;
@@ -22,7 +23,7 @@ class ObjectHydrator
     private $instances;
 
     public function __construct(
-        ?DefinitionProvider $definitionProvider = null,
+        ?DefinitionProvider $definitionProvider = null
     ) {
         $this->definitionProvider = $definitionProvider ?: new ReflectionDefinitionProvider();
     }
@@ -65,10 +66,14 @@ class ObjectHydrator
                 $properties[$property] = $value;
             }
 
-            return match ($classDefinition->constructionStyle) {
-                'static' => ($classDefinition->constructor)(...$properties),
-                'new' => new ($classDefinition->constructor)(...$properties),
-            };
+            switch ($classDefinition->constructionStyle) {
+                case 'static':
+                    return ($classDefinition->constructor)(...$properties);
+                case 'new':
+                    return new ($classDefinition->constructor)(...$properties);
+                default:
+                    throw new LogicException("Invalid construction style: $classDefinition->constructionStyle");
+            }
         } catch (Throwable $exception) {
             throw UnableToHydrateObject::dueToError($className, $exception);
         }

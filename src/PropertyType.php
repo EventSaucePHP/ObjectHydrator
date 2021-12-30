@@ -30,7 +30,7 @@ class PropertyType
         return count($this->concreteTypes) === 1 && $this->concreteTypes[0]->isBuiltIn === false;
     }
 
-    public static function fromNamedType(ReflectionNamedType $type): static
+    public static function fromNamedType(ReflectionNamedType $type): self
     {
         $name = $type->getName();
         $canBeHydrated = $type->isBuiltin();
@@ -56,14 +56,16 @@ class PropertyType
         return new PropertyType(...$resolvedTypes);
     }
 
-    public static function mixed(): static
+    public static function mixed(): self
     {
         return new static(new ConcreteType('mixed', true));
     }
 
     public function firstTypeName(): ?string
     {
-        return $this->concreteTypes[0]?->name;
+        $first = $this->concreteTypes[0] ?? null;
+
+        return $first ? $first->name : null;
     }
 
     public function isEnum(): bool

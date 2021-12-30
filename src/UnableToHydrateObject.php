@@ -14,7 +14,7 @@ class UnableToHydrateObject extends RuntimeException
         parent::__construct($message, 0, $previous);
     }
 
-    public static function dueToError(string $className, ?Throwable $previous = null): static
+    public static function dueToError(string $className, ?Throwable $previous = null): self
     {
         return new static("Unable to hydrate object: $className", $previous);
     }

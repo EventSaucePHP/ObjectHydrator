@@ -84,6 +84,7 @@ class ObjectHydratorTest extends TestCase
 
     /**
      * @test
+     * @requires PHP >= 8.0
      */
     public function hydrating_a_complex_object_that_uses_property_casting(): void
     {
