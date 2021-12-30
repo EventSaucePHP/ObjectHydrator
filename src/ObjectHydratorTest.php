@@ -10,6 +10,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyCasting;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyThatUsesListCasting;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyThatUsesListCastingToClasses;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithStaticConstructor;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUnmappedStringProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
@@ -68,6 +69,28 @@ class ObjectHydratorTest extends TestCase
 
         self::assertInstanceOf(ClassWithPropertyThatUsesListCasting::class, $object);
         self::assertEquals([1234, 2345], $object->ages);
+    }
+
+    /**
+     * @test
+     */
+    public function list_values_can_be_cast_to_objects(): void
+    {
+        $expectedChildren = [
+            new ClassWithUnmappedStringProperty('Frank'),
+            new ClassWithUnmappedStringProperty('Renske'),
+        ];
+        $hydrator = $this->createObjectHydrator();
+
+        $payload = ['children' => [
+            ['name' => 'Frank'],
+            ['name' => 'Renske'],
+        ]];
+
+        $object = $hydrator->hydrateObject(ClassWithPropertyThatUsesListCastingToClasses::class, $payload);
+
+        self::assertInstanceOf(ClassWithPropertyThatUsesListCastingToClasses::class, $object);
+        self::assertEquals($expectedChildren, $object->children);
     }
 
     /**
