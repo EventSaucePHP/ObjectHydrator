@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use EventSauce\ObjectHydrator\Fixtures\ClassThatContainsAnotherClass;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatHasMultipleCastersOnSingleProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
@@ -180,6 +181,20 @@ class ObjectHydratorTest extends TestCase
         $this->expectExceptionObject(UnableToHydrateObject::dueToError('ThisClass\\DoesNotExist'));
 
         $hydrator->hydrateObject('ThisClass\\DoesNotExist', []);
+    }
+
+    /**
+     * @test
+     */
+    public function constructing_a_property_with_multiple_casters(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $payload = ['child' => 1234];
+        $object = $hydrator->hydrateObject(ClassThatHasMultipleCastersOnSingleProperty::class, $payload);
+
+        self::assertInstanceOf(ClassThatHasMultipleCastersOnSingleProperty::class, $object);
+        self::assertEquals('1234', $object->child->name);
     }
 
     protected function createObjectHydrator(): ObjectHydrator

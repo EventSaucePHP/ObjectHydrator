@@ -106,8 +106,7 @@ CODE;
 
     private function dumpPropertyDefinition(PropertyDefinition $propertyDefinition): string
     {
-        $propertyCaster = var_export($propertyDefinition->propertyCaster, true);
-        $castingOptions = var_export($propertyDefinition->castingOptions, true);
+        $propertyCasters = var_export($propertyDefinition->propertyCasters, true);
         $canBeHydrated = var_export($propertyDefinition->canBeHydrated, true);
         $isEnum = var_export($propertyDefinition->isEnum, true);
         $concreteTypeName = var_export($propertyDefinition->concreteTypeName, true);
@@ -115,8 +114,7 @@ CODE;
             new PropertyDefinition(
                 '$propertyDefinition->key',
                 '$propertyDefinition->property',
-                $propertyCaster,
-                $castingOptions,
+                $propertyCasters,
                 $canBeHydrated,
                 $isEnum,
                 $concreteTypeName
