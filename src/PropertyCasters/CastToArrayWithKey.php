@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EventSauce\ObjectHydrator\Fixtures;
+namespace EventSauce\ObjectHydrator\PropertyCasters;
 
 use Attribute;
 use EventSauce\ObjectHydrator\ObjectHydrator;

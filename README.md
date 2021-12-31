@@ -17,6 +17,7 @@ and does __not__ validate input.
     - [**Casting to a list of objects**](#casting-to-a-list-of-objects)
     - [**Casting to DateTimeImmutable objects**](#casting-to-datetimeimmutable-objects)
     - [**Casting to Uuid objects (ramsey/uuid)**](#casting-to-uuid-objects-ramseyuuid)
+    - [**Using multiple casters per property**](#creating-your-own-property-casters)
     - [**Creating your own property casters**](#creating-your-own-property-casters)
     - [**Static constructors**](#static-constructors)
 - [**Maximizing performance**](#maximizing-performance)
@@ -230,6 +231,36 @@ $command = $hydrator->hydrateObject(
         'id' => '9f960d77-7c9b-4bfd-9fc4-62d141efc7e5',
     ],
 );
+```
+
+#### Using multiple casters per property
+
+Create rich compositions of casting by using multiple casters.
+
+```php
+use EventSauce\ObjectHydrator\PropertyCasters\CastToArrayWithKey;
+use EventSauce\ObjectHydrator\PropertyCasters\CastToType;
+use EventSauce\ObjectHydrator\MapFrom;
+use Ramsey\Uuid\UuidInterface;
+
+class ExampleCommand
+{
+    public function __construct(
+        #[CastToType('string')]
+        #[CastToArrayWithKey('nested')]
+        #[Map('number')]
+        public readonly array $stringNumbers,
+    ) {}
+}
+
+$command = $hydrator->hydrateObject(
+    ExampleCommand::class,
+    [
+        'number' => [1234],
+    ],
+);
+
+$command->stringNumbers === ['nested' => [1234]];
 ```
 
 ### Creating your own property casters
