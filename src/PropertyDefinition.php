@@ -12,8 +12,9 @@ class PropertyDefinition
     public function __construct(
         public string $key,
         public string $property,
-        public ?string $propertyCaster,
-        public array $castingOptions,
+        public array $propertyCasters,
+//        public ?string $propertyCaster,
+//        public array $castingOptions,
         public bool $canBeHydrated,
         public bool $isEnum,
         public ?string $concreteTypeName,

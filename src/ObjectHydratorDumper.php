@@ -117,12 +117,12 @@ CODE;
 
 CODE;
 
-            $caster = $definition->propertyCaster;
-            $casterOptions = var_export($definition->castingOptions, true);
-            $casterName = $property . 'Caster';
+            foreach ($definition->propertyCasters as $index => [$caster, $options]) {
+                $casterOptions = var_export($options, true);
+                $casterName = $property . 'Caster' . $index;
 
-            if ($caster) {
-                $body .= <<<CODE
+                if ($caster) {
+                    $body .= <<<CODE
         global \$$casterName;
 
         if (\$$casterName === null) {
@@ -131,6 +131,7 @@ CODE;
 
         \$value = \${$casterName}->cast(\$value, \$this);
 CODE;
+                }
             }
 
             if ($definition->isEnum) {

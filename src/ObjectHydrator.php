@@ -47,11 +47,11 @@ class ObjectHydrator
 
                 $property = $definition->property;
 
-                if ($definition->propertyCaster) {
+                foreach ($definition->propertyCasters as $index => [$caster, $options]) {
+                    $key = "$className-$index-$caster";
                     /** @var PropertyCaster $propertyCaster */
-                    $propertyCaster = $this->instances[$definition->propertyCaster]
-                        ??= new $definition->propertyCaster(...$definition->castingOptions);
-                    $value = $propertyCaster->cast($value, $this,);
+                    $propertyCaster = $this->instances[$key] ??= new $caster(...$options);
+                    $value = $propertyCaster->cast($value, $this);
                 }
 
                 $typeName = $definition->concreteTypeName;

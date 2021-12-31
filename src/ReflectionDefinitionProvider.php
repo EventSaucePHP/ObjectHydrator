@@ -38,6 +38,7 @@ class ReflectionDefinitionProvider implements DefinitionProvider
             ];
 
             $attributes = $parameter->getAttributes();
+            $casters = [];
 
             foreach ($attributes as $attribute) {
                 $attributeName = $attribute->getName();
@@ -45,16 +46,14 @@ class ReflectionDefinitionProvider implements DefinitionProvider
                 if ($attributeName === MapFrom::class) {
                     $definition['key'] = $arguments[0] ?? $definition['key'];
                 } elseif (is_a($attributeName, PropertyCaster::class, true)) {
-                    $definition['cast_using'] = $attributeName;
-                    $definition['casting_options'] = $attribute->getArguments();
+                    $casters[] = [$attributeName, $attribute->getArguments()];
                 }
             }
 
             $definitions[] = new PropertyDefinition(
                 $definition['key'],
                 $definition['property'],
-                $definition['cast_using'] ?? null,
-                $definition['casting_options'] ?? [],
+                $casters,
                 $parameterType->canBeHydrated(),
                 $definition['enum'] ?? false,
                 $parameterType->firstTypeName()
