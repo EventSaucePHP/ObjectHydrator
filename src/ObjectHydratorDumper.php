@@ -136,7 +136,7 @@ CODE;
 
                 if ($caster) {
                     $body .= <<<CODE
-        global \$$casterName;
+        static \$$casterName;
 
         if (\$$casterName === null) {
             \$$casterName = new \\$caster(...$casterOptions);
