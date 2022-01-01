@@ -140,7 +140,7 @@ CODE;
 
             $collectKeys
 
-            if (\$value === []]) {
+            if (\$value === []) {
                 goto after_$property;
             }
 
