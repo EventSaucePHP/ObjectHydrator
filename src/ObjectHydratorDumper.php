@@ -4,17 +4,11 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
-use EventSauce\ObjectHydrator\FixturesFor81\CustomEnum;
-
-use function array_key_exists;
 use function array_keys;
 use function array_pop;
-use function array_values;
-use function class_exists;
 use function count;
 use function explode;
 use function implode;
-use function in_array;
 use function str_replace;
 use function var_export;
 
@@ -113,7 +107,6 @@ CODE;
                 \$value['$to'] = \$payload['$from'];
             }
 CODE;
-
                 }
 
                 $body .= <<<CODE

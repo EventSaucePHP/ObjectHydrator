@@ -10,7 +10,7 @@ namespace EventSauce\ObjectHydrator;
 class PropertyDefinition
 {
     public function __construct(
-        /** @var string[] */
+        /** @var array<string, string> */
         public array $keys,
         public string $property,
         public array $propertyCasters,

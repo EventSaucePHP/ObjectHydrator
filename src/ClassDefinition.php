@@ -14,9 +14,8 @@ class ClassDefinition
     public function __construct(
         public string $constructor,
         public string $constructionStyle,
-        PropertyDefinition ... $propertyDefinitions,
-    )
-    {
+        PropertyDefinition ...$propertyDefinitions,
+    ) {
         $this->propertyDefinitions = $propertyDefinitions;
     }
 }

@@ -11,7 +11,7 @@ use EventSauce\ObjectHydrator\PropertyCaster;
 use function in_array;
 use function settype;
 
-#[Attribute(Attribute::TARGET_PARAMETER)]
+#[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
 class CastListToType implements PropertyCaster
 {
     private bool $nativeType;

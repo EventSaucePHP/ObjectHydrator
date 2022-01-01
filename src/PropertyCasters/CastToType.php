@@ -15,8 +15,7 @@ class CastToType implements PropertyCaster
 {
     public function __construct(
         private string $type
-    )
-    {
+    ) {
     }
 
     public function cast(mixed $value, ObjectHydrator $hydrator): mixed

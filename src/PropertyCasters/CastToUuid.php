@@ -11,7 +11,7 @@ use LogicException;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
-#[Attribute(Attribute::TARGET_PARAMETER)]
+#[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
 class CastToUuid implements PropertyCaster
 {
     public function __construct(private string $type = 'string')

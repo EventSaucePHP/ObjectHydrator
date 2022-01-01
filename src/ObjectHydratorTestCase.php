@@ -85,10 +85,12 @@ abstract class ObjectHydratorTestCase extends TestCase
         ];
         $hydrator = $this->createObjectHydrator();
 
-        $payload = ['children' => [
-            ['name' => 'Frank'],
-            ['name' => 'Renske'],
-        ]];
+        $payload = [
+            'children' => [
+                ['name' => 'Frank'],
+                ['name' => 'Renske'],
+            ],
+        ];
 
         $object = $hydrator->hydrateObject(ClassWithPropertyThatUsesListCastingToClasses::class, $payload);
 

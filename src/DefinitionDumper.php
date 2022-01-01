@@ -6,12 +6,9 @@ namespace EventSauce\ObjectHydrator;
 
 use Throwable;
 
-use function array_key_exists;
 use function array_pop;
-use function array_values;
 use function explode;
 use function implode;
-use function in_array;
 use function join;
 use function var_export;
 
@@ -79,7 +76,6 @@ class $shortName implements DefinitionProvider
 
 }
 CODE;
-
     }
 
     private function dumpClassDefinition(ClassDefinition $definition): string
@@ -101,7 +97,6 @@ new ClassDefinition(
     $propertyCode
             )
 CODE;
-
     }
 
     private function dumpPropertyDefinition(PropertyDefinition $propertyDefinition): string
@@ -111,6 +106,7 @@ CODE;
         $canBeHydrated = var_export($propertyDefinition->canBeHydrated, true);
         $isEnum = var_export($propertyDefinition->isEnum, true);
         $concreteTypeName = var_export($propertyDefinition->concreteTypeName, true);
+
         return <<<CODE
             new PropertyDefinition(
                 $keys,
