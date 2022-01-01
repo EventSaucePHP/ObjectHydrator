@@ -15,9 +15,7 @@ use function count;
 use function explode;
 use function implode;
 use function in_array;
-use function join;
 use function str_replace;
-use function var_dump;
 use function var_export;
 
 class ObjectHydratorDumper
@@ -133,18 +131,16 @@ CODE;
 
             foreach ($definition->propertyCasters as [$caster, $options]) {
                 $this->casterIndex++;
-                $arguments = [];
-
-                foreach ($options as $option) {
-                    $arguments[] = var_export($option, true);
-                }
-    
-                $argumentsCode = implode(', ', $arguments);
+                $casterOptions = var_export($options, true);
                 $casterName = $property . 'Caster' . $this->casterIndex;
 
                 if ($caster) {
                     $body .= <<<CODE
-        static \$$casterName = new \\$caster($argumentsCode);
+        global \$$casterName;
+
+        if (\$$casterName === null) {
+            \$$casterName = new \\$caster(...$casterOptions);
+        }
 
         \$value = \${$casterName}->cast(\$value, \$this);
 CODE;
