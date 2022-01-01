@@ -6,6 +6,8 @@ namespace EventSauce\ObjectHydrator;
 
 use EventSauce\ObjectHydrator\Fixtures\ClassThatContainsAnotherClass;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatHasMultipleCastersOnSingleProperty;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatRenamesInputForClassWithMultipleProperties;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatUsesClassWithMultipleProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
@@ -195,6 +197,37 @@ class ObjectHydratorTest extends TestCase
 
         self::assertInstanceOf(ClassThatHasMultipleCastersOnSingleProperty::class, $object);
         self::assertEquals('1234', $object->child->name);
+    }
+
+    /**
+     * @test
+     */
+    public function mapping_multiple_keys_to_one_object(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $payload = ['value' => 'dog', 'name' => 'Rover', 'age' => 2];
+        $object = $hydrator->hydrateObject(ClassThatUsesClassWithMultipleProperties::class, $payload);
+
+        self::assertInstanceOf(ClassThatUsesClassWithMultipleProperties::class, $object);
+        self::assertEquals('dog', $object->value);
+        self::assertEquals('Rover', $object->child->name);
+        self::assertEquals(2, $object->child->age);
+    }
+
+    /**
+     * @test
+     */
+    public function mapping_multiple_keys_to_one_object_with_renames(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $payload = ['name' => 'Rover', 'mapped_age' => 2];
+        $object = $hydrator->hydrateObject(ClassThatRenamesInputForClassWithMultipleProperties::class, $payload);
+
+        self::assertInstanceOf(ClassThatRenamesInputForClassWithMultipleProperties::class, $object);
+        self::assertEquals('Rover', $object->child->name);
+        self::assertEquals(2, $object->child->age);
     }
 
     protected function createObjectHydrator(): ObjectHydrator

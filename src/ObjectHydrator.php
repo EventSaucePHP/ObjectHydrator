@@ -6,6 +6,9 @@ namespace EventSauce\ObjectHydrator;
 
 use Throwable;
 
+use function array_key_exists;
+use function count;
+use function current;
 use function is_array;
 
 /**
@@ -39,10 +42,20 @@ class ObjectHydrator
             $properties = [];
 
             foreach ($classDefinition->propertyDefinitions as $definition) {
-                $value = $payload[$definition->key] ?? null;
+                $value = [];
 
-                if ($value === null) {
+                foreach ($definition->keys as $from => $to) {
+                    if (array_key_exists($from, $payload)) {
+                        $value[$to] = $payload[$from];
+                    }
+                }
+
+                if ($value === []) {
                     continue;
+                }
+
+                if (count($definition->keys) === 1) {
+                    $value = current($value);
                 }
 
                 $property = $definition->property;
