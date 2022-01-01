@@ -115,6 +115,11 @@ class ExampleCommand
 
 ### Mapping from multiple keys
 
+You can pass an array to capture input from multiple input keys. This is
+useful when multiple values represent a singular code concept. The array
+allows you to rename keys as well, further decoupling the input from the
+constructed object graph.
+
 ```php
 use EventSauce\ObjectHydrator\MapFrom;
 
