@@ -5,15 +5,11 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
-
-use EventSauce\ObjectHydrator\FixturesFor81\CustomEnum;
 use League\ConstructFinder\Construct;
 use League\ConstructFinder\ConstructFinder;
+
 use function class_exists;
-use function in_array;
-use function is_file;
 use function strpos;
-use function unlink;
 
 class ObjectHydratorDumperTest extends ObjectHydratorTestCase
 {
@@ -23,8 +19,8 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
      */
     public function removeTestFile(): void
     {
-//        is_file(__DIR__ . '/test.php') && unlink(__DIR__ . '/test.php');
-//        is_file(__DIR__ . '/test81.php') && unlink(__DIR__ . '/test81.php');
+        is_file(__DIR__ . '/test80.php') && unlink(__DIR__ . '/test80.php');
+        is_file(__DIR__ . '/test81.php') && unlink(__DIR__ . '/test81.php');
     }
 
     /**
@@ -46,8 +42,10 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
         }
 
         $classes = ConstructFinder::locatedIn($directory)->findClasses();
-        $classes = array_map(function (Construct $c) { return $c->name(); }, $classes);
-         $dumper = new ObjectHydratorDumper();
+        $classes = array_map(function (Construct $c) {
+            return $c->name();
+        }, $classes);
+        $dumper = new ObjectHydratorDumper();
 
         $dumpedDefinition = $dumper->dump(
             $classes,
