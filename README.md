@@ -11,6 +11,7 @@ and does __not__ validate input.
 - [**Installation**](#installation)
 - [**Usage**](#usage)
     - [**Custom mapping key**](#custom-mapping-key)
+    - [**Mapping from multiple keys**](#mapping-from-multiple-keys)
     - [**Property casting**](#property-casting)
     - [**Casting to scalar values**](#casting-to-scalar-values)
     - [**Casting to a list of scalar values**](#casting-to-a-list-of-scalar-values)
@@ -110,6 +111,37 @@ class ExampleCommand
         public readonly int $birthYear,
     ) {}
 }
+```
+
+### Mapping from multiple keys
+
+```php
+use EventSauce\ObjectHydrator\MapFrom;
+
+class BirthDay
+{
+    public function __construct(
+        public int $year,
+        public int $month,
+        public int $day
+    ){}
+}
+
+class ExampleCommand
+{
+    public function __construct(
+        public readonly string $name,
+        #[MapFrom(['year_of_birth' => 'year', 'month', 'day'])]
+        public readonly int $birthYear,
+    ) {}
+}
+
+$hydrator->hydrateObject(ExampleCommand::class, [
+    'name' => 'Frank',
+    'year_of_birth' => 1987,
+    'month' => 11,
+    'day' => 24,
+]);
 ```
 
 ### Property casting
