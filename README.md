@@ -441,3 +441,11 @@ file_put_contents('src/AcmeCorp/YourOptimizedDefinitionProvider.php');
 $hydrator = new AcmeCorp\YourOptimizedDefinitionProvider();
 $definitionForSomeObject = $hydrator->provideDefinition(SomeObject::class);
 ```
+
+## Alternatives
+
+This package is not unique, there are a couple implementations our there that do
+the same, similar, or more than this package does.
+
+- [cuyz/valinor](https://github.com/CuyZ/Valinor)
+- [spatie/data-transfer-object](https://github.com/spatie/data-transfer-object)
