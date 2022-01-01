@@ -166,7 +166,7 @@ abstract class ObjectHydratorTestCase extends TestCase
      */
     public function hydrating_an_object_with_an_enum(): void
     {
-        $hydrator = $this->createObjectHydrator();
+        $hydrator = $this->createObjectHydratorFor81();
 
         $object = $hydrator->hydrateObject(ClassWithEnumProperty::class, ['enum' => 'one']);
 
