@@ -1,8 +1,8 @@
 {
     "name": "eventsauce/object-hydrator",
     "description": "Converts structured data into strict objects.",
-    "license": "MIT",
     "keywords": ["hydration", "mapper", "construction", "constructor"],
+    "license": "MIT",
     "require": {
         "php": "^8.0",
         "ext-fileinfo": "*",
