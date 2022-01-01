@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use function array_key_exists;
+use function array_keys;
 use function array_pop;
 use function array_values;
+use function count;
 use function explode;
 use function implode;
 use function in_array;
@@ -105,17 +107,45 @@ CODE;
     {
         $body = '';
         foreach ($classDefinition->propertyDefinitions as $definition) {
-            $key = $definition->key;
+            $keys = $definition->keys;
             $property = $definition->property;
-            $body .= <<<CODE
 
-            \$value = \$payload['$key'] ?? null;
+            if (count($keys) === 1) {
+                $from = array_keys($keys)[0];
+                $body .= <<<CODE
+
+            \$value = \$payload['$from'] ?? null;
 
             if (\$value === null) {
-                goto after_$key;
+                goto after_$property;
             }
 
 CODE;
+            } else {
+                $collectKeys = '';
+
+                foreach ($keys as $from => $to) {
+                    $collectKeys .= <<<CODE
+
+            if (array_key_exists('$from', \$payload)) {
+                \$value['$to'] = \$payload['$from'];
+            }
+CODE;
+
+                }
+
+                $body .= <<<CODE
+
+            \$value = [];
+
+            $collectKeys
+
+            if (\$value === []]) {
+                goto after_$property;
+            }
+
+CODE;
+            }
 
             foreach ($definition->propertyCasters as $index => [$caster, $options]) {
                 $casterOptions = var_export($options, true);
@@ -150,7 +180,7 @@ CODE;
 
             \$properties['$property'] = \$value;
 
-            after_$key:
+            after_$property:
 
 CODE;
         }

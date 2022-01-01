@@ -33,7 +33,7 @@ class ReflectionDefinitionProvider implements DefinitionProvider
             $parameterType = $this->normalizeType($parameter->getType());
             $definition = [
                 'property' => $paramName,
-                'key' => $paramName,
+                'keys' => [$paramName => $paramName],
                 'enum' => $parameterType->isEnum(),
             ];
 
@@ -42,16 +42,16 @@ class ReflectionDefinitionProvider implements DefinitionProvider
 
             foreach ($attributes as $attribute) {
                 $attributeName = $attribute->getName();
-                $arguments = $attribute->getArguments();
+
                 if ($attributeName === MapFrom::class) {
-                    $definition['key'] = $arguments[0] ?? $definition['key'];
+                    $definition['keys'] = $attribute->newInstance()->keys;
                 } elseif (is_a($attributeName, PropertyCaster::class, true)) {
                     $casters[] = [$attributeName, $attribute->getArguments()];
                 }
             }
 
             $definitions[] = new PropertyDefinition(
-                $definition['key'],
+                $definition['keys'],
                 $definition['property'],
                 $casters,
                 $parameterType->canBeHydrated(),
