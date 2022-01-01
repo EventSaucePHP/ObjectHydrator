@@ -186,7 +186,7 @@ CODE;
         }
 
         $methodName = 'hydrate' . str_replace('\\', '', $className);
-        $constructionCode = $classDefinition->constructionStyle === 'new' ? "new \\$className(...\$properties)" : "$classDefinition->constructor(...\$properties)";
+        $constructionCode = $classDefinition->constructionStyle === 'new' ? "new \\$className(...\$properties)" : "\\$classDefinition->constructor(...\$properties)";
 
         return <<<CODE
         
