@@ -12,7 +12,7 @@ use function implode;
 use function str_replace;
 use function var_export;
 
-class ObjectHydratorDumper
+final class ObjectHydratorDumper
 {
     private DefinitionProvider $definitionProvider;
 

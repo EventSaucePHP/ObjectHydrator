@@ -16,7 +16,7 @@ use function function_exists;
 /**
  * @internal
  */
-class PropertyType
+final class PropertyType
 {
     private array $concreteTypes;
 

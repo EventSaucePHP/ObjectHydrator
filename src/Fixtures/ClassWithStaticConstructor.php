@@ -6,7 +6,7 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 
 use EventSauce\ObjectHydrator\Constructor;
 
-class ClassWithStaticConstructor
+final class ClassWithStaticConstructor
 {
     private function __construct(public string $name) {}
 

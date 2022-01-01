@@ -6,7 +6,7 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 
 use EventSauce\ObjectHydrator\PropertyCasters\CastListToType;
 
-class ClassWithPropertyThatUsesListCastingToClasses
+final class ClassWithPropertyThatUsesListCastingToClasses
 {
     public function __construct(
         #[CastListToType(ClassWithUnmappedStringProperty::class)]

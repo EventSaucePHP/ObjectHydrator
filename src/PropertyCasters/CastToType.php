@@ -11,7 +11,7 @@ use EventSauce\ObjectHydrator\PropertyCaster;
 use function settype;
 
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
-class CastToType implements PropertyCaster
+final class CastToType implements PropertyCaster
 {
     public function __construct(
         private string $type

@@ -6,7 +6,7 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 
 use EventSauce\ObjectHydrator\MapFrom;
 
-class ClassWithMappedStringProperty
+final class ClassWithMappedStringProperty
 {
     public function __construct(
         #[MapFrom('my_name')]

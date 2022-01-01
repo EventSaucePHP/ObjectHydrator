@@ -7,7 +7,7 @@ namespace EventSauce\ObjectHydrator;
 /**
  * @internal
  */
-class ClassDefinition
+final class ClassDefinition
 {
     public array $propertyDefinitions;
 

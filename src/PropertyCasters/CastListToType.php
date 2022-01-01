@@ -12,7 +12,7 @@ use function in_array;
 use function settype;
 
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
-class CastListToType implements PropertyCaster
+final class CastListToType implements PropertyCaster
 {
     private bool $nativeType;
 

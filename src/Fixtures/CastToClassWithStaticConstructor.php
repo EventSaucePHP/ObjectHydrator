@@ -10,7 +10,7 @@ use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\ObjectHydrator;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-class CastToClassWithStaticConstructor implements PropertyCaster
+final class CastToClassWithStaticConstructor implements PropertyCaster
 {
     public function cast(mixed $value, ObjectHydrator $hydrator): mixed
     {

@@ -6,7 +6,7 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 
 use EventSauce\ObjectHydrator\MapFrom;
 
-class ClassThatUsesClassWithMultipleProperties
+final class ClassThatUsesClassWithMultipleProperties
 {
     public function __construct(
 

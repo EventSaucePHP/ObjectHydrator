@@ -10,7 +10,7 @@ use function is_int;
 use function is_string;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-class MapFrom
+final class MapFrom
 {
     /** @var array<string, string> */
     public array $keys = [];

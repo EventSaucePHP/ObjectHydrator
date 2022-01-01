@@ -7,7 +7,7 @@ namespace EventSauce\ObjectHydrator;
 use RuntimeException;
 use Throwable;
 
-class UnableToHydrateObject extends RuntimeException
+final class UnableToHydrateObject extends RuntimeException
 {
     private function __construct(string $message, ?Throwable $previous = null)
     {

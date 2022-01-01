@@ -12,7 +12,7 @@ use function implode;
 use function join;
 use function var_export;
 
-class DefinitionDumper
+final class DefinitionDumper
 {
     private DefinitionProvider $definitionProvider;
 

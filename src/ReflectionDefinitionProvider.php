@@ -13,7 +13,7 @@ use ReflectionUnionType;
 use function count;
 use function is_a;
 
-class ReflectionDefinitionProvider implements DefinitionProvider
+final class ReflectionDefinitionProvider implements DefinitionProvider
 {
     public function provideDefinition(string $className): ClassDefinition
     {

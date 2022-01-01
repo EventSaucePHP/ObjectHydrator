@@ -6,7 +6,7 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 
 use EventSauce\ObjectHydrator\MapFrom;
 
-class ClassThatRenamesInputForClassWithMultipleProperties
+final class ClassThatRenamesInputForClassWithMultipleProperties
 {
     public function __construct(
 

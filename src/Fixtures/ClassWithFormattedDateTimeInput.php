@@ -7,7 +7,7 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 use DateTimeImmutable;
 use EventSauce\ObjectHydrator\PropertyCasters\CastToDateTimeImmutable;
 
-class ClassWithFormattedDateTimeInput
+final class ClassWithFormattedDateTimeInput
 {
     public function __construct(
         #[CastToDateTimeImmutable('!d-m-Y')]

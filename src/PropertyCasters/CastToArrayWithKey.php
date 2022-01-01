@@ -9,7 +9,7 @@ use EventSauce\ObjectHydrator\ObjectHydrator;
 use EventSauce\ObjectHydrator\PropertyCaster;
 
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
-class CastToArrayWithKey implements PropertyCaster
+final class CastToArrayWithKey implements PropertyCaster
 {
     public function __construct(private string $key)
     {

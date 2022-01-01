@@ -7,6 +7,6 @@ namespace EventSauce\ObjectHydrator;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_METHOD)]
-class Constructor
+final class Constructor
 {
 }

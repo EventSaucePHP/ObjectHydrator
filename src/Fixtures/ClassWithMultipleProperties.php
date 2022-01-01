@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator\Fixtures;
 
-class ClassWithMultipleProperties
+final class ClassWithMultipleProperties
 {
     public function __construct(
         public int $age,
