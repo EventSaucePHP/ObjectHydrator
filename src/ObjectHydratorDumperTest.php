@@ -6,9 +6,11 @@ namespace EventSauce\ObjectHydrator;
 
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 
+use EventSauce\ObjectHydrator\FixturesFor81\CustomEnum;
 use League\ConstructFinder\Construct;
 use League\ConstructFinder\ConstructFinder;
 use function class_exists;
+use function in_array;
 use function is_file;
 use function strpos;
 use function unlink;
@@ -45,13 +47,13 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
 
         $classes = ConstructFinder::locatedIn($directory)->findClasses();
         $classes = array_map(function (Construct $c) { return $c->name(); }, $classes);
-        $dumper = new ObjectHydratorDumper();
+         $dumper = new ObjectHydratorDumper();
 
         $dumpedDefinition = $dumper->dump(
             $classes,
             $className
         );
-        $filename = __DIR__ . '/test' . (strpos($directory, '81') === false ? '' : '81') . '.php';
+        $filename = __DIR__ . '/test' . (strpos($directory, '81') === false ? '80' : '81') . '.php';
 
         file_put_contents($filename, $dumpedDefinition);
         include $filename;

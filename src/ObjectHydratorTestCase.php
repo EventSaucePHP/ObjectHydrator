@@ -192,11 +192,11 @@ abstract class ObjectHydratorTestCase extends TestCase
     {
         $hydrator = $this->createObjectHydrator();
 
-        $payload = ['child' => 1234];
+        $payload = ['child' => 12345];
         $object = $hydrator->hydrateObject(ClassThatHasMultipleCastersOnSingleProperty::class, $payload);
 
         self::assertInstanceOf(ClassThatHasMultipleCastersOnSingleProperty::class, $object);
-        self::assertEquals('1234', $object->child->name);
+        self::assertEquals('12345', $object->child->name);
     }
 
     /**

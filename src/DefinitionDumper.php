@@ -29,7 +29,7 @@ class DefinitionDumper
      */
     public function dump(array $classNames, string $dumpedClassName): string
     {
-        $classNames = $this->expandClasses($classNames);
+        $classNames = ClassExpander::expandClasses($classNames, $this->definitionProvider);
         $sections = [];
         foreach ($classNames as $className) {
             $definition = $this->definitionProvider->provideDefinition($className);
@@ -121,29 +121,5 @@ CODE;
                 $concreteTypeName
             )
 CODE;
-    }
-
-    private function expandClasses(array $classes): array
-    {
-        $classes = array_values($classes);
-
-        for ($i = 0; array_key_exists($i, $classes); $i++) {
-            $class = $classes[$i];
-            $classDefinition = $this->definitionProvider->provideDefinition($class);
-
-            foreach ($classDefinition->propertyDefinitions as $propertyDefinition) {
-                if ($propertyDefinition->canBeHydrated === false) {
-                    continue;
-                }
-
-                $className = (string) $propertyDefinition->concreteTypeName;
-
-                if ( ! in_array($className, $classes)) {
-                    $classes[] = $className;
-                }
-            }
-        }
-
-        return $classes;
     }
 }

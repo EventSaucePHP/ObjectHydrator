@@ -4,20 +4,27 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use EventSauce\ObjectHydrator\FixturesFor81\CustomEnum;
+
 use function array_key_exists;
 use function array_keys;
 use function array_pop;
 use function array_values;
+use function class_exists;
 use function count;
 use function explode;
 use function implode;
 use function in_array;
+use function join;
 use function str_replace;
+use function var_dump;
 use function var_export;
 
 class ObjectHydratorDumper
 {
     private DefinitionProvider $definitionProvider;
+
+    private int $casterIndex = 0;
 
     public function __construct(DefinitionProvider $definitionProvider = null)
     {
@@ -26,10 +33,11 @@ class ObjectHydratorDumper
 
     public function dump(array $classes, string $dumpedClassName): string
     {
+        $this->casterIndex = 0;
         $parts = explode('\\', $dumpedClassName);
         $shortName = array_pop($parts);
         $namespace = implode('\\', $parts);
-        $classes = $this->expandClasses($classes);
+        $classes = ClassExpander::expandClasses($classes, $this->definitionProvider);
         $hydrators = [];
         $hydratorMap = [];
 
@@ -79,30 +87,6 @@ class $shortName extends ObjectHydrator
 CODE;
     }
 
-    private function expandClasses(array $classes): array
-    {
-        $classes = array_values($classes);
-
-        for ($i = 0; array_key_exists($i, $classes); $i++) {
-            $class = $classes[$i];
-            $classDefinition = $this->definitionProvider->provideDefinition($class);
-
-            foreach ($classDefinition->propertyDefinitions as $propertyDefinition) {
-                if ($propertyDefinition->canBeHydrated === false) {
-                    continue;
-                }
-
-                $className = (string) $propertyDefinition->concreteTypeName;
-
-                if ( ! in_array($className, $classes)) {
-                    $classes[] = $className;
-                }
-            }
-        }
-
-        return $classes;
-    }
-
     private function dumpClassHydrator(string $className, ClassDefinition $classDefinition)
     {
         $body = '';
@@ -147,17 +131,20 @@ CODE;
 CODE;
             }
 
-            foreach ($definition->propertyCasters as $index => [$caster, $options]) {
-                $casterOptions = var_export($options, true);
-                $casterName = $property . 'Caster' . $index;
+            foreach ($definition->propertyCasters as [$caster, $options]) {
+                $this->casterIndex++;
+                $arguments = [];
+
+                foreach ($options as $option) {
+                    $arguments[] = var_export($option, true);
+                }
+    
+                $argumentsCode = implode(', ', $arguments);
+                $casterName = $property . 'Caster' . $this->casterIndex;
 
                 if ($caster) {
                     $body .= <<<CODE
-        global \$$casterName;
-
-        if (\$$casterName === null) {
-            \$$casterName = new \\$caster(...$casterOptions);
-        }
+        static \$$casterName = new \\$caster($argumentsCode);
 
         \$value = \${$casterName}->cast(\$value, \$this);
 CODE;
