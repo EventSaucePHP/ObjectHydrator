@@ -55,6 +55,8 @@ use EventSauce\ObjectHydrator\UnableToHydrateObject;
  */
 class $shortName extends ObjectHydrator
 {
+    public function __construct() {}
+
     /**
      * @param class-string<T> \$className
      * @return T
