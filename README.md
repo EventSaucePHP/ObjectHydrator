@@ -5,6 +5,9 @@ complex object structure. The intended use of this utility is to receive request
 convert this into Command or Query object. The library is designed to follow a convention
 and does __not__ validate input.
 
+The object hydration can be achieved a **zero** expense, due to a ahead-of-time resolving of
+hydration steps using an [optimized dumper](#maximizing-performance).
+
 #### Quick links:
 
 - [**Design goals**](#design-goals)
@@ -403,8 +406,10 @@ of classes as the dynamic would, in an optimized way.
 
 ### Dumping an optimized hydrator
 
-You can dump a fully optimized hydrator for a known set of classes. This dumper will dump the code required for
-constructing the entire object tree, it automatically resolves the nested classes it can hydrate.
+You can dump a fully optimized hydrator for a known set of classes. This dumper will dump the code required
+for  constructing the entire object tree, it automatically resolves the nested classes it can hydrate.
+
+The dumped code is **3-10x faster** than the reflection based implementation. 
 
 ```php
 use EventSauce\ObjectHydrator\ObjectHydrator;
