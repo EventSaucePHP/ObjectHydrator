@@ -1,7 +1,13 @@
 .github export-ignore
-phpbench.json
-phpbench-bootstrap.php
+phpbench.json export-ignore
+phpbench-bootstrap.php export-ignore
 src/**/*Test.php export-ignore
 src/Fixtures export-ignore
 src/Benchmarks export-ignore
 src/FixturesFor81 export-ignore
+phpunix.xml.dist export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore
+.php-cs-fixer.php export-ignore
+README.md export-ignore
+composer.lock export-ignore
