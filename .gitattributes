@@ -1,4 +1,7 @@
 .github export-ignore
+phpbench.json
+phpbench-bootstrap.php
 src/**/*Test.php export-ignore
 src/Fixtures export-ignore
+src/Benchmarks export-ignore
 src/FixturesFor81 export-ignore

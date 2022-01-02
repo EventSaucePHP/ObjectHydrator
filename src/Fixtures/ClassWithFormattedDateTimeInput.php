@@ -7,6 +7,7 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 use DateTimeImmutable;
 use EventSauce\ObjectHydrator\PropertyCasters\CastToDateTimeImmutable;
 
+#[ExampleData(['date' => '24-11-1987'])]
 final class ClassWithFormattedDateTimeInput
 {
     public function __construct(

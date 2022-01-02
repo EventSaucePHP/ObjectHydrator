@@ -6,6 +6,7 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 
 use EventSauce\ObjectHydrator\MapFrom;
 
+#[ExampleData(['mapped_age' => 34, 'name' => 'Frank'])]
 final class ClassThatRenamesInputForClassWithMultipleProperties
 {
     public function __construct(
