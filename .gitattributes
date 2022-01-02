@@ -5,7 +5,7 @@ src/**/*Test.php export-ignore
 src/Fixtures export-ignore
 src/Benchmarks export-ignore
 src/FixturesFor81 export-ignore
-phpunix.xml.dist export-ignore
+phpunit.xml.dist export-ignore
 .gitignore export-ignore
 .gitattributes export-ignore
 .php-cs-fixer.php export-ignore
