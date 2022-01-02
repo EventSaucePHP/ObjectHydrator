@@ -23,7 +23,6 @@ final class ObjectHydratorDumper
 
     public function dump(array $classes, string $dumpedClassName): string
     {
-        $this->casterIndex = 0;
         $parts = explode('\\', $dumpedClassName);
         $shortName = array_pop($parts);
         $namespace = implode('\\', $parts);
