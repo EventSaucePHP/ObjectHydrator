@@ -13,7 +13,7 @@ use function is_int;
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
 final class CastToDateTimeImmutable implements PropertyCaster
 {
-    public function __construct(private ?string $format)
+    public function __construct(private ?string $format = null)
     {
     }
 

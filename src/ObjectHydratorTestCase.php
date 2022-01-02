@@ -11,6 +11,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassThatUsesClassWithMultipleProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithNotCastedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyCasting;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyThatUsesListCasting;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyThatUsesListCastingToClasses;
@@ -151,6 +152,19 @@ abstract class ObjectHydratorTestCase extends TestCase
 
         self::assertInstanceOf(ClassWithFormattedDateTimeInput::class, $object);
         self::assertEquals('1987-11-24 00:00:00', $object->date->format('Y-m-d H:i:s'));
+    }
+
+    /**
+     * @test
+     */
+    public function hydrating_a_class_with_a_not_casted_date_input(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $object = $hydrator->hydrateObject(ClassWithNotCastedDateTimeInput::class, ['date' => '2022-01-01 12:00:00']);
+
+        self::assertInstanceOf(ClassWithNotCastedDateTimeInput::class, $object);
+        self::assertEquals('2022-01-01 12:00:00', $object->date->format('Y-m-d H:i:s'));
     }
 
     /**

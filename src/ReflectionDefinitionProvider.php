@@ -14,6 +14,13 @@ use function is_a;
 
 final class ReflectionDefinitionProvider implements DefinitionProvider
 {
+    private DefaultCasterRepository $defaultCasterRepository;
+
+    public function __construct(DefaultCasterRepository $defaultCasterRepository = null)
+    {
+        $this->defaultCasterRepository = $defaultCasterRepository ?: DefaultCasterRepository::buildIn();
+    }
+
     public function provideDefinition(string $className): ClassDefinition
     {
         $reflectionClass = new ReflectionClass($className);
@@ -30,6 +37,7 @@ final class ReflectionDefinitionProvider implements DefinitionProvider
         foreach ($parameters as $parameter) {
             $paramName = $parameter->getName();
             $parameterType = $this->normalizeType($parameter->getType());
+            $firstTypeName = $parameterType->firstTypeName();
             $definition = [
                 'property' => $paramName,
                 'keys' => [$paramName => $paramName],
@@ -49,13 +57,19 @@ final class ReflectionDefinitionProvider implements DefinitionProvider
                 }
             }
 
+            if ($firstTypeName && count($casters) === 0 && $defaultCaster = $this->defaultCasterRepository->casterFor(
+                    $firstTypeName
+                )) {
+                $casters = [$defaultCaster];
+            }
+
             $definitions[] = new PropertyDefinition(
                 $definition['keys'],
                 $definition['property'],
                 $casters,
                 $parameterType->canBeHydrated(),
                 $definition['enum'] ?? false,
-                $parameterType->firstTypeName()
+                $firstTypeName
             );
         }
 
