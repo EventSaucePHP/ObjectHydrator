@@ -49,3 +49,6 @@ jobs:
       - name: Execute tests
         run: vendor/bin/phpunit --verbose --coverage-text --coverage-clover=coverage.clover
 
+      - name: Run benchmarks
+        run: vendor/bin/phpbench run src/Benchmarks
+
