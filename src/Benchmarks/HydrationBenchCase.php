@@ -18,6 +18,29 @@ abstract class HydrationBenchCase
 
     private array $examples = [];
 
+    private array $exampleSeed = [];
+
+    public function __construct()
+    {
+        $classes = ConstructFinder::locatedIn(__DIR__ . '/../Fixtures')->findClasses();
+
+        foreach ($classes as $class) {
+            $className = $class->name();
+            $reflection = new ReflectionClass($className);
+
+            $atttributes = $reflection->getAttributes(ExampleData::class);
+
+            if (count($atttributes) === 0) {
+                continue;
+            }
+
+            $exampleData = $atttributes[0]->newInstance()->payload;
+            $examples[] = [$className, $exampleData];
+        }
+
+        $this->exampleSeed = $examples;
+    }
+
     /**
      * @ParamProviders({"provideSampleSizes"})
      * @BeforeMethods({"prepareHydrator"})
@@ -34,22 +57,10 @@ abstract class HydrationBenchCase
         $this->objectHydrator = $this->createObjectHydrator();
         $examples = [];
         [$scale] = $params;
-        $classes = ConstructFinder::locatedIn(__DIR__ . '/../Fixtures')->findClasses();
 
-        foreach ($classes as $class) {
-            $className = $class->name();
-            $reflection = new ReflectionClass($className);
-
-            $atttributes = $reflection->getAttributes(ExampleData::class);
-
-            if (count($atttributes) === 0) {
-                continue;
-            }
-
-            $exampleData = $atttributes[0]->newInstance()->payload;
-
+        foreach ($this->exampleSeed as $example) {
             for ($i = 0; $i < $scale; ++$i) {
-                $examples[] = [$className, $exampleData];
+                $examples[] = $example;
             }
         }
 
@@ -58,9 +69,12 @@ abstract class HydrationBenchCase
 
     public function provideSampleSizes(): Generator
     {
-        yield [10];
-        yield [50];
-        yield [250];
+        $exampleCount = count($this->exampleSeed);
+
+        yield ($exampleCount * 10) => [10];
+        yield ($exampleCount * 75) => [75];
+        yield ($exampleCount * 250) => [250];
+        yield ($exampleCount * 500) => [500];
     }
 
     abstract protected function createObjectHydrator(): ObjectHydrator;
