@@ -8,7 +8,6 @@ final class ClassThatContainsAnotherClass
 {
     public function __construct(
         public ClassWithUnmappedStringProperty $child
-    )
-    {
+    ) {
     }
 }

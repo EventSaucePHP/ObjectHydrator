@@ -6,7 +6,6 @@ namespace EventSauce\ObjectHydrator;
 
 use ReflectionClass;
 use Throwable;
-
 use function array_key_exists;
 use function array_values;
 use function enum_exists;
@@ -26,7 +25,7 @@ final class ClassExpander
     {
         $classes = array_values($classes);
 
-        for ($i = 0; array_key_exists($i, $classes); $i++) {
+        for ($i = 0; array_key_exists($i, $classes); ++$i) {
             $class = $classes[$i];
             $classDefinition = $definitionProvider->provideDefinition($class);
 

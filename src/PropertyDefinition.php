@@ -17,7 +17,6 @@ final class PropertyDefinition
         public bool $canBeHydrated,
         public bool $isEnum,
         public ?string $concreteTypeName,
-    )
-    {
+    ) {
     }
 }

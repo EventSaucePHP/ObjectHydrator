@@ -7,7 +7,6 @@ namespace EventSauce\ObjectHydrator;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use League\ConstructFinder\Construct;
 use League\ConstructFinder\ConstructFinder;
-
 use function class_exists;
 use function strpos;
 

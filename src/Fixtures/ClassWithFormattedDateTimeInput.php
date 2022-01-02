@@ -12,7 +12,6 @@ final class ClassWithFormattedDateTimeInput
     public function __construct(
         #[CastToDateTimeImmutable('!d-m-Y')]
         public DateTimeImmutable $date
-    )
-    {
+    ) {
     }
 }

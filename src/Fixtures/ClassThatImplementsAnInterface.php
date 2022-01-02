@@ -8,7 +8,6 @@ final class ClassThatImplementsAnInterface implements InterfaceToFilterOn
 {
     public function __construct(
         public string $name
-    )
-    {
+    ) {
     }
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use Throwable;
-
 use function array_key_exists;
 use function count;
 use function current;
@@ -32,6 +31,7 @@ class ObjectHydrator
 
     /**
      * @param class-string<T> $className
+     *
      * @return T
      */
     public function hydrateObject(string $className, array $payload): object

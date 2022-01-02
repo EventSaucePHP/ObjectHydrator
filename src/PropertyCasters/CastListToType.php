@@ -7,7 +7,6 @@ namespace EventSauce\ObjectHydrator\PropertyCasters;
 use Attribute;
 use EventSauce\ObjectHydrator\ObjectHydrator;
 use EventSauce\ObjectHydrator\PropertyCaster;
-
 use function in_array;
 use function settype;
 
@@ -19,7 +18,7 @@ final class CastListToType implements PropertyCaster
     public function __construct(
         private string $type
     ) {
-        $this->nativeType = in_array($this->type, ["bool", "boolean", "int", "integer", "float", "double", "string", "array", "object", "null"]);
+        $this->nativeType = in_array($this->type, ['bool', 'boolean', 'int', 'integer', 'float', 'double', 'string', 'array', 'object', 'null']);
     }
 
     public function cast(mixed $value, ObjectHydrator $hydrator): mixed
@@ -35,9 +34,8 @@ final class CastListToType implements PropertyCaster
 
     /**
      * @param mixed $value
-     * @return mixed
      */
-    protected function castToNativeType(array $value): mixed
+    private function castToNativeType(array $value): mixed
     {
         foreach ($value as $i => $item) {
             settype($item, $this->type);

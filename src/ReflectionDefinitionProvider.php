@@ -9,7 +9,6 @@ use ReflectionIntersectionType;
 use ReflectionMethod;
 use ReflectionType;
 use ReflectionUnionType;
-
 use function count;
 use function is_a;
 

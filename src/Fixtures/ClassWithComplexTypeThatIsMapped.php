@@ -9,7 +9,6 @@ final class ClassWithComplexTypeThatIsMapped
     public function __construct(
         #[CastToClassWithStaticConstructor]
         public ClassWithStaticConstructor|ClassWithUnmappedStringProperty $child
-    )
-    {
+    ) {
     }
 }

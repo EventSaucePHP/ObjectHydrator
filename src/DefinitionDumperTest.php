@@ -9,7 +9,6 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
 use League\ConstructFinder\Construct;
 use League\ConstructFinder\ConstructFinder;
 use PHPUnit\Framework\TestCase;
-
 use function array_map;
 use function file_put_contents;
 use function is_file;

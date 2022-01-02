@@ -121,7 +121,7 @@ CODE;
             }
 
             foreach ($definition->propertyCasters as $index => [$caster, $options]) {
-                $index++;
+                ++$index;
                 $casterOptions = var_export($options, true);
                 $casterName = $property . 'Caster' . $index;
 

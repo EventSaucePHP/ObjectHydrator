@@ -8,7 +8,6 @@ use Attribute;
 use DateTimeImmutable;
 use EventSauce\ObjectHydrator\ObjectHydrator;
 use EventSauce\ObjectHydrator\PropertyCaster;
-
 use function is_int;
 
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]

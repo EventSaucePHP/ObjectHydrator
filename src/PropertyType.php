@@ -8,7 +8,6 @@ use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionUnionType;
-
 use function count;
 use function enum_exists;
 use function function_exists;

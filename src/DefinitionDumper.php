@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use Throwable;
-
 use function array_pop;
 use function explode;
 use function implode;
-use function join;
 use function var_export;
 
 final class DefinitionDumper
@@ -88,7 +86,7 @@ CODE;
             $properties[] = $this->dumpPropertyDefinition($propertyDefinition);
         }
 
-        $propertyCode = join(",\n", $properties);
+        $propertyCode = implode(",\n", $properties);
 
         return <<<CODE
 new ClassDefinition(

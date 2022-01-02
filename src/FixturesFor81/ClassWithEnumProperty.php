@@ -8,7 +8,6 @@ class ClassWithEnumProperty
 {
     public function __construct(
         public CustomEnum $enum,
-    )
-    {
+    ) {
     }
 }

@@ -7,7 +7,6 @@ namespace EventSauce\ObjectHydrator\PropertyCasters;
 use Attribute;
 use EventSauce\ObjectHydrator\ObjectHydrator;
 use EventSauce\ObjectHydrator\PropertyCaster;
-
 use function settype;
 
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
