@@ -16,9 +16,12 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyThatUsesListCasting;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyThatUsesListCastingToClasses;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithStaticConstructor;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUnmappedStringProperty;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithUuidProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\CustomEnum;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 abstract class ObjectHydratorTestCase extends TestCase
 {
@@ -215,6 +218,21 @@ abstract class ObjectHydratorTestCase extends TestCase
         self::assertEquals('dog', $object->value);
         self::assertEquals('Rover', $object->child->name);
         self::assertEquals(2, $object->child->age);
+    }
+
+    /**
+     * @test
+     */
+    public function casting_a_property_to_a_uuid(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $payload = ['id' => '9f960d77-7c9b-4bfd-9fc4-62d141efc7e5'];
+        $object = $hydrator->hydrateObject(ClassWithUuidProperty::class, $payload);
+
+        self::assertInstanceOf(ClassWithUuidProperty::class, $object);
+        self::assertInstanceOf(UuidInterface::class, $object->id);
+        self::assertTrue($object->id->equals(Uuid::fromString('9f960d77-7c9b-4bfd-9fc4-62d141efc7e5')));
     }
 
     /**
