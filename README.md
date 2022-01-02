@@ -285,7 +285,7 @@ class ExampleCommand
     public function __construct(
         #[CastToType('string')]
         #[CastToArrayWithKey('nested')]
-        #[Map('number')]
+        #[MapFrom('number')]
         public readonly array $stringNumbers,
     ) {}
 }
