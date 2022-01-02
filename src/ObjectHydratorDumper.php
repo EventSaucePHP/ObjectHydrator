@@ -103,6 +103,7 @@ CODE;
             if (array_key_exists('$from', \$payload)) {
                 \$value['$to'] = \$payload['$from'];
             }
+
 CODE;
                 }
 
@@ -126,26 +127,32 @@ CODE;
 
                 if ($caster) {
                     $body .= <<<CODE
-        static \$$casterName;
 
-        if (\$$casterName === null) {
-            \$$casterName = new \\$caster(...$casterOptions);
-        }
+            static \$$casterName;
 
-        \$value = \${$casterName}->cast(\$value, \$this);
+            if (\$$casterName === null) {
+                \$$casterName = new \\$caster(...$casterOptions);
+            }
+
+            \$value = \${$casterName}->cast(\$value, \$this);
+
 CODE;
                 }
             }
 
             if ($definition->isEnum) {
                 $body .= <<<CODE
+
             \$value = \\{$definition->concreteTypeName}::from(\$value);
+
 CODE;
             } elseif ($definition->canBeHydrated) {
                 $body .= <<<CODE
+
             if (is_array(\$value)) {
                 \$value = \$this->hydrateObject('{$definition->concreteTypeName}', \$value);
             }
+
 CODE;
             }
 
