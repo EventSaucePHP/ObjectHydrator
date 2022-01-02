@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d2d902541a4f8f823f9c68a3cb37d40f",
+    "content-hash": "551dd34ce293430d7d6ad5a43f00c135",
     "packages": [
         {
             "name": "league/construct-finder",
-            "version": "1.0.1",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/construct-finder.git",
-                "reference": "c027590fdf6b0e2495806a32b4594df50c9730ce"
+                "reference": "88bcbced498dda94f819d38c352cefa91cb4fb56"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/construct-finder/zipball/c027590fdf6b0e2495806a32b4594df50c9730ce",
-                "reference": "c027590fdf6b0e2495806a32b4594df50c9730ce",
+                "url": "https://api.github.com/repos/thephpleague/construct-finder/zipball/88bcbced498dda94f819d38c352cefa91cb4fb56",
+                "reference": "88bcbced498dda94f819d38c352cefa91cb4fb56",
                 "shasum": ""
             },
             "require": {
@@ -45,7 +45,7 @@
             "description": "Finds classes, interfaces, traits, and enums.",
             "support": {
                 "issues": "https://github.com/thephpleague/construct-finder/issues",
-                "source": "https://github.com/thephpleague/construct-finder/tree/1.0.1"
+                "source": "https://github.com/thephpleague/construct-finder/tree/1.1.0"
             },
             "funding": [
                 {
@@ -53,7 +53,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-12-30T10:57:55+00:00"
+            "time": "2022-01-02T16:14:17+00:00"
         }
     ],
     "packages-dev": [
