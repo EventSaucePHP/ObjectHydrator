@@ -6,6 +6,7 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 
 use EventSauce\ObjectHydrator\MapFrom;
 
+#[ExampleData(['my_name' => 'Frank'])]
 final class ClassWithMappedStringProperty
 {
     public function __construct(

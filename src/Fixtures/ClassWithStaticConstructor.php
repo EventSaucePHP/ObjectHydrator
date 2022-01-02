@@ -6,6 +6,7 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 
 use EventSauce\ObjectHydrator\Constructor;
 
+#[ExampleData(['name' => 'Frank'])]
 final class ClassWithStaticConstructor
 {
     private function __construct(public string $name)

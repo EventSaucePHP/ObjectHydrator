@@ -6,6 +6,7 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 
 use EventSauce\ObjectHydrator\PropertyCasters\CastListToType;
 
+#[ExampleData(['children' => [['name' => 'Frank'], ['name' => 'Renske'], ['name' => 'Rover']]])]
 final class ClassWithPropertyThatUsesListCastingToClasses
 {
     public function __construct(
