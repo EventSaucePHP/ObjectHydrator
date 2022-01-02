@@ -6,10 +6,8 @@ namespace EventSauce\ObjectHydrator;
 
 use EventSauce\ObjectHydrator\Fixtures\ClassThatContainsAnotherClass;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
-use League\ConstructFinder\Construct;
 use League\ConstructFinder\ConstructFinder;
 use PHPUnit\Framework\TestCase;
-use function array_map;
 use function file_put_contents;
 use function is_file;
 use function unlink;
@@ -52,10 +50,7 @@ class DefinitionDumperTest extends TestCase
     public function dumping_all_definitions_of_a_directory(): void
     {
         $dumper = new DefinitionDumper();
-        $classes = ConstructFinder::locatedIn(__DIR__ . '/Fixtures')->findAll();
-        $classes = array_map(function (Construct $c) {
-            return $c->name();
-        }, $classes);
+        $classes = ConstructFinder::locatedIn(__DIR__ . '/Fixtures')->findAllNames();
 
         $dumpedDefinition = $dumper->dump($classes, $className = 'Dummy\\AnotherDefinitionProvider');
         file_put_contents(__DIR__ . '/test.php', $dumpedDefinition);

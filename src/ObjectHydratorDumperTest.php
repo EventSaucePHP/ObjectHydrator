@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
-use League\ConstructFinder\Construct;
 use League\ConstructFinder\ConstructFinder;
 use function class_exists;
 use function strpos;
@@ -40,10 +39,7 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
             goto create_object_hydrator;
         }
 
-        $classes = ConstructFinder::locatedIn($directory)->findClasses();
-        $classes = array_map(function (Construct $c) {
-            return $c->name();
-        }, $classes);
+        $classes = ConstructFinder::locatedIn($directory)->findClassNames();
         $dumper = new ObjectHydratorDumper();
 
         $dumpedDefinition = $dumper->dump(

@@ -6,10 +6,8 @@ namespace EventSauce\ObjectHydrator\Benchmarks;
 
 use EventSauce\ObjectHydrator\ObjectHydrator;
 use EventSauce\ObjectHydrator\ObjectHydratorDumper;
-use League\ConstructFinder\Construct;
 use League\ConstructFinder\ConstructFinder;
 
-use function array_map;
 use function class_exists;
 use function file_put_contents;
 use function unlink;
@@ -20,8 +18,7 @@ class DumpedHydrationBench extends HydrationBenchCase
     {
         if ( ! class_exists(DumpedObjectHydrator::class, true)) {
             $className = DumpedObjectHydrator::class;
-            $classes = ConstructFinder::locatedIn(__DIR__ . '/../Fixtures')->findClasses();
-            $classes = array_map(fn(Construct $c) => $c->name(), $classes);
+            $classes = ConstructFinder::locatedIn(__DIR__ . '/../Fixtures')->findClassNames();
             $dumper = new ObjectHydratorDumper();
             $code = $dumper->dump($classes, $className);
             file_put_contents(__DIR__.'/DumpedObjectHydrator.php', $code);
