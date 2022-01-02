@@ -16,8 +16,6 @@ final class ObjectHydratorDumper
 {
     private DefinitionProvider $definitionProvider;
 
-    private int $casterIndex = 0;
-
     public function __construct(DefinitionProvider $definitionProvider = null)
     {
         $this->definitionProvider = $definitionProvider ?: new ReflectionDefinitionProvider();
@@ -122,10 +120,10 @@ CODE;
 CODE;
             }
 
-            foreach ($definition->propertyCasters as [$caster, $options]) {
-                $this->casterIndex++;
+            foreach ($definition->propertyCasters as $index => [$caster, $options]) {
+                $index++;
                 $casterOptions = var_export($options, true);
-                $casterName = $property . 'Caster' . $this->casterIndex;
+                $casterName = $property . 'Caster' . $index;
 
                 if ($caster) {
                     $body .= <<<CODE
