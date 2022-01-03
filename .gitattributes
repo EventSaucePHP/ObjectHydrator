@@ -10,4 +10,5 @@ phpunit.xml.dist export-ignore
 .gitattributes export-ignore
 .php-cs-fixer.php export-ignore
 README.md export-ignore
+CHANGELOG.md export-ignore
 composer.lock export-ignore
