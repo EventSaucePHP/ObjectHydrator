@@ -8,9 +8,17 @@ use EventSauce\ObjectHydrator\Fixtures\ExampleData;
 use EventSauce\ObjectHydrator\ObjectHydrator;
 use Generator;
 use League\ConstructFinder\ConstructFinder;
+use PhpBench\Attributes\AfterMethods;
+use PhpBench\Attributes\BeforeMethods;
+use PhpBench\Attributes\Iterations;
+use PhpBench\Attributes\ParamProviders;
+use PhpBench\Attributes\Warmup;
 use ReflectionClass;
 
 use function count;
+use function gc_collect_cycles;
+use function gc_disable;
+use function gc_enable;
 
 abstract class HydrationBenchCase
 {
@@ -41,10 +49,13 @@ abstract class HydrationBenchCase
         $this->exampleSeed = $examples;
     }
 
-    /**
-     * @ParamProviders({"provideSampleSizes"})
-     * @BeforeMethods({"prepareHydrator"})
-     */
+    #[
+        BeforeMethods(['prepareHydrator', 'disableGarbageCollector']),
+        AfterMethods(['enableGarbageCollector']),
+        ParamProviders('provideSampleSizes'),
+        Warmup(3),
+        Iterations(25),
+    ]
     public function benchObjectHydration(): void
     {
         foreach ($this->examples as [$className, $data]) {
@@ -52,8 +63,21 @@ abstract class HydrationBenchCase
         }
     }
 
+    public function disableGarbageCollector(): void
+    {
+        gc_disable();
+        gc_collect_cycles();
+    }
+
+    public function enableGarbageCollector(): void
+    {
+        gc_enable();
+        gc_collect_cycles();
+    }
+
     public function prepareHydrator(array $params): void
     {
+        gc_disable();
         $this->objectHydrator = $this->createObjectHydrator();
         $examples = [];
         [$scale] = $params;
@@ -71,9 +95,9 @@ abstract class HydrationBenchCase
     {
         $exampleCount = count($this->exampleSeed);
 
+        yield ($exampleCount * 1) => [1];
         yield ($exampleCount * 10) => [10];
-        yield ($exampleCount * 75) => [75];
-        yield ($exampleCount * 250) => [250];
+        yield ($exampleCount * 100) => [100];
         yield ($exampleCount * 500) => [500];
     }
 
