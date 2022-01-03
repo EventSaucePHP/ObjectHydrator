@@ -14,6 +14,9 @@
         "friendsofphp/php-cs-fixer": "^3.4",
         "phpbench/phpbench": "^1.2"
     },
+    "suggest": {
+        "league/construct-finder": "Find all classes in a directory for the best dumped hydrators."
+    },
     "autoload": {
         "psr-4": {
             "EventSauce\\ObjectHydrator\\": "src/"
