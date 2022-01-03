@@ -126,7 +126,7 @@ constructed object graph.
 ```php
 use EventSauce\ObjectHydrator\MapFrom;
 
-class BirthDay
+class BirthDate
 {
     public function __construct(
         public int $year,
@@ -140,7 +140,7 @@ class ExampleCommand
     public function __construct(
         public readonly string $name,
         #[MapFrom(['year_of_birth' => 'year', 'month', 'day'])]
-        public readonly int $birthYear,
+        public readonly BirthDate $birthDate,
     ) {}
 }
 
