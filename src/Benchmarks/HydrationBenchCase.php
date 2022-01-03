@@ -12,6 +12,7 @@ use PhpBench\Attributes\AfterMethods;
 use PhpBench\Attributes\BeforeMethods;
 use PhpBench\Attributes\Iterations;
 use PhpBench\Attributes\ParamProviders;
+use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
 use ReflectionClass;
 
@@ -54,7 +55,8 @@ abstract class HydrationBenchCase
         AfterMethods(['enableGarbageCollector']),
         ParamProviders('provideSampleSizes'),
         Warmup(3),
-        Iterations(25),
+        Iterations(10),
+        Revs(15)
     ]
     public function benchObjectHydration(): void
     {
