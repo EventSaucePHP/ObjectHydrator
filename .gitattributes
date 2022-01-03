@@ -2,6 +2,7 @@
 phpbench.json export-ignore
 phpbench-bootstrap.php export-ignore
 src/**/*Test.php export-ignore
+src/**/*TestCase.php export-ignore
 src/Fixtures export-ignore
 src/Benchmarks export-ignore
 src/FixturesFor81 export-ignore
