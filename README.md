@@ -440,12 +440,31 @@ $dumper = new DefinitionDumper();
 $classesToDump = [SomeCommand::class, AnotherCommand::class];
 
 $code = $dumper->dump($classesToDump, $dumpedClassNamed);
-file_put_contents('src/AcmeCorp/YourOptimizedDefinitionProvider.php');
+file_put_contents('src/AcmeCorp/YourOptimizedDefinitionProvider.php', $code);
 
 /** @var DefinitionProvider $hydrator */
 $hydrator = new AcmeCorp\YourOptimizedDefinitionProvider();
 $definitionForSomeObject = $hydrator->provideDefinition(SomeObject::class);
 ```
+
+### Tip: Use `league/construct-finder`
+
+You can use the construct finder package from The PHP League to find all classes in
+a given directory.
+
+```bash
+composer require league/construct-finder
+```
+
+```php
+use EventSauce\ObjectHydrator\DefinitionProvider;
+
+$classesToDump = ConstructFinder::locatedIn($directoryName)->findClassNames();
+
+$code = $dumper->dump($classesToDump, $dumpedClassNamed);
+file_put_contents('src/AcmeCorp/YourOptimizedDefinitionProvider.php', $code);
+```
+
 
 ## Alternatives
 
