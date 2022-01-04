@@ -5,7 +5,7 @@ complex object structure. The intended use of this utility is to receive request
 convert this into Command or Query object. The library is designed to follow a convention
 and does __not__ validate input.
 
-The object hydration can be achieved a **zero** expense, due to a ahead-of-time resolving of
+The object hydration can be achieved at **zero** expense, due to a ahead-of-time resolving of
 hydration steps using an [optimized dumper](#maximizing-performance).
 
 #### Quick links:
