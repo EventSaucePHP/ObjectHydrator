@@ -8,6 +8,22 @@ and does __not__ validate input.
 The object hydration can be achieved at **zero** expense, due to a ahead-of-time resolving of
 hydration steps using an [optimized dumper](#maximizing-performance).
 
+## Why does this library exist?
+
+That's a good question, so let's dig in. The primary driver for creating this tool was the desire
+to use objects (DTOs, Query and Command objects) to interact with a software model instead of
+using plain (raw) data. The use of objects makes code easier to understand as it provides clarity
+over what data is available, and what the data is intended for. The use of objects also prevents
+having to check for the availability and correctness of the data at every place of use, it can be
+checked once and trusted many times.
+
+Th use of objects also has down-sides, some more impactful than others. One of these is the
+burdon of converting data into objects, which is what this library aims to eliminate. By
+providing a predictable convention much of the conversion can be automated away. The use of
+instrumentation (in the form of property casters) expands these capabilities by allowing
+users to provide re-usable building blocks that provide full control as to how properties are
+converted from data to (complex) objects.
+
 #### Quick links:
 
 - [**Design goals**](#design-goals)
