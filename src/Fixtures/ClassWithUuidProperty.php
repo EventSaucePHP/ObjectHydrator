@@ -13,7 +13,6 @@ class ClassWithUuidProperty
     public function __construct(
         #[CastToUuid]
         public UuidInterface $id,
-    )
-    {
+    ) {
     }
 }
