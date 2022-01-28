@@ -489,3 +489,4 @@ the same, similar, or more than this package does.
 
 - [cuyz/valinor](https://github.com/CuyZ/Valinor)
 - [spatie/data-transfer-object](https://github.com/spatie/data-transfer-object)
+- [jane-php/automapper](https://github.com/janephp/janephp/tree/next/src/Component/AutoMapper)
