@@ -17,7 +17,7 @@ over what data is available, and what the data is intended for. The use of objec
 having to check for the availability and correctness of the data at every place of use, it can be
 checked once and trusted many times.
 
-Th use of objects also has down-sides, some more impactful than others. One of these is the
+The use of objects also has down-sides, some more impactful than others. One of these is the
 burdon of converting data into objects, which is what this library aims to eliminate. By
 providing a predictable convention much of the conversion can be automated away. The use of
 instrumentation (in the form of property casters) expands these capabilities by allowing
