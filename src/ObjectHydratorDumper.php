@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
-use function array_keys;
 use function array_pop;
+use function array_values;
 use function count;
 use function explode;
 use function implode;
@@ -86,7 +86,8 @@ CODE;
             $property = $definition->property;
 
             if (count($keys) === 1) {
-                $from = array_keys($keys)[0];
+                $from = array_values($keys)[0];
+                $from = implode('\'][\'', $from);
                 $body .= <<<CODE
 
             \$value = \$payload['$from'] ?? null;
@@ -99,10 +100,13 @@ CODE;
             } else {
                 $collectKeys = '';
 
-                foreach ($keys as $from => $to) {
+                foreach ($keys as $to => $from) {
+                    $from = implode('\'][\'', $from);
                     $collectKeys .= <<<CODE
 
-            if (array_key_exists('$from', \$payload)) {
+            \$to = \$payload['$from'] ?? null;
+
+            if (\$to !== null) {
                 \$value['$to'] = \$payload['$from'];
             }
 

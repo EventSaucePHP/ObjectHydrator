@@ -13,6 +13,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithNotCastedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyCasting;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyMappedFromNestedKey;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyThatUsesListCasting;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyThatUsesListCastingToClasses;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithStaticConstructor;
@@ -37,6 +38,32 @@ abstract class ObjectHydratorTestCase extends TestCase
 
         self::assertInstanceOf(ClassWithMappedStringProperty::class, $object);
         self::assertEquals('Frank', $object->name);
+    }
+
+    /**
+     * @test
+     */
+    public function mapping_a_nested_key(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        /** @var ClassWithPropertyMappedFromNestedKey $object */
+        $object = $hydrator->hydrateObject(ClassWithPropertyMappedFromNestedKey::class, ['nested' => ['name' => 'Frank']]);
+
+        self::assertInstanceOf(ClassWithPropertyMappedFromNestedKey::class, $object);
+        self::assertEquals('Frank', $object->name);
+    }
+
+    /**
+     * @test
+     */
+    public function trying_to_map_a_nested_key_from_shallow_input(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $this->expectExceptionObject(UnableToHydrateObject::dueToError(ClassWithPropertyMappedFromNestedKey::class));
+
+        $hydrator->hydrateObject(ClassWithPropertyMappedFromNestedKey::class, ['nested' => 'Frank']);
     }
 
     /**
