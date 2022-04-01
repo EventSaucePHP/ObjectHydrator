@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use Generator;
 use Throwable;
 use function array_key_exists;
 use function count;
@@ -84,6 +85,26 @@ class ObjectHydrator
             };
         } catch (Throwable $exception) {
             throw UnableToHydrateObject::dueToError($className, $exception);
+        }
+    }
+
+    /**
+     * @param class-string<T> $className
+     * @param iterable<array> $payloads;
+     *
+     * @return ListOfObjects<T>
+     */
+    public function hydrateObjects(string $className, iterable $payloads): ListOfObjects
+    {
+        $generator = $this->doHydrateObjects($className, $payloads);
+
+        return new ListOfObjects($generator);
+    }
+
+    private function doHydrateObjects(string $className, iterable $payloads): Generator
+    {
+        foreach ($payloads as $payload) {
+            yield $this->hydrateObject($className, $payload);
         }
     }
 }

@@ -42,6 +42,34 @@ abstract class ObjectHydratorTestCase extends TestCase
     /**
      * @test
      */
+    public function mapping_to_a_list_of_objects(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+        $input = [['my_name' => 'Frank'], ['my_name' => 'Renske']];
+
+        $objects = $hydrator->hydrateObjects(ClassWithMappedStringProperty::class, $input);
+
+        self::assertContainsOnlyInstancesOf(ClassWithMappedStringProperty::class, $objects);
+    }
+
+    /**
+     * @test
+     */
+    public function mapping_to_an_array_of_objects(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+        $input = [['my_name' => 'Frank'], ['my_name' => 'Renske']];
+
+        $objects = $hydrator->hydrateObjects(ClassWithMappedStringProperty::class, $input)->toArray();
+
+        self::assertIsArray($objects);
+        self::assertCount(2, $objects);
+        self::assertContainsOnlyInstancesOf(ClassWithMappedStringProperty::class, $objects);
+    }
+
+    /**
+     * @test
+     */
     public function properties_are_mapped_by_name_by_default(): void
     {
         $hydrator = $this->createObjectHydrator();
