@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use Attribute;
-use function is_int;
 use function is_string;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
@@ -20,7 +19,7 @@ final class MapFrom
             $this->keys[$keyOrMap] = $keyOrMap;
         } else {
             foreach ($keyOrMap as $index => $key) {
-                $this->keys[is_int($index) ? $key : $index] = $key;
+                $this->keys[is_string($index) ? $index : $key] = $key;
             }
         }
     }
