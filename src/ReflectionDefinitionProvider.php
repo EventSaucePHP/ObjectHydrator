@@ -40,7 +40,7 @@ final class ReflectionDefinitionProvider implements DefinitionProvider
             $firstTypeName = $parameterType->firstTypeName();
             $definition = [
                 'property' => $paramName,
-                'keys' => [$paramName => $paramName],
+                'keys' => [$paramName => [$paramName]],
                 'enum' => $parameterType->isEnum(),
             ];
 

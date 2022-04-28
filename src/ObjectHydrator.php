@@ -45,10 +45,19 @@ class ObjectHydrator
             foreach ($classDefinition->propertyDefinitions as $definition) {
                 $value = [];
 
-                foreach ($definition->keys as $from => $to) {
-                    if (array_key_exists($from, $payload)) {
-                        $value[$to] = $payload[$from];
+                foreach ($definition->keys as $to => $from) {
+                    $p = $payload;
+
+                    foreach ($from as $fromSegment) {
+                        if ( ! is_array($p) || ! array_key_exists($fromSegment, $p)) {
+                            goto next_property;
+                        }
+                        $p = $p[$fromSegment];
                     }
+
+                    $value[$to] = $p;
+
+                    next_property:
                 }
 
                 if ($value === []) {
