@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added ability to define nested input (#12)
+- Added ability to define nested input ([#12](https://github.com/EventSaucePHP/ObjectHydrator/pull/12))
 
 ## [0.2.0] - 2022-04-01
 
