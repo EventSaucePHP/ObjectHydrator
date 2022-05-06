@@ -31,6 +31,7 @@ class ObjectHydrator
     }
 
     /**
+     * @template T
      * @param class-string<T> $className
      *
      * @return T
@@ -98,6 +99,7 @@ class ObjectHydrator
     }
 
     /**
+     * @template T
      * @param class-string<T> $className
      * @param iterable<array> $payloads;
      *
