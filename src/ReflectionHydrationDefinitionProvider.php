@@ -25,7 +25,7 @@ final class ReflectionHydrationDefinitionProvider implements HydrationDefinition
         $this->keyFormatter = $keyFormatter ?? new KeyFormattingWithoutConversion();
     }
 
-    public function provideDefinition(string $className): ClassDefinition
+    public function provideDefinition(string $className): ClassHydrationDefinition
     {
         $reflectionClass = new ReflectionClass($className);
         $constructor = $this->resolveConstructor($reflectionClass);
@@ -78,7 +78,7 @@ final class ReflectionHydrationDefinitionProvider implements HydrationDefinition
             );
         }
 
-        return new ClassDefinition($constructorName, $constructionStyle, ...$definitions);
+        return new ClassHydrationDefinition($constructorName, $constructionStyle, ...$definitions);
     }
 
     private function normalizeType(?ReflectionType $type): PropertyType

@@ -12,7 +12,7 @@ use function file_put_contents;
 use function is_file;
 use function unlink;
 
-class DefinitionDumperTest extends TestCase
+class HydrationDefinitionDumperTest extends TestCase
 {
     /**
      * @before
@@ -40,7 +40,7 @@ class DefinitionDumperTest extends TestCase
         $provider = new $className();
         $definition = $provider->provideDefinition(ClassWithComplexTypeThatIsMapped::class);
 
-        self::assertInstanceOf(ClassDefinition::class, $definition);
+        self::assertInstanceOf(ClassHydrationDefinition::class, $definition);
     }
 
     /**
@@ -59,7 +59,7 @@ class DefinitionDumperTest extends TestCase
         $provider = new $className();
         $definition = $provider->provideDefinition(ClassThatContainsAnotherClass::class);
 
-        self::assertInstanceOf(ClassDefinition::class, $definition);
+        self::assertInstanceOf(ClassHydrationDefinition::class, $definition);
         self::assertEquals(ClassThatContainsAnotherClass::class, $definition->constructor);
     }
 }

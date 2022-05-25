@@ -18,7 +18,7 @@ final class ObjectHydratorDumper
 
     public function __construct(HydrationDefinitionProvider $definitionProvider = null)
     {
-        $this->definitionProvider = $definitionProvider ?: new ReflectionHydrationDefinitionProvider();
+        $this->definitionProvider = $definitionProvider ?? new ReflectionHydrationDefinitionProvider();
     }
 
     public function dump(array $classes, string $dumpedClassName): string
@@ -26,7 +26,7 @@ final class ObjectHydratorDumper
         $parts = explode('\\', $dumpedClassName);
         $shortName = array_pop($parts);
         $namespace = implode('\\', $parts);
-        $classes = ClassExpander::expandClasses($classes, $this->definitionProvider);
+        $classes = ClassExpander::expandClassesForHydration($classes, $this->definitionProvider);
         $hydrators = [];
         $hydratorMap = [];
 
@@ -78,7 +78,7 @@ class $shortName extends ObjectHydrator
 CODE;
     }
 
-    private function dumpClassHydrator(string $className, ClassDefinition $classDefinition)
+    private function dumpClassHydrator(string $className, ClassHydrationDefinition $classDefinition)
     {
         $body = '';
         foreach ($classDefinition->propertyDefinitions as $definition) {

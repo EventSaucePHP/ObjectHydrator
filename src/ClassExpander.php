@@ -21,7 +21,7 @@ final class ClassExpander
     {
     }
 
-    public static function expandClasses(array $classes, HydrationDefinitionProvider $definitionProvider): array
+    public static function expandClassesForHydration(array $classes, HydrationDefinitionProvider $definitionProvider): array
     {
         $classes = array_values($classes);
 

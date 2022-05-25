@@ -14,5 +14,5 @@ interface HydrationDefinitionProvider
     /**
      * @throws Throwable
      */
-    public function provideDefinition(string $className): ClassDefinition;
+    public function provideDefinition(string $className): ClassHydrationDefinition;
 }

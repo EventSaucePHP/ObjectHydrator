@@ -24,7 +24,7 @@ final class HydrationDefinitionDumper
      */
     public function dump(array $classNames, string $dumpedClassName): string
     {
-        $classNames = ClassExpander::expandClasses($classNames, $this->definitionProvider);
+        $classNames = ClassExpander::expandClassesForHydration($classNames, $this->definitionProvider);
         $sections = [];
         foreach ($classNames as $className) {
             $definition = $this->definitionProvider->provideDefinition($className);
@@ -44,7 +44,7 @@ declare(strict_types=1);
 
 namespace $namespace {
 
-use EventSauce\ObjectHydrator\ClassDefinition;
+use EventSauce\ObjectHydrator\ClassHydrationDefinition;
 use EventSauce\ObjectHydrator\HydrationDefinitionProvider;
 use EventSauce\ObjectHydrator\PropertyHydrationDefinition;
 use LogicException;
@@ -60,7 +60,7 @@ class $shortName implements HydrationDefinitionProvider
         ];
     }
 
-    public function provideDefinition(string \$className): ClassDefinition
+    public function provideDefinition(string \$className): ClassHydrationDefinition
     {
         \$definition = \$this->definitions[\$className] ?? null;
         
@@ -76,7 +76,7 @@ class $shortName implements HydrationDefinitionProvider
 CODE;
     }
 
-    private function dumpClassDefinition(ClassDefinition $definition): string
+    private function dumpClassDefinition(ClassHydrationDefinition $definition): string
     {
         $constructor = $definition->constructor;
         $constructionStyle = $definition->constructionStyle;
@@ -89,7 +89,7 @@ CODE;
         $propertyCode = implode(",\n", $properties);
 
         return <<<CODE
-new ClassDefinition(
+new ClassHydrationDefinition(
     '$constructor',
     '$constructionStyle',
     $propertyCode
