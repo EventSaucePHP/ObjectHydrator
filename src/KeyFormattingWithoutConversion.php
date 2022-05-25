@@ -10,4 +10,9 @@ class KeyFormattingWithoutConversion implements KeyFormatter
     {
         return $propertyName;
     }
+
+    public function keyToPropertyName(string $key): string
+    {
+        return $key;
+    }
 }

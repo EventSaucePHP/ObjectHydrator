@@ -10,12 +10,20 @@ use EventSauce\ObjectHydrator\PropertyCasters\CastToDateTimeImmutable;
 use EventSauce\ObjectHydrator\PropertyCasters\CastToUuid;
 use Ramsey\Uuid\UuidInterface;
 
-class DefaultCasterRepository
+final class DefaultCasterRepository
 {
     /** @var array<string, array<string, array>> */
     private array $casters = [];
 
+    /**
+     * BC forwarding function
+     */
     public static function buildIn(): static
+    {
+        return static::builtIn();
+    }
+
+    public static function builtIn(): static
     {
         $repository = new static();
         $repository->registerDefaultCaster(DateTimeImmutable::class, CastToDateTimeImmutable::class);

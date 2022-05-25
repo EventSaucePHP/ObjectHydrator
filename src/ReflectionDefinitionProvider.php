@@ -21,7 +21,7 @@ final class ReflectionDefinitionProvider implements DefinitionProvider
         DefaultCasterRepository $defaultCasterRepository = null,
         KeyFormatter $keyFormatter = null,
     ) {
-        $this->defaultCasterRepository = $defaultCasterRepository ?? DefaultCasterRepository::buildIn();
+        $this->defaultCasterRepository = $defaultCasterRepository ?? DefaultCasterRepository::builtIn();
         $this->keyFormatter = $keyFormatter ?? new KeyFormattingWithoutConversion();
     }
 
