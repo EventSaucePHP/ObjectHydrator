@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator\Benchmarks;
 
 use EventSauce\ObjectHydrator\ObjectHydrator;
-use EventSauce\ObjectHydrator\ReflectionHydrationDefinitionProvider;
+use EventSauce\ObjectHydrator\HydrationDefinitionProviderUsingReflection;
 
 class ReflectionHydrationBench extends HydrationBenchCase
 {

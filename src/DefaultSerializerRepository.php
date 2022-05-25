@@ -44,4 +44,9 @@ class DefaultSerializerRepository
     {
         return $this->serializersPerType[$type] ?? null;
     }
+
+    public function allSerializersPerType(): array
+    {
+        return $this->serializersPerType;
+    }
 }

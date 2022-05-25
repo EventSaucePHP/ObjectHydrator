@@ -12,7 +12,7 @@ use ReflectionUnionType;
 use function count;
 use function is_a;
 
-final class ReflectionHydrationDefinitionProvider implements HydrationDefinitionProvider
+final class HydrationDefinitionProviderUsingReflection implements HydrationDefinitionProvider
 {
     private DefaultCasterRepository $defaultCasterRepository;
     private KeyFormatter $keyFormatter;

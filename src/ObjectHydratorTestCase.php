@@ -168,7 +168,7 @@ abstract class ObjectHydratorTestCase extends TestCase
     public function using_default_key_conversion_from_snake_case(): void
     {
         $hydrator = $this->createObjectHydrator(
-            new ReflectionHydrationDefinitionProvider(null, new KeyFormatterForSnakeCasing())
+            new HydrationDefinitionProviderUsingReflection(null, new KeyFormatterForSnakeCasing())
         );
 
         $object = $hydrator->hydrateObject(ClassWithCamelCaseProperty::class, ['snake_case' => 'camelCase']);

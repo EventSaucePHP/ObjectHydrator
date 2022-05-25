@@ -6,5 +6,8 @@ namespace EventSauce\ObjectHydrator;
 
 interface ObjectSerializer
 {
+    /**
+     * @throws UnableToSerializeObject
+     */
     public function serializeObject(object $object): mixed;
 }

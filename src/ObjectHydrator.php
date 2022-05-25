@@ -28,7 +28,7 @@ class ObjectHydrator
     public function __construct(
         ?HydrationDefinitionProvider $definitionProvider = null,
     ) {
-        $this->definitionProvider = $definitionProvider ?: new ReflectionHydrationDefinitionProvider();
+        $this->definitionProvider = $definitionProvider ?: new HydrationDefinitionProviderUsingReflection();
     }
 
     /**
@@ -36,6 +36,7 @@ class ObjectHydrator
      * @param class-string<T> $className
      *
      * @return T
+     * @throws UnableToHydrateObject
      */
     public function hydrateObject(string $className, array $payload): object
     {
@@ -105,6 +106,7 @@ class ObjectHydrator
      * @param iterable<array> $payloads;
      *
      * @return ListOfObjects<T>
+     * @throws UnableToHydrateObject
      */
     public function hydrateObjects(string $className, iterable $payloads): ListOfObjects
     {
