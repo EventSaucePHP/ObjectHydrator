@@ -39,7 +39,7 @@ class DefaultSerializerRepository
         $this->serializersPerType[$type] = [$serializerClass, $arguments];
     }
 
-    public function serializerForType(string $type, array $arguments): ?array
+    public function serializerForType(string $type): ?array
     {
         return $this->serializersPerType[$type] ?? null;
     }
