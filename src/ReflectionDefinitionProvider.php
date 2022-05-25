@@ -40,7 +40,7 @@ final class ReflectionDefinitionProvider implements DefinitionProvider
 
         foreach ($parameters as $parameter) {
             $paramName = $parameter->getName();
-            $key = $this->keyFormatter->formatPropertyName($paramName);
+            $key = $this->keyFormatter->propertyNameToKey($paramName);
             $parameterType = $this->normalizeType($parameter->getType());
             $firstTypeName = $parameterType->firstTypeName();
             $definition = [

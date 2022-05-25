@@ -6,5 +6,5 @@ namespace EventSauce\ObjectHydrator;
 
 interface KeyFormatter
 {
-    public function formatPropertyName(string $propertyName): string;
+    public function propertyNameToKey(string $propertyName): string;
 }
