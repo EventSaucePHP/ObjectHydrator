@@ -10,7 +10,7 @@ use function explode;
 use function implode;
 use function var_export;
 
-final class DefinitionDumper
+final class HydrationDefinitionDumper
 {
     private HydrationDefinitionProvider $definitionProvider;
 

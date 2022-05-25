@@ -28,7 +28,7 @@ class DefinitionDumperTest extends TestCase
      */
     public function dumping_a_definition(): void
     {
-        $dumper = new DefinitionDumper();
+        $dumper = new HydrationDefinitionDumper();
 
         $dumpedDefinition = $dumper->dump(
             [ClassWithComplexTypeThatIsMapped::class],
@@ -49,7 +49,7 @@ class DefinitionDumperTest extends TestCase
      */
     public function dumping_all_definitions_of_a_directory(): void
     {
-        $dumper = new DefinitionDumper();
+        $dumper = new HydrationDefinitionDumper();
         $classes = ConstructFinder::locatedIn(__DIR__ . '/Fixtures')->findAllNames();
 
         $dumpedDefinition = $dumper->dump($classes, $className = 'Dummy\\AnotherDefinitionProvider');

@@ -448,18 +448,18 @@ $someObject = $hydrator->hydrateObject(SomeObject::class, $payload);
 When only need a cached version of the class and property definitions, you can dump those too.
 
 ```php
-use EventSauce\ObjectHydrator\DefinitionProvider;
-use EventSauce\ObjectHydrator\DefinitionDumper;
+use EventSauce\ObjectHydrator\HydrationDefinitionProvider;
+use EventSauce\ObjectHydrator\HydrationDefinitionDumper;
 
-$dumpedClassNamed = "AcmeCorp\\YourOptimizedDefinitionProvider";
-$dumper = new DefinitionDumper();
+$dumpedClassNamed = "AcmeCorp\\YourOptimizedHydrationDefinitionProvider";
+$dumper = new HydrationDefinitionDumper();
 $classesToDump = [SomeCommand::class, AnotherCommand::class];
 
 $code = $dumper->dump($classesToDump, $dumpedClassNamed);
-file_put_contents('src/AcmeCorp/YourOptimizedDefinitionProvider.php', $code);
+file_put_contents('src/AcmeCorp/YourOptimizedHydrationDefinitionProvider.php', $code);
 
-/** @var DefinitionProvider $hydrator */
-$hydrator = new AcmeCorp\YourOptimizedDefinitionProvider();
+/** @var HydrationDefinitionProvider $hydrator */
+$hydrator = new AcmeCorp\YourOptimizedHydrationDefinitionProvider();
 $definitionForSomeObject = $hydrator->provideDefinition(SomeObject::class);
 ```
 
@@ -473,12 +473,12 @@ composer require league/construct-finder
 ```
 
 ```php
-use EventSauce\ObjectHydrator\DefinitionProvider;
+use EventSauce\ObjectHydrator\HydrationDefinitionProvider;
 
 $classesToDump = ConstructFinder::locatedIn($directoryName)->findClassNames();
 
 $code = $dumper->dump($classesToDump, $dumpedClassNamed);
-file_put_contents('src/AcmeCorp/YourOptimizedDefinitionProvider.php', $code);
+file_put_contents('src/AcmeCorp/YourOptimizedHydrationDefinitionProvider.php', $code);
 ```
 
 
