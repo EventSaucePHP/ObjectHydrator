@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use ReflectionAttribute;
+use ReflectionClass;
 use ReflectionMethod;
 use ReflectionObject;
 
 use ReflectionProperty;
 
+use function get_class;
 use function is_a;
 use function is_scalar;
 
@@ -26,10 +28,18 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
         $this->keyFormatter = $keyFormatter ?? new KeyFormatterForSnakeCasing();
     }
 
-    public function serializeObject(object $object): array
+    public function serializeObject(object $object): mixed
     {
         $result = [];
-        $reflection = new ReflectionObject($object);
+        $objectType = get_class($object);
+
+        if ($serializer = $this->serializers->serializerForType($objectType)) {
+            [$serializerClass, $arguments] = $serializer;
+
+            return (new $serializerClass(...$arguments))->serialize($object, $this);
+        }
+
+        $reflection = new ReflectionClass($objectType);
         $publicMethod = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
 
         foreach ($publicMethod as $method) {

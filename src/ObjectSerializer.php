@@ -6,5 +6,5 @@ namespace EventSauce\ObjectHydrator;
 
 interface ObjectSerializer
 {
-    public function serializeObject(object $object): array;
+    public function serializeObject(object $object): mixed;
 }

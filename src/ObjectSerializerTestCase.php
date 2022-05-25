@@ -9,6 +9,7 @@ use DateTimeImmutable;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCaseProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCasePublicMethod;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCustomDateTimeSerialization;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithListOfObjects;
 use PHPUnit\Framework\TestCase;
 
 abstract class ObjectSerializerTestCase extends TestCase
@@ -39,6 +40,40 @@ abstract class ObjectSerializerTestCase extends TestCase
         $payload = $serializer->serializeObject($object);
 
         self::assertEquals(['camel_case' => 'some_property'], $payload);
+    }
+
+    /**
+     * @test
+     */
+    public function serializing_a_list_of_custom_objects(): void
+    {
+        $serializer = $this->objectSerializer();
+        $object = new ClassWithListOfObjects([
+            new ClassWithCamelCasePublicMethod('first_element'),
+            new ClassWithCamelCasePublicMethod('second_element'),
+        ]);
+
+        $payload = $serializer->serializeObject($object);
+
+        self::assertEquals(['children' => [
+            ['camel_case' => 'first_element'],
+            ['camel_case' => 'second_element'],
+        ]], $payload);
+    }
+
+    /**
+     * @test
+     */
+    public function serializing_a_list_of_internal_objects(): void
+    {
+        $serializer = $this->objectSerializer();
+        $now = new DateTimeImmutable();
+        $nowFormatted = $now->format('Y-m-d H:i:s.uO');
+        $object = new ClassWithListOfObjects([$now]);
+
+        $payload = $serializer->serializeObject($object);
+
+        self::assertEquals(['children' => [$nowFormatted]], $payload);
     }
 
     /**
