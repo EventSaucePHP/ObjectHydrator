@@ -8,6 +8,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassThatContainsAnotherClass;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatHasMultipleCastersOnSingleProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatRenamesInputForClassWithMultipleProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatUsesClassWithMultipleProperties;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCaseProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
@@ -48,7 +49,10 @@ abstract class ObjectHydratorTestCase extends TestCase
         $hydrator = $this->createObjectHydrator();
 
         /** @var ClassWithPropertyMappedFromNestedKey $object */
-        $object = $hydrator->hydrateObject(ClassWithPropertyMappedFromNestedKey::class, ['nested' => ['name' => 'Frank']]);
+        $object = $hydrator->hydrateObject(
+            ClassWithPropertyMappedFromNestedKey::class,
+            ['nested' => ['name' => 'Frank']]
+        );
 
         self::assertInstanceOf(ClassWithPropertyMappedFromNestedKey::class, $object);
         self::assertEquals('Frank', $object->name);
@@ -155,6 +159,21 @@ abstract class ObjectHydratorTestCase extends TestCase
 
         self::assertInstanceOf(ClassWithPropertyThatUsesListCastingToClasses::class, $object);
         self::assertEquals($expectedChildren, $object->children);
+    }
+
+    /**
+     * @test
+     */
+    public function using_default_key_conversion_from_snake_case(): void
+    {
+        $hydrator = $this->createObjectHydrator(
+            new ReflectionDefinitionProvider(null, new KeyFormatterForSnakeCasing())
+        );
+
+        $object = $hydrator->hydrateObject(ClassWithCamelCaseProperty::class, ['snake_case' => 'camelCase']);
+
+        self::assertInstanceOf(ClassWithCamelCaseProperty::class, $object);
+        self::assertEquals('camelCase', $object->snakeCase);
     }
 
     /**
@@ -324,5 +343,5 @@ abstract class ObjectHydratorTestCase extends TestCase
         return $this->createObjectHydrator();
     }
 
-    abstract protected function createObjectHydrator(): ObjectHydrator;
+    abstract protected function createObjectHydrator(DefinitionProvider $definitionProvider = null): ObjectHydrator;
 }

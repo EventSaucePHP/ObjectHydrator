@@ -15,10 +15,14 @@ use function is_a;
 final class ReflectionDefinitionProvider implements DefinitionProvider
 {
     private DefaultCasterRepository $defaultCasterRepository;
+    private KeyFormatter $keyFormatter;
 
-    public function __construct(DefaultCasterRepository $defaultCasterRepository = null)
-    {
-        $this->defaultCasterRepository = $defaultCasterRepository ?: DefaultCasterRepository::buildIn();
+    public function __construct(
+        DefaultCasterRepository $defaultCasterRepository = null,
+        KeyFormatter $keyFormatter = null,
+    ) {
+        $this->defaultCasterRepository = $defaultCasterRepository ?? DefaultCasterRepository::buildIn();
+        $this->keyFormatter = $keyFormatter ?? new KeyFormattingWithoutConversion();
     }
 
     public function provideDefinition(string $className): ClassDefinition
@@ -36,11 +40,12 @@ final class ReflectionDefinitionProvider implements DefinitionProvider
 
         foreach ($parameters as $parameter) {
             $paramName = $parameter->getName();
+            $key = $this->keyFormatter->propertyNameToKey($paramName);
             $parameterType = $this->normalizeType($parameter->getType());
             $firstTypeName = $parameterType->firstTypeName();
             $definition = [
                 'property' => $paramName,
-                'keys' => [$paramName => [$paramName]],
+                'keys' => [$key => [$key]],
                 'enum' => $parameterType->isEnum(),
             ];
 

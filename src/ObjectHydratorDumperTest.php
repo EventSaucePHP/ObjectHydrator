@@ -7,18 +7,20 @@ namespace EventSauce\ObjectHydrator;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use League\ConstructFinder\ConstructFinder;
 use function class_exists;
+use function spl_object_hash;
 use function strpos;
+use function unlink;
 
 class ObjectHydratorDumperTest extends ObjectHydratorTestCase
 {
+    private ReflectionDefinitionProvider $defaultDefintionProvider;
+
     /**
      * @before
-     * @after
      */
-    public function removeTestFile(): void
+    public function setupDefaultDefinitionProvider(): void
     {
-        is_file(__DIR__ . '/test80.php') && unlink(__DIR__ . '/test80.php');
-        is_file(__DIR__ . '/test81.php') && unlink(__DIR__ . '/test81.php');
+        $this->defaultDefintionProvider = new ReflectionDefinitionProvider();
     }
 
     /**
@@ -33,14 +35,14 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
         self::assertInstanceOf(ClassWithMappedStringProperty::class, $object);
     }
 
-    private function createDumpedObjectHydrator(string $directory, string $className): ObjectHydrator
+    private function createDumpedObjectHydrator(string $directory, string $className, DefinitionProvider $definitionProvider): ObjectHydrator
     {
         if (class_exists($className, false)) {
             goto create_object_hydrator;
         }
 
         $classes = ConstructFinder::locatedIn($directory)->findClassNames();
-        $dumper = new ObjectHydratorDumper();
+        $dumper = new ObjectHydratorDumper($definitionProvider);
 
         $dumpedDefinition = $dumper->dump(
             $classes,
@@ -50,6 +52,7 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
 
         file_put_contents($filename, $dumpedDefinition);
         include $filename;
+        unlink($filename);
 
         create_object_hydrator:
         /** @var ObjectHydrator $objectHydrator */
@@ -58,13 +61,16 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
         return $objectHydrator;
     }
 
-    protected function createObjectHydrator(): ObjectHydrator
+    protected function createObjectHydrator(DefinitionProvider $definitionProvider = null): ObjectHydrator
     {
-        return $this->createDumpedObjectHydrator(__DIR__ . '/Fixtures', 'AcmeCorp\\DumpedHydrator');
+        $definitionProvider ??= $this->defaultDefintionProvider;
+        $className = 'AcmeCorp\\DumpedHydrator' . spl_object_hash($definitionProvider);
+
+        return $this->createDumpedObjectHydrator(__DIR__ . '/Fixtures', $className, $definitionProvider);
     }
 
     protected function createObjectHydratorFor81(): ObjectHydrator
     {
-        return $this->createDumpedObjectHydrator(__DIR__ . '/FixturesFor81', 'AcmeCorp\\DumpedHydratorFor81');
+        return $this->createDumpedObjectHydrator(__DIR__ . '/FixturesFor81', 'AcmeCorp\\DumpedHydratorFor81', $this->defaultDefintionProvider);
     }
 }
