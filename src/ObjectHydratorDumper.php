@@ -14,11 +14,11 @@ use function var_export;
 
 final class ObjectHydratorDumper
 {
-    private DefinitionProvider $definitionProvider;
+    private HydrationDefinitionProvider $definitionProvider;
 
-    public function __construct(DefinitionProvider $definitionProvider = null)
+    public function __construct(HydrationDefinitionProvider $definitionProvider = null)
     {
-        $this->definitionProvider = $definitionProvider ?: new ReflectionDefinitionProvider();
+        $this->definitionProvider = $definitionProvider ?: new ReflectionHydrationDefinitionProvider();
     }
 
     public function dump(array $classes, string $dumpedClassName): string

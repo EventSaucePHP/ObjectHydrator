@@ -18,7 +18,7 @@ use function json_encode;
  */
 class ObjectHydrator
 {
-    private ?DefinitionProvider $definitionProvider;
+    private ?HydrationDefinitionProvider $definitionProvider;
 
     /**
      * @var array<class-string<I>, I>
@@ -26,9 +26,9 @@ class ObjectHydrator
     private $casterInstances;
 
     public function __construct(
-        ?DefinitionProvider $definitionProvider = null,
+        ?HydrationDefinitionProvider $definitionProvider = null,
     ) {
-        $this->definitionProvider = $definitionProvider ?: new ReflectionDefinitionProvider();
+        $this->definitionProvider = $definitionProvider ?: new ReflectionHydrationDefinitionProvider();
     }
 
     /**

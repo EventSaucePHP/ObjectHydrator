@@ -13,14 +13,14 @@ use function unlink;
 
 class ObjectHydratorDumperTest extends ObjectHydratorTestCase
 {
-    private ReflectionDefinitionProvider $defaultDefintionProvider;
+    private ReflectionHydrationDefinitionProvider $defaultDefintionProvider;
 
     /**
      * @before
      */
     public function setupDefaultDefinitionProvider(): void
     {
-        $this->defaultDefintionProvider = new ReflectionDefinitionProvider();
+        $this->defaultDefintionProvider = new ReflectionHydrationDefinitionProvider();
     }
 
     /**
@@ -35,7 +35,7 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
         self::assertInstanceOf(ClassWithMappedStringProperty::class, $object);
     }
 
-    private function createDumpedObjectHydrator(string $directory, string $className, DefinitionProvider $definitionProvider): ObjectHydrator
+    private function createDumpedObjectHydrator(string $directory, string $className, HydrationDefinitionProvider $definitionProvider): ObjectHydrator
     {
         if (class_exists($className, false)) {
             goto create_object_hydrator;
@@ -61,7 +61,7 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
         return $objectHydrator;
     }
 
-    protected function createObjectHydrator(DefinitionProvider $definitionProvider = null): ObjectHydrator
+    protected function createObjectHydrator(HydrationDefinitionProvider $definitionProvider = null): ObjectHydrator
     {
         $definitionProvider ??= $this->defaultDefintionProvider;
         $className = 'AcmeCorp\\DumpedHydrator' . spl_object_hash($definitionProvider);

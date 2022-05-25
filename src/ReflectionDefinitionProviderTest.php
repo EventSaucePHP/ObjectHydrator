@@ -14,7 +14,7 @@ class ReflectionDefinitionProviderTest extends TestCase
      */
     public function internal_classes_are_not_hydratable(): void
     {
-        $provider = new ReflectionDefinitionProvider();
+        $provider = new ReflectionHydrationDefinitionProvider();
 
         $definition = $provider->provideDefinition(ClassWithFormattedDateTimeInput::class);
         $dateTimeProperty = $definition->propertyDefinitions[0];

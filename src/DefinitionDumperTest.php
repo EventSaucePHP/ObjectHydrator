@@ -36,7 +36,7 @@ class DefinitionDumperTest extends TestCase
         );
         file_put_contents(__DIR__ . '/test.php', $dumpedDefinition);
         include __DIR__ . '/test.php';
-        /** @var DefinitionProvider $provider */
+        /** @var HydrationDefinitionProvider $provider */
         $provider = new $className();
         $definition = $provider->provideDefinition(ClassWithComplexTypeThatIsMapped::class);
 
@@ -55,7 +55,7 @@ class DefinitionDumperTest extends TestCase
         $dumpedDefinition = $dumper->dump($classes, $className = 'Dummy\\AnotherDefinitionProvider');
         file_put_contents(__DIR__ . '/test.php', $dumpedDefinition);
         include __DIR__ . '/test.php';
-        /** @var DefinitionProvider $provider */
+        /** @var HydrationDefinitionProvider $provider */
         $provider = new $className();
         $definition = $provider->provideDefinition(ClassThatContainsAnotherClass::class);
 

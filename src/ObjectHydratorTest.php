@@ -6,7 +6,7 @@ namespace EventSauce\ObjectHydrator;
 
 class ObjectHydratorTest extends ObjectHydratorTestCase
 {
-    protected function createObjectHydrator(DefinitionProvider $definitionProvider = null): ObjectHydrator
+    protected function createObjectHydrator(HydrationDefinitionProvider $definitionProvider = null): ObjectHydrator
     {
         return new ObjectHydrator($definitionProvider);
     }

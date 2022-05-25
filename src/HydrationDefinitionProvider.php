@@ -9,7 +9,7 @@ use Throwable;
 /**
  * @internal
  */
-interface DefinitionProvider
+interface HydrationDefinitionProvider
 {
     /**
      * @throws Throwable

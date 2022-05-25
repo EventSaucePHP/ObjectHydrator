@@ -12,11 +12,11 @@ use function var_export;
 
 final class DefinitionDumper
 {
-    private DefinitionProvider $definitionProvider;
+    private HydrationDefinitionProvider $definitionProvider;
 
-    public function __construct(DefinitionProvider $definitionProvider = null)
+    public function __construct(HydrationDefinitionProvider $definitionProvider = null)
     {
-        $this->definitionProvider = $definitionProvider ?: new ReflectionDefinitionProvider();
+        $this->definitionProvider = $definitionProvider ?: new ReflectionHydrationDefinitionProvider();
     }
 
     /**
@@ -45,11 +45,11 @@ declare(strict_types=1);
 namespace $namespace {
 
 use EventSauce\ObjectHydrator\ClassDefinition;
-use EventSauce\ObjectHydrator\DefinitionProvider;
+use EventSauce\ObjectHydrator\HydrationDefinitionProvider;
 use EventSauce\ObjectHydrator\PropertyHydrationDefinition;
 use LogicException;
 
-class $shortName implements DefinitionProvider
+class $shortName implements HydrationDefinitionProvider
 {
     private array \$definitions;
 
