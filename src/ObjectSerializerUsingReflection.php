@@ -40,7 +40,7 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
             $methodName = $method->getShortName();
             $key = $this->keyFormatter->propertyNameToKey($methodName);
             $value = $method->invoke($object);
-            $value = $this->serializeValue($value, $method->getAttributes());
+            $value = $this->serializeValue($method->getReturnType()->getName(), $value, $method->getAttributes());
             $result[$key] = $value;
         }
 
@@ -53,7 +53,7 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
 
             $key = $this->keyFormatter->propertyNameToKey($property->getName());
             $value = $property->getValue($object);
-            $value = $this->serializeValue($value, $property->getAttributes());
+            $value = $this->serializeValue($property->getType()->getName(), $value, $property->getAttributes());
             $result[$key] = $value;
         }
 
@@ -63,19 +63,26 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
     /**
      * @param ReflectionAttribute[] $attributes
      */
-    private function serializeValue(mixed $value, array $attributes): mixed
+    private function serializeValue(string $type, mixed $value, array $attributes): mixed
     {
+        $serializer = null;
+
         foreach ($attributes as $attribute) {
             $type = $attribute->getName();
 
-            if ( ! is_a($type, TypeSerializer::class, true)) {
-                continue;
+            if (is_a($type, TypeSerializer::class, true)) {
+                $serializer = [$attribute->getName(), $attribute->getArguments()];
+                break;
             }
+        }
 
-            /** @var TypeSerializer $instance */
-            $instance = $attribute->newInstance();
+        $serializer ??= $this->serializers->serializerForType($type);
 
-            return $instance->serialize($value, $this);
+        if ($serializer !== null) {
+            [$serializerClass, $arguments] = $serializer;
+            /** @var TypeSerializer $serializer */
+            $serializer = new $serializerClass(...$arguments);
+            $value = $serializer->serialize($value, $this);
         }
 
         return $value;
