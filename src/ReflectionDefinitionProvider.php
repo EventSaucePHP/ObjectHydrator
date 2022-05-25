@@ -30,7 +30,7 @@ final class ReflectionDefinitionProvider implements DefinitionProvider
         $reflectionClass = new ReflectionClass($className);
         $constructor = $this->resolveConstructor($reflectionClass);
 
-        /** @var PropertyDefinition[] $definitions */
+        /** @var PropertyHydrationDefinition[] $definitions */
         $definitions = [];
 
         $constructionStyle = $constructor instanceof ReflectionMethod ? $constructor->isConstructor(
@@ -68,7 +68,7 @@ final class ReflectionDefinitionProvider implements DefinitionProvider
                 $casters = [$defaultCaster];
             }
 
-            $definitions[] = new PropertyDefinition(
+            $definitions[] = new PropertyHydrationDefinition(
                 $definition['keys'],
                 $definition['property'],
                 $casters,

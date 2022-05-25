@@ -7,7 +7,7 @@ namespace EventSauce\ObjectHydrator;
 /**
  * @internal
  */
-final class PropertyDefinition
+final class PropertyHydrationDefinition
 {
     public function __construct(
         /** @var array<string, array<string>> */

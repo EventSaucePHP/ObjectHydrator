@@ -46,7 +46,7 @@ namespace $namespace {
 
 use EventSauce\ObjectHydrator\ClassDefinition;
 use EventSauce\ObjectHydrator\DefinitionProvider;
-use EventSauce\ObjectHydrator\PropertyDefinition;
+use EventSauce\ObjectHydrator\PropertyHydrationDefinition;
 use LogicException;
 
 class $shortName implements DefinitionProvider
@@ -97,7 +97,7 @@ new ClassDefinition(
 CODE;
     }
 
-    private function dumpPropertyDefinition(PropertyDefinition $propertyDefinition): string
+    private function dumpPropertyDefinition(PropertyHydrationDefinition $propertyDefinition): string
     {
         $keys = var_export($propertyDefinition->keys, true);
         $propertyCasters = var_export($propertyDefinition->propertyCasters, true);
@@ -106,7 +106,7 @@ CODE;
         $concreteTypeName = var_export($propertyDefinition->concreteTypeName, true);
 
         return <<<CODE
-            new PropertyDefinition(
+            new PropertyHydrationDefinition(
                 $keys,
                 '$propertyDefinition->property',
                 $propertyCasters,
