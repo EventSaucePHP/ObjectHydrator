@@ -7,12 +7,16 @@ namespace EventSauce\ObjectHydrator;
 use DateTime;
 use DateTimeImmutable;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCustomDateTimeSerialization;
+use League\ConstructFinder\ConstructFinder;
 use PHPUnit\Framework\TestCase;
 
+use function class_exists;
 use function file_put_contents;
+use function spl_object_hash;
+use function strpos;
 use function unlink;
 
-class ObjectSerializerDumperTest extends TestCase
+class ObjectSerializerDumperTest extends ObjectSerializerTestCase
 {
     /**
      * @test
@@ -38,5 +42,41 @@ class ObjectSerializerDumperTest extends TestCase
         ];
 
         self::assertEquals($expectedPayload, $payload);
+    }
+
+    private function createDumpedObjectSerializer(string $directory, string $className, SerializationDefinitionProviderUsingReflection $definitionProvider): ObjectSerializer
+    {
+        if (class_exists($className, false)) {
+            goto create_object_serializer;
+        }
+
+        $classes = ConstructFinder::locatedIn($directory)->findClassNames();
+        $dumper = new ObjectSerializerDumper($definitionProvider);
+
+        $dumpedDefinition = $dumper->dump(
+            $classes,
+            $className
+        );
+        $filename = __DIR__ . '/test' . ( ! str_contains($directory, '81') ? '80' : '81') . '.php';
+
+        file_put_contents($filename, $dumpedDefinition);
+        include $filename;
+//        unlink($filename);
+
+        create_object_serializer:
+        /** @var ObjectSerializer $objectSerializer */
+        $objectSerializer = new $className();
+
+        return $objectSerializer;
+    }
+
+
+
+    public function objectSerializer(): ObjectSerializer
+    {
+        $definitionProvider = new SerializationDefinitionProviderUsingReflection();
+        $className = 'AcmeCorp\\DumpedSerializer'; // . spl_object_hash($definitionProvider);
+
+        return $this->createDumpedObjectSerializer(__DIR__ . '/Fixtures', $className, $definitionProvider);
     }
 }

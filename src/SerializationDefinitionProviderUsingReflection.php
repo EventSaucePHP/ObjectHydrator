@@ -6,7 +6,10 @@ namespace EventSauce\ObjectHydrator;
 
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionNamedType;
 use ReflectionProperty;
+
+use ReflectionUnionType;
 
 use function is_a;
 
@@ -40,7 +43,7 @@ class SerializationDefinitionProviderUsingReflection
                 PropertySerializationDefinition::TYPE_METHOD,
                 $methodName,
                 $key,
-                $this->resolveSerializer($method->getReturnType()->getName(), $method->getAttributes()),
+                $this->resolveSerializers($method->getReturnType(), $method->getAttributes()),
             );
         }
 
@@ -56,7 +59,7 @@ class SerializationDefinitionProviderUsingReflection
                 PropertySerializationDefinition::TYPE_PROPERTY,
                 $property->getName(),
                 $key,
-                $this->resolveSerializer($property->getType()->getName(), $method->getAttributes()),
+                $this->resolveSerializers($property->getType(), $property->getAttributes()),
             );
         }
 
@@ -87,5 +90,21 @@ class SerializationDefinitionProviderUsingReflection
     public function allSerializers(): array
     {
         return $this->serializers->allSerializersPerType();
+    }
+
+    private function resolveSerializers(ReflectionUnionType|ReflectionNamedType $type, array $attributes): array
+    {
+        if ($type instanceof ReflectionNamedType) {
+            return [$type->getName() => $this->resolveSerializer($type->getName(), $attributes)];
+        }
+
+        $serializersPerType = [];
+
+        foreach ($type->getTypes() as $t) {
+            $typeName = $t->getName();
+            $serializersPerType[$typeName] = $this->resolveSerializer($typeName, $attributes);
+        }
+
+        return $serializersPerType;
     }
 }

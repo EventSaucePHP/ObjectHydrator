@@ -7,6 +7,9 @@ namespace EventSauce\ObjectHydrator;
 class ClassSerializationDefinition
 {
     public function __construct(
+        /**
+         * @var PropertySerializationDefinition[]
+         */
         public array $properties
     ) {
     }

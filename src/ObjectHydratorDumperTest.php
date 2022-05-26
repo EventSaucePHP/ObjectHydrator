@@ -13,14 +13,14 @@ use function unlink;
 
 class ObjectHydratorDumperTest extends ObjectHydratorTestCase
 {
-    private HydrationDefinitionProviderUsingReflection $defaultDefintionProvider;
+    private HydrationDefinitionProviderUsingReflection $defaultDefinitionProvider;
 
     /**
      * @before
      */
     public function setupDefaultDefinitionProvider(): void
     {
-        $this->defaultDefintionProvider = new HydrationDefinitionProviderUsingReflection();
+        $this->defaultDefinitionProvider ??= new HydrationDefinitionProviderUsingReflection();
     }
 
     /**
@@ -63,7 +63,7 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
 
     protected function createObjectHydrator(HydrationDefinitionProvider $definitionProvider = null): ObjectHydrator
     {
-        $definitionProvider ??= $this->defaultDefintionProvider;
+        $definitionProvider ??= $this->defaultDefinitionProvider;
         $className = 'AcmeCorp\\DumpedHydrator' . spl_object_hash($definitionProvider);
 
         return $this->createDumpedObjectHydrator(__DIR__ . '/Fixtures', $className, $definitionProvider);
@@ -71,6 +71,6 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
 
     protected function createObjectHydratorFor81(): ObjectHydrator
     {
-        return $this->createDumpedObjectHydrator(__DIR__ . '/FixturesFor81', 'AcmeCorp\\DumpedHydratorFor81', $this->defaultDefintionProvider);
+        return $this->createDumpedObjectHydrator(__DIR__ . '/FixturesFor81', 'AcmeCorp\\DumpedHydratorFor81', $this->defaultDefinitionProvider);
     }
 }

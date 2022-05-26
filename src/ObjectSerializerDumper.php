@@ -6,6 +6,7 @@ namespace EventSauce\ObjectHydrator;
 
 use function array_map;
 use function array_pop;
+use function count;
 use function explode;
 use function implode;
 use function is_array;
@@ -126,15 +127,32 @@ CODE;
     private function dumpClassProperty(PropertySerializationDefinition $definition): string
     {
         $accessorName = $definition->accessorName;
-        $serializerName = $accessorName . 'Serializer';
+        $index = 0;
         $accessor = $definition->formattedAccessor();
         $key = $definition->payloadKey;
+        $code = <<<CODE
 
-        if (is_array($definition->serializer)) {
-            [$serializer, $arguments] = $definition->serializer;
+        \$result['$key'] = \$object->$accessor;
+
+CODE;
+;
+
+        $hasMultipleSerializers = count($definition->serializers) > 1;
+
+        foreach ($definition->serializers as $valueType => [$serializer, $arguments]) {
+            $index++;
+            $serializerName = $accessorName . 'Serializer' . $index;
             $arguments = var_export($arguments, true);
 
-            return <<<CODE
+            if ($hasMultipleSerializers) {
+                $code .= <<<CODE
+        if ( ! \$result['$key'] instanceof \\$valueType) {
+            goto after_$serializerName;
+        } 
+CODE;
+            }
+
+            $code .= <<<CODE
 
         static \$$serializerName;
         
@@ -142,15 +160,17 @@ CODE;
             \$$serializerName = new \\$serializer(...$arguments);
         }
         
-        \$result['$key'] = \${$serializerName}->serialize(\$object->$accessor, \$this);
-CODE;
-        } else {
-            return <<<CODE
-
-        \$result['$key'] = \$object->$accessor;
-
+        \$result['$key'] = \${$serializerName}->serialize(\$result['$key'], \$this);
 CODE;
 
+            if ($hasMultipleSerializers) {
+                $code .= <<<CODE
+
+        after_$serializerName:
+CODE;
+            }
         }
+
+        return $code;
     }
 }
