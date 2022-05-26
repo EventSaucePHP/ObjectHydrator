@@ -17,7 +17,7 @@ use function is_scalar;
 
 class ObjectSerializerUsingReflection implements ObjectSerializer
 {
-    private ?DefaultSerializerRepository $serializers;
+    private DefaultSerializerRepository $serializers;
     private KeyFormatter $keyFormatter;
 
     public function __construct(
