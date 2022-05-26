@@ -18,7 +18,7 @@ having to check for the availability and correctness of the data at every place 
 checked once and trusted many times.
 
 The use of objects also has down-sides, some more impactful than others. One of these is the
-burdon of converting data into objects, which is what this library aims to eliminate. By
+burden of converting data into objects, which is what this library aims to eliminate. By
 providing a predictable convention much of the conversion can be automated away. The use of
 instrumentation (in the form of property casters) expands these capabilities by allowing
 users to provide re-usable building blocks that provide full control as to how properties are
