@@ -436,7 +436,7 @@ $dumper = new ObjectHydratorDumper();
 $classesToDump = [SomeCommand::class, AnotherCommand::class];
 
 $code = $dumper->dump($classesToDump, $dumpedClassNamed);
-file_put_contents('src/AcmeCorp/YourOptimizedHydrator.php');
+file_put_contents('src/AcmeCorp/YourOptimizedHydrator.php', $code);
 
 /** @var ObjectHydrator $hydrator */
 $hydrator = new AcmeCorp\YourOptimizedHydrator();
