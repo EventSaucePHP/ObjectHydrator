@@ -59,4 +59,27 @@ final class ClassExpander
             return false;
         }
     }
+
+    public static function expandClassesForSerialization(
+        array $classes,
+        SerializationDefinitionProviderUsingReflection $definitionProvider
+    ): array {
+        $classes = array_values($classes);
+
+        for ($i = 0; array_key_exists($i, $classes); ++$i) {
+            $class = $classes[$i];
+            $classDefinition = $definitionProvider->provideDefinition($class);
+
+            /** @var PropertySerializationDefinition $property */
+            foreach ($classDefinition->properties as $property) {
+                $type = $property->type;
+
+                if ( ! in_array($type, $classes) && self::isClass($type)) {
+                    $classes[] = $type;
+                }
+            }
+        }
+
+        return $classes;
+    }
 }
