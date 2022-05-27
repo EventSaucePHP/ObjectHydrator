@@ -6,10 +6,13 @@ namespace EventSauce\ObjectHydrator;
 
 use DateTime;
 use DateTimeImmutable;
+use EventSauce\ObjectHydrator\Fixtures\ClassReferencedByUnionOne;
+use EventSauce\ObjectHydrator\Fixtures\ClassReferencedByUnionTwo;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCaseProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCasePublicMethod;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCustomDateTimeSerialization;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithListOfObjects;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithUnionProperty;
 use PHPUnit\Framework\TestCase;
 
 abstract class ObjectSerializerTestCase extends TestCase
@@ -95,5 +98,21 @@ abstract class ObjectSerializerTestCase extends TestCase
             'regular_public_property' => '25-11-1987',
             'getter_property' => '26-11-1987',
         ], $payload);
+    }
+
+    /**
+     * @test
+     */
+    public function serializing_a_class_with_a_union(): void
+    {
+        $serializer = $this->objectSerializer();
+        $object1 = new ClassWithUnionProperty(new ClassReferencedByUnionOne(1234));
+        $object2 = new ClassWithUnionProperty(new ClassReferencedByUnionTwo('name'));
+
+        $payload1 = $serializer->serializeObject($object1);
+        $payload2 = $serializer->serializeObject($object2);
+
+        self::assertEquals(['union' => ['number' => 1234]], $payload1);
+        self::assertEquals(['union' => ['text' => 'name']], $payload2);
     }
 }

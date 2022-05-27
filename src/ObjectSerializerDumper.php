@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use function array_key_exists;
+use function array_keys;
 use function array_map;
 use function array_pop;
 use function count;
 use function explode;
 use function implode;
-use function is_array;
 use function str_replace;
-use function var_dump;
 use function var_export;
 
 final class ObjectSerializerDumper
@@ -41,6 +41,9 @@ final class ObjectSerializerDumper
         }
 
         foreach ($classes as $class) {
+            if (array_key_exists($class, $valueSerializers)) {
+                continue;
+            }
             $definition = $this->definitionProvider->provideDefinition($class);
             $methodName = 'serializeObject' . str_replace('\\', '', $class);
             $serializationMap[] = "'$class' => \$this->$methodName(\$object),";
@@ -88,6 +91,7 @@ CODE;
     ): string {
         $methodName = 'serializeValue' . str_replace('\\', '', $valueType);
         $serializerArgs = var_export($valueSerializerArgs, true);
+
         return <<<CODE
 
     private function $methodName(mixed \$value): mixed
@@ -101,7 +105,6 @@ CODE;
         return \$serializer->serialize(\$value, \$this);
     }
 CODE;
-
     }
 
     private function dumpClassDefinition(mixed $class, ClassSerializationDefinition $definition)
@@ -117,60 +120,135 @@ CODE;
         \\assert(\$object instanceof \\$class);
         \$result = [];
         $propertiesCode
-        
+
         return \$result;
     }
 CODE;
-
     }
 
     private function dumpClassProperty(PropertySerializationDefinition $definition): string
     {
+        $propertyType = $definition->propertyType;
         $accessorName = $definition->accessorName;
-        $index = 0;
         $accessor = $definition->formattedAccessor();
-        $key = $definition->payloadKey;
+        $key = $definition->key;
         $code = <<<CODE
 
         \$result['$key'] = \$object->$accessor;
 
 CODE;
-;
 
-        $hasMultipleSerializers = count($definition->serializers) > 1;
-
-        foreach ($definition->serializers as $valueType => [$serializer, $arguments]) {
-            $index++;
-            $serializerName = $accessorName . 'Serializer' . $index;
-            $arguments = var_export($arguments, true);
-
-            if ($hasMultipleSerializers) {
-                $code .= <<<CODE
-        if ( ! \$result['$key'] instanceof \\$valueType) {
-            goto after_$serializerName;
-        } 
-CODE;
-            }
-
+        if ($propertyType->allowsNull()) {
             $code .= <<<CODE
 
-        static \$$serializerName;
-        
-        if (\$$serializerName === null) {
-            \$$serializerName = new \\$serializer(...$arguments);
+        if (\$result['$key'] === null) {
+            goto after_$accessorName
         }
-        
-        \$result['$key'] = \${$serializerName}->serialize(\$result['$key'], \$this);
+CODE;
+        }
+
+        if ( ! $definition->isComplexType()) {
+            $code .= $this->dumpSimpleClassProperty($definition);
+        } else {
+            $code .= $this->dumpComplexClassProperty($definition);
+        }
+
+        $code .= <<<CODE
+        after_$accessorName:
 CODE;
 
-            if ($hasMultipleSerializers) {
-                $code .= <<<CODE
+        return $code;
+    }
 
-        after_$serializerName:
+    /**
+     * A simple class property is one with a single type, no union or intersection type.
+     * The serialization of this type can be done in either of these 3 ways.
+     *
+     *    1. There is NO serializer defined and the type is built-in => no conversion
+     *    2. There is NO serializer defined and the type is NOT built-in => serialize through ObjectSerializer
+     *    3. There IS a serializer defined => serialize through value serializer
+     */
+    private function dumpSimpleClassProperty(PropertySerializationDefinition $definition): string
+    {
+        $key = $definition->key;
+        $serializers = $definition->serializers;
+        /** @var ConcreteType $firstType */
+        $firstType = $definition->propertyType->concreteTypes()[0];
+
+        if (count($serializers) === 0) {
+            if ($firstType->isBuiltIn) {
+                return '';
+            }
+
+            return <<<CODE
+        \$result['$key'] = \$this->serializeObject(\$result['$key'], \$this);
+
+CODE;
+        }
+
+        $accessorName = $definition->accessorName;
+        [$class, $arguments] = $serializers[0];
+        $arguments = var_export($arguments, true);
+        $serializerName = '$' . $accessorName . 'Serializer';
+
+        return <<<CODE
+        static $serializerName;
+        
+        if ($serializerName === null) {
+            $serializerName = new \\$class(...$arguments);
+        }
+        
+        \$result['$key'] = {$serializerName}->serialize(\$result['$key'], \$this);
+
+CODE;
+    }
+
+    /**
+     * Serialization of a complex property is ... well, more complex. A complex type
+     * contains any number of concrete types, either from a union or an intersection type.
+     *
+     * There are a couple of aspects that influence serialization. First off, a property serializer
+     * may have been defined. In this case that serializer is always used. If no serializers are
+     * defined, custom types are serialized through the ObjectSerializer.
+     */
+    private function dumpComplexClassProperty(PropertySerializationDefinition $definition): string
+    {
+        $serializers = $definition->serializers;
+
+        if (count($serializers) === 1 && array_keys($serializers)[0] === 0) {
+            return $this->dumpSimpleClassProperty($definition);
+        }
+
+        $key = $definition->key;
+
+        if (count($serializers) === 0 && ! $definition->propertyType->containsBuiltInType()) {
+            return <<<CODE
+        \$result['$key'] = \$this->serializeObject(\$result['$key']);
+
+CODE;
+        }
+
+        if (count($serializers) === count($definition->propertyType->concreteTypes())) {
+            $code = '';
+            $index = 0;
+
+            foreach ($serializers as $type => [$class, $arguments]) {
+                ++$index;
+                $serializerName = '$' . $definition->accessorName . 'Serializer' . $index;
+                $arguments = var_export($arguments, true);
+                $code .= <<<CODE
+        if (\$result['$key'] instanceof \\$type) {
+            static $serializerName;
+            
+            if ($serializerName === null) {
+                $serializerName = new \\$class(...$arguments);
+            }
+            
+            \$result['$key'] = {$serializerName}->serialize(\$result['$key'], \$this);
+        }
+
 CODE;
             }
         }
-
-        return $code;
     }
 }

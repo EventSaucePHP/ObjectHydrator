@@ -17,16 +17,58 @@ use function function_exists;
  */
 final class PropertyType
 {
+    /** @var ConcreteType[] */
     private array $concreteTypes;
 
-    private function __construct(ConcreteType ...$concreteTypes)
+    private bool $allowsNull;
+
+    private function __construct(bool $allowsNull, ConcreteType ...$concreteTypes)
     {
         $this->concreteTypes = $concreteTypes;
+        $this->allowsNull = $allowsNull;
+    }
+
+    public function allowsNull(): bool
+    {
+        return $this->allowsNull;
+    }
+
+    /**
+     * @return ConcreteType[]
+     */
+    public function concreteTypes(): array
+    {
+        return $this->concreteTypes;
+    }
+
+    public function containsBuiltInType(): bool
+    {
+        foreach ($this->concreteTypes as $type) {
+            if ($type->isBuiltIn) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function canBeHydrated(): bool
     {
         return count($this->concreteTypes) === 1 && $this->concreteTypes[0]->isBuiltIn === false;
+    }
+
+    public static function fromReflectionType(
+        ReflectionUnionType|ReflectionIntersectionType|ReflectionNamedType|null $type
+    ): PropertyType {
+        if ($type === null) {
+            return static::mixed();
+        }
+
+        if ($type instanceof ReflectionUnionType || $type instanceof ReflectionIntersectionType) {
+            return static::fromCompositeType($type);
+        }
+
+        return static::fromNamedType($type);
     }
 
     public static function fromNamedType(ReflectionNamedType $type): static
@@ -39,25 +81,25 @@ final class PropertyType
             $canBeHydrated = ! $reflectionClass->isUserDefined();
         }
 
-        return new static(new ConcreteType($type->getName(), $canBeHydrated));
+        return new static($type->allowsNull(), new ConcreteType($type->getName(), $canBeHydrated));
     }
 
-    public static function fromCompositeType(ReflectionIntersectionType|ReflectionUnionType $type)
+    public static function fromCompositeType(ReflectionIntersectionType|ReflectionUnionType $compositeType)
     {
         /** @var ReflectionNamedType[] $types */
-        $types = $type->getTypes();
+        $types = $compositeType->getTypes();
         $resolvedTypes = [];
 
         foreach ($types as $type) {
             $resolvedTypes[] = new ConcreteType($type->getName(), $type->isBuiltin());
         }
 
-        return new PropertyType(...$resolvedTypes);
+        return new PropertyType($compositeType->allowsNull(), ...$resolvedTypes);
     }
 
     public static function mixed(): static
     {
-        return new static(new ConcreteType('mixed', true));
+        return new static(true, new ConcreteType('mixed', true));
     }
 
     public function firstTypeName(): ?string
@@ -67,8 +109,8 @@ final class PropertyType
 
     public function isEnum(): bool
     {
-        return count($this->concreteTypes) === 1 && function_exists('enum_exists') && enum_exists(
-                $this->concreteTypes[0]->name
-            );
+        return count($this->concreteTypes) === 1
+            && function_exists('enum_exists')
+            && enum_exists($this->concreteTypes[0]->name);
     }
 }

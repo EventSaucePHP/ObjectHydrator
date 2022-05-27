@@ -41,7 +41,7 @@ final class HydrationDefinitionProviderUsingReflection implements HydrationDefin
         foreach ($parameters as $parameter) {
             $paramName = $parameter->getName();
             $key = $this->keyFormatter->propertyNameToKey($paramName);
-            $parameterType = $this->normalizeType($parameter->getType());
+            $parameterType = PropertyType::fromReflectionType($parameter->getType());
             $firstTypeName = $parameterType->firstTypeName();
             $definition = [
                 'property' => $paramName,

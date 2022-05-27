@@ -14,15 +14,21 @@ class PropertySerializationDefinition
     public function __construct(
         public string $type,
         public string $accessorName,
-        public string $payloadKey,
-        public array $serializers
-    )
-    {
+        public string $key,
+        public array $serializers,
+        public PropertyType $propertyType,
+        public bool $nullable
+    ) {
         $this->serializers = array_filter($this->serializers);
     }
 
     public function formattedAccessor(): string
     {
         return $this->accessorName . ($this->type === self::TYPE_METHOD ? '()' : '');
+    }
+
+    public function isComplexType(): bool
+    {
+        return count($this->propertyType->concreteTypes()) > 1;
     }
 }

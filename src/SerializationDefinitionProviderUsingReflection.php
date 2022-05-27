@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
@@ -39,11 +40,14 @@ class SerializationDefinitionProviderUsingReflection
 
             $methodName = $method->getShortName();
             $key = $this->keyFormatter->propertyNameToKey($methodName);
+            $returnType = $method->getReturnType();
             $properties[] = new PropertySerializationDefinition(
                 PropertySerializationDefinition::TYPE_METHOD,
                 $methodName,
                 $key,
-                $this->resolveSerializers($method->getReturnType(), $method->getAttributes()),
+                $this->resolveSerializers($returnType, $method->getAttributes()),
+                PropertyType::fromReflectionType($returnType),
+                $returnType->allowsNull(),
             );
         }
 
@@ -55,11 +59,14 @@ class SerializationDefinitionProviderUsingReflection
             }
 
             $key = $this->keyFormatter->propertyNameToKey($property->getName());
+            $propertyType = $property->getType();
             $properties[] = new PropertySerializationDefinition(
                 PropertySerializationDefinition::TYPE_PROPERTY,
                 $property->getName(),
                 $key,
-                $this->resolveSerializers($property->getType(), $property->getAttributes()),
+                $this->resolveSerializers($propertyType, $property->getAttributes()),
+                PropertyType::fromReflectionType($propertyType),
+                $propertyType->allowsNull(),
             );
         }
 
@@ -68,16 +75,7 @@ class SerializationDefinitionProviderUsingReflection
 
     private function resolveSerializer(string $type, array $attributes): ?array
     {
-        $serializer = null;
-
-        foreach ($attributes as $attribute) {
-            $type = $attribute->getName();
-
-            if (is_a($type, TypeSerializer::class, true)) {
-                $serializer = [$attribute->getName(), $attribute->getArguments()];
-                break;
-            }
-        }
+        $serializer = $this->resolveSerializerFromAttributes($attributes);
 
         return $serializer ?? $this->serializers->serializerForType($type);
     }
@@ -94,8 +92,14 @@ class SerializationDefinitionProviderUsingReflection
 
     private function resolveSerializers(ReflectionUnionType|ReflectionNamedType $type, array $attributes): array
     {
+        $attributeSerializer = $this->resolveSerializerFromAttributes($attributes);
+
+        if ($attributeSerializer !== null) {
+            return [$attributeSerializer];
+        }
+
         if ($type instanceof ReflectionNamedType) {
-            return [$type->getName() => $this->resolveSerializer($type->getName(), $attributes)];
+            return [$this->serializers->serializerForType($type->getName())];
         }
 
         $serializersPerType = [];
@@ -106,5 +110,21 @@ class SerializationDefinitionProviderUsingReflection
         }
 
         return $serializersPerType;
+    }
+
+    /**
+     * @param ReflectionAttribute[] $attributes
+     */
+    private function resolveSerializerFromAttributes(array $attributes): ?array
+    {
+        foreach ($attributes as $attribute) {
+            $name = $attribute->getName();
+
+            if (is_a($name, TypeSerializer::class, true)) {
+                return [$attribute->getName(), $attribute->getArguments()];
+            }
+        }
+
+        return null;
     }
 }

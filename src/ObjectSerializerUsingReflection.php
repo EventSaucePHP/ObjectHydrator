@@ -11,6 +11,8 @@ use ReflectionObject;
 
 use ReflectionProperty;
 
+use ReflectionUnionType;
+
 use function get_class;
 use function is_a;
 use function is_scalar;
@@ -48,9 +50,10 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
             }
 
             $methodName = $method->getShortName();
+            $returnType = $method->getReturnType();
             $key = $this->keyFormatter->propertyNameToKey($methodName);
             $value = $method->invoke($object);
-            $value = $this->serializeValue($method->getReturnType()->getName(), $value, $method->getAttributes());
+            $value = $this->serializeValue($returnType->getName(), $returnType->isBuiltin(), $value, $method->getAttributes());
             $result[$key] = $value;
         }
 
@@ -63,7 +66,17 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
 
             $key = $this->keyFormatter->propertyNameToKey($property->getName());
             $value = $property->getValue($object);
-            $value = $this->serializeValue($property->getType()->getName(), $value, $property->getAttributes());
+            $propertyType = $property->getType();
+
+            if ($propertyType instanceof ReflectionUnionType) {
+                foreach ($propertyType->getTypes() as $namedType) {
+                    if (is_a($value, $namedType->getName())) {
+                        $value = $this->serializeValue($namedType->getName(), $namedType->isBuiltin(), $value, $property->getAttributes());
+                    }
+                }
+            } else {
+                $value = $this->serializeValue($propertyType->getName(), $propertyType->isBuiltin(), $value, $property->getAttributes());
+            }
             $result[$key] = $value;
         }
 
@@ -73,7 +86,7 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
     /**
      * @param ReflectionAttribute[] $attributes
      */
-    private function serializeValue(string $type, mixed $value, array $attributes): mixed
+    private function serializeValue(string $type, bool $builtIn, mixed $value, array $attributes): mixed
     {
         $serializer = null;
 
@@ -93,6 +106,8 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
             /** @var TypeSerializer $serializer */
             $serializer = new $serializerClass(...$arguments);
             $value = $serializer->serialize($value, $this);
+        } elseif ( ! $builtIn) {
+            return $this->serializeObject($value);
         }
 
         return $value;
