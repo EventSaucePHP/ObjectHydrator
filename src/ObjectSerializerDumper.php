@@ -144,6 +144,7 @@ CODE;
         if (\$result['$key'] === null) {
             goto after_$accessorName;
         }
+
 CODE;
         }
 
@@ -181,7 +182,7 @@ CODE;
             }
 
             return <<<CODE
-        \$result['$key'] = \$this->serializeObject(\$result['$key'], \$this);
+        \$result['$key'] = \$this->serializeObject(\$result['$key']);
 
 CODE;
         }

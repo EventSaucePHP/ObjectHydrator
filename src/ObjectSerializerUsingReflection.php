@@ -15,6 +15,7 @@ use ReflectionUnionType;
 
 use function get_class;
 use function is_a;
+use function is_object;
 use function is_scalar;
 
 class ObjectSerializerUsingReflection implements ObjectSerializer
@@ -106,7 +107,7 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
             /** @var TypeSerializer $serializer */
             $serializer = new $serializerClass(...$arguments);
             $value = $serializer->serialize($value, $this);
-        } elseif ( ! $builtIn) {
+        } elseif ( ! $builtIn && is_object($value)) {
             return $this->serializeObject($value);
         }
 

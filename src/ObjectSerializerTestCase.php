@@ -110,11 +110,15 @@ abstract class ObjectSerializerTestCase extends TestCase
             new ClassReferencedByUnionOne(1234),
             'name',
             new ClassReferencedByUnionOne(1234),
+            null,
+            null,
         );
         $object2 = new ClassWithUnionProperty(
             new ClassReferencedByUnionTwo('name'),
             1234,
-            2345
+            2345,
+            null,
+            new ClassReferencedByUnionOne(1234),
         );
 
         $payload1 = $serializer->serializeObject($object1);
@@ -124,11 +128,15 @@ abstract class ObjectSerializerTestCase extends TestCase
             'union' => ['number' => 1234],
             'built_in_union' => 'name',
             'mixed_union' => ['number' => 1234],
+            'nullable_mixed_union' => null,
+            'nullable_via_union' => null,
         ], $payload1);
         self::assertEquals([
             'union' => ['text' => 'name'],
             'built_in_union' => 1234,
             'mixed_union' => 2345,
+            'nullable_mixed_union' => null,
+            'nullable_via_union' => ['number' => 1234],
         ], $payload2);
     }
 }
