@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToDifferentTypes;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatContainsAnotherClass;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatHasMultipleCastersOnSingleProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatRenamesInputForClassWithMultipleProperties;
@@ -336,6 +337,28 @@ abstract class ObjectHydratorTestCase extends TestCase
         self::assertInstanceOf(ClassThatRenamesInputForClassWithMultipleProperties::class, $object);
         self::assertEquals('Rover', $object->child->name);
         self::assertEquals(2, $object->child->age);
+    }
+
+    /**
+     * @test
+     */
+    public function using_the_same_hydrator_with_different_options(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+        $payload = [
+            'first' => [
+                ['snakeCase' => 'first'],
+            ],
+            'second' => [
+                ['age' => '34'],
+            ],
+        ];
+
+        $object = $hydrator->hydrateObject(ClassThatCastsListsToDifferentTypes::class, $payload);
+
+        self::assertInstanceOf(ClassThatCastsListsToDifferentTypes::class, $object);
+        self::assertContainsOnlyInstancesOf(ClassWithCamelCaseProperty::class, $object->first);
+        self::assertContainsOnlyInstancesOf(ClassWithPropertyCasting::class, $object->second);
     }
 
     protected function createObjectHydratorFor81(): ObjectHydrator

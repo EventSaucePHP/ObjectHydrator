@@ -10,6 +10,7 @@ use function array_key_exists;
 use function count;
 use function current;
 use function is_array;
+use function json_encode;
 
 /**
  * @template T
@@ -72,7 +73,7 @@ class ObjectHydrator
                 $property = $definition->property;
 
                 foreach ($definition->propertyCasters as $index => [$caster, $options]) {
-                    $key = "$className-$index-$caster";
+                    $key = "$className-$index-$caster-" . json_encode($options);
                     /** @var PropertyCaster $propertyCaster */
                     $propertyCaster = $this->instances[$key] ??= new $caster(...$options);
                     $value = $propertyCaster->cast($value, $this);
