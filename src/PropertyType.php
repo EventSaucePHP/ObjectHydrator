@@ -52,6 +52,17 @@ final class PropertyType
         return false;
     }
 
+    public function containsOnlyBuiltInTypes(): bool
+    {
+        foreach ($this->concreteTypes as $type) {
+            if ( ! $type->isBuiltIn) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function canBeHydrated(): bool
     {
         return count($this->concreteTypes) === 1 && $this->concreteTypes[0]->isBuiltIn === false;

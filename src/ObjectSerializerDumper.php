@@ -142,7 +142,7 @@ CODE;
             $code .= <<<CODE
 
         if (\$result['$key'] === null) {
-            goto after_$accessorName
+            goto after_$accessorName;
         }
 CODE;
         }
@@ -220,23 +220,63 @@ CODE;
         }
 
         $key = $definition->key;
+        $propertyType = $definition->propertyType;
 
-        if (count($serializers) === 0 && ! $definition->propertyType->containsBuiltInType()) {
+        if (count($serializers) === 0 && ! $propertyType->containsBuiltInType()) {
             return <<<CODE
         \$result['$key'] = \$this->serializeObject(\$result['$key']);
 
 CODE;
         }
 
-        if (count($serializers) === count($definition->propertyType->concreteTypes())) {
+        if (count($serializers) === count($propertyType->concreteTypes())) {
             $code = '';
             $index = 0;
 
-            foreach ($serializers as $type => [$class, $arguments]) {
+            foreach (array_keys($serializers) as $type) {
                 ++$index;
-                $serializerName = '$' . $definition->accessorName . 'Serializer' . $index;
-                $arguments = var_export($arguments, true);
-                $code .= <<<CODE
+                $code .= $this->renderPartial($type, $definition, $index);
+            }
+
+            return $code;
+        }
+
+        $index = 0;
+        $code = '';
+
+        foreach ($propertyType->concreteTypes() as $concreteType) {
+            $index++;
+            $type = $concreteType->name;
+
+            if (array_key_exists($type, $definition->serializers)) {
+                $code .= $this->renderPartial($type, $definition, $index);
+            }
+        }
+
+        if ( ! $propertyType->containsOnlyBuiltInTypes()) {
+            $code .= <<<CODE
+        if (is_object(\$result['$key'])) {
+            \$result['$key'] = \$this->serializeObject(\$result['$key']);
+        }
+
+CODE;
+        }
+
+
+        return $code;
+    }
+
+    private function renderPartial(
+        string $type,
+        PropertySerializationDefinition $definition,
+        int $index,
+    ): string {
+        $key = $definition->key;
+        [$class, $arguments] = $definition->serializers[$type];
+        $serializerName = '$' . $definition->accessorName . 'Serializer' . $index;
+        $arguments = var_export($arguments, true);
+
+        return <<<CODE
         if (\$result['$key'] instanceof \\$type) {
             static $serializerName;
             
@@ -245,10 +285,9 @@ CODE;
             }
             
             \$result['$key'] = {$serializerName}->serialize(\$result['$key'], \$this);
+            goto after_$definition->accessorName;
         }
 
 CODE;
-            }
-        }
     }
 }

@@ -6,7 +6,10 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 
 class ClassWithUnionProperty
 {
-    public function __construct(public ClassReferencedByUnionOne|ClassReferencedByUnionTwo $union)
-    {
+    public function __construct(
+        public ClassReferencedByUnionOne|ClassReferencedByUnionTwo $union,
+        public int|string $builtInUnion,
+        public int|ClassReferencedByUnionOne $mixedUnion
+    ) {
     }
 }

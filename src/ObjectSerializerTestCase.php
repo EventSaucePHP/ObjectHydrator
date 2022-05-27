@@ -106,13 +106,29 @@ abstract class ObjectSerializerTestCase extends TestCase
     public function serializing_a_class_with_a_union(): void
     {
         $serializer = $this->objectSerializer();
-        $object1 = new ClassWithUnionProperty(new ClassReferencedByUnionOne(1234));
-        $object2 = new ClassWithUnionProperty(new ClassReferencedByUnionTwo('name'));
+        $object1 = new ClassWithUnionProperty(
+            new ClassReferencedByUnionOne(1234),
+            'name',
+            new ClassReferencedByUnionOne(1234),
+        );
+        $object2 = new ClassWithUnionProperty(
+            new ClassReferencedByUnionTwo('name'),
+            1234,
+            2345
+        );
 
         $payload1 = $serializer->serializeObject($object1);
         $payload2 = $serializer->serializeObject($object2);
 
-        self::assertEquals(['union' => ['number' => 1234]], $payload1);
-        self::assertEquals(['union' => ['text' => 'name']], $payload2);
+        self::assertEquals([
+            'union' => ['number' => 1234],
+            'built_in_union' => 'name',
+            'mixed_union' => ['number' => 1234],
+        ], $payload1);
+        self::assertEquals([
+            'union' => ['text' => 'name'],
+            'built_in_union' => 1234,
+            'mixed_union' => 2345,
+        ], $payload2);
     }
 }
