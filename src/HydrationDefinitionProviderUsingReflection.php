@@ -22,7 +22,7 @@ final class HydrationDefinitionProviderUsingReflection implements HydrationDefin
         KeyFormatter $keyFormatter = null,
     ) {
         $this->defaultCasterRepository = $defaultCasterRepository ?? DefaultCasterRepository::builtIn();
-        $this->keyFormatter = $keyFormatter ?? new KeyFormattingWithoutConversion();
+        $this->keyFormatter = $keyFormatter ?? new KeyFormatterForSnakeCasing();
     }
 
     public function provideDefinition(string $className): ClassHydrationDefinition

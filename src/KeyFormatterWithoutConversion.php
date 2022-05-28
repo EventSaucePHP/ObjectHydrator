@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
-class KeyFormattingWithoutConversion implements KeyFormatter
+class KeyFormatterWithoutConversion implements KeyFormatter
 {
     public function propertyNameToKey(string $propertyName): string
     {

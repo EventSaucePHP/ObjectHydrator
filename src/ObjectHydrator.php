@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use BackedEnum;
 use Generator;
 use Throwable;
+use UnitEnum;
+
 use function array_key_exists;
+use function call_user_func;
+use function constant;
 use function count;
 use function current;
+use function is_a;
 use function is_array;
 use function json_encode;
 
@@ -83,7 +89,11 @@ class ObjectHydrator
                 $typeName = $definition->concreteTypeName;
 
                 if ($definition->isEnum) {
-                    $value = $typeName::from($value);
+                    if (is_a($typeName, BackedEnum::class, true)) {
+                        $value = $typeName::from($value);
+                    } else {
+                        $value = constant("$typeName::$value");
+                    }
                 } elseif ($definition->canBeHydrated && is_array($value)) {
                     $value = $this->hydrateObject($typeName, $value);
                 }

@@ -20,7 +20,9 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
      */
     public function setupDefaultDefinitionProvider(): void
     {
-        $this->defaultDefinitionProvider ??= new HydrationDefinitionProviderUsingReflection();
+        $this->defaultDefinitionProvider ??= new HydrationDefinitionProviderUsingReflection(
+            keyFormatter: new KeyFormatterWithoutConversion(),
+        );
     }
 
     /**

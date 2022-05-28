@@ -16,12 +16,15 @@ use ReflectionUnionType;
 
 use UnitEnum;
 
+use function array_key_exists;
 use function enum_exists;
 use function function_exists;
 use function get_class;
 use function is_a;
 use function is_object;
 use function is_scalar;
+use function var_dump;
+use function var_export;
 
 class ObjectSerializerUsingReflection implements ObjectSerializer
 {
@@ -97,9 +100,9 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
         $serializer = null;
 
         foreach ($attributes as $attribute) {
-            $type = $attribute->getName();
+            $t = $attribute->getName();
 
-            if (is_a($type, TypeSerializer::class, true)) {
+            if (is_a($t, TypeSerializer::class, true)) {
                 $serializer = [$attribute->getName(), $attribute->getArguments()];
                 break;
             }

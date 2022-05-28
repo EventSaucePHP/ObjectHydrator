@@ -36,7 +36,6 @@ abstract class HydrationBenchCase
         foreach ($classes as $class) {
             $className = $class->name();
             $reflection = new ReflectionClass($className);
-
             $atttributes = $reflection->getAttributes(ExampleData::class);
 
             if (count($atttributes) === 0) {
