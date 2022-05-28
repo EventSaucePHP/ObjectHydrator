@@ -10,4 +10,9 @@ class ObjectSerializerUsingReflectionTest extends ObjectSerializerTestCase
     {
         return new ObjectSerializerUsingReflection();
     }
+
+    protected function objectSerializerFor81(): ObjectSerializer
+    {
+        return $this->objectSerializer();
+    }
 }

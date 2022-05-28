@@ -181,6 +181,18 @@ CODE;
                 return '';
             }
 
+            if ($firstType->isBackedEnum()) {
+                return <<<CODE
+        \$result['$key'] = \$result['$key']->value;
+CODE;
+            }
+
+            if ($firstType->isUnitEnum()) {
+                return <<<CODE
+        \$result['$key'] = \$result['$key']->name;
+CODE;
+            }
+
             return <<<CODE
         \$result['$key'] = \$this->serializeObject(\$result['$key']);
 
@@ -246,7 +258,7 @@ CODE;
         $code = '';
 
         foreach ($propertyType->concreteTypes() as $concreteType) {
-            $index++;
+            ++$index;
             $type = $concreteType->name;
 
             if (array_key_exists($type, $definition->serializers)) {
@@ -262,7 +274,6 @@ CODE;
 
 CODE;
         }
-
 
         return $code;
     }

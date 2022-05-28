@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use BackedEnum;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
@@ -13,6 +14,10 @@ use ReflectionProperty;
 
 use ReflectionUnionType;
 
+use UnitEnum;
+
+use function enum_exists;
+use function function_exists;
 use function get_class;
 use function is_a;
 use function is_object;
@@ -107,8 +112,14 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
             /** @var TypeSerializer $serializer */
             $serializer = new $serializerClass(...$arguments);
             $value = $serializer->serialize($value, $this);
-        } elseif ( ! $builtIn && is_object($value)) {
-            return $this->serializeObject($value);
+        } elseif ( ! $builtIn) {
+            if ($value instanceof BackedEnum) {
+                return $value->value;
+            } elseif ($value instanceof UnitEnum) {
+                return $value->name;
+            } elseif (is_object($value)) {
+                return $this->serializeObject($value);
+            }
         }
 
         return $value;

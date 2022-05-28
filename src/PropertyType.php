@@ -102,7 +102,8 @@ final class PropertyType
         $resolvedTypes = [];
 
         foreach ($types as $type) {
-            $resolvedTypes[] = new ConcreteType($type->getName(), $type->isBuiltin());
+            $name = $type->getName();
+            $resolvedTypes[] = new ConcreteType($name, $type->isBuiltin());
         }
 
         return new PropertyType($compositeType->allowsNull(), ...$resolvedTypes);

@@ -13,11 +13,17 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCasePublicMethod;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCustomDateTimeSerialization;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithListOfObjects;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUnionProperty;
+use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
+use EventSauce\ObjectHydrator\FixturesFor81\CustomEnum;
 use PHPUnit\Framework\TestCase;
+
+use function json_encode;
 
 abstract class ObjectSerializerTestCase extends TestCase
 {
     abstract public function objectSerializer(): ObjectSerializer;
+
+    abstract protected function objectSerializerFor81(): ObjectSerializer;
 
     /**
      * @test
@@ -98,6 +104,20 @@ abstract class ObjectSerializerTestCase extends TestCase
             'regular_public_property' => '25-11-1987',
             'getter_property' => '26-11-1987',
         ], $payload);
+    }
+
+    /**
+     * @test
+     * @requires PHP >= 8.1
+     */
+    public function serializing_a_class_with_an_enum(): void
+    {
+        $serializer = $this->objectSerializerFor81();
+        $object = new ClassWithEnumProperty(CustomEnum::VALUE_ONE);
+
+        $payload = $serializer->serializeObject($object);
+
+        self::assertEquals(['enum' => 'one'], $payload);
     }
 
     /**

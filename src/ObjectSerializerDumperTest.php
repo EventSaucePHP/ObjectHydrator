@@ -8,12 +8,9 @@ use DateTime;
 use DateTimeImmutable;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCustomDateTimeSerialization;
 use League\ConstructFinder\ConstructFinder;
-use PHPUnit\Framework\TestCase;
 
 use function class_exists;
 use function file_put_contents;
-use function spl_object_hash;
-use function strpos;
 use function unlink;
 
 class ObjectSerializerDumperTest extends ObjectSerializerTestCase
@@ -70,13 +67,19 @@ class ObjectSerializerDumperTest extends ObjectSerializerTestCase
         return $objectSerializer;
     }
 
-
-
     public function objectSerializer(): ObjectSerializer
     {
         $definitionProvider = new SerializationDefinitionProviderUsingReflection();
-        $className = 'AcmeCorp\\DumpedSerializer'; // . spl_object_hash($definitionProvider);
+        $className = 'AcmeCorp\\DumpedSerializer';
 
         return $this->createDumpedObjectSerializer(__DIR__ . '/Fixtures', $className, $definitionProvider);
+    }
+
+    protected function objectSerializerFor81(): ObjectSerializer
+    {
+        $definitionProvider = new SerializationDefinitionProviderUsingReflection();
+        $className = 'AcmeCorp\\DumpedSerializerFor81';
+
+        return $this->createDumpedObjectSerializer(__DIR__ . '/FixturesFor81', $className, $definitionProvider);
     }
 }
