@@ -49,8 +49,6 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
             ]
         ];
 
-        return;
-
         if (version_compare(PHP_VERSION, '8.1.0', '>=')) {
             yield "class with backed enum property" => [
                 ClassWithEnumProperty::class,

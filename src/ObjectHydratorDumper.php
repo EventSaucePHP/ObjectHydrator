@@ -146,12 +146,17 @@ CODE;
                 }
             }
 
-            if ($definition->isEnum) {
+            if ($definition->isBackedEnum()) {
                 $body .= <<<CODE
 
             \$value = \\{$definition->concreteTypeName}::from(\$value);
 
 CODE;
+            } elseif ($definition->isEnum) {
+                $body .= <<<CODE
+            \$value = constant("$definition->concreteTypeName::\$value");
+CODE;
+
             } elseif ($definition->canBeHydrated) {
                 $body .= <<<CODE
 

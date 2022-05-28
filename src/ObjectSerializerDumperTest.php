@@ -58,7 +58,7 @@ class ObjectSerializerDumperTest extends ObjectSerializerTestCase
 
         file_put_contents($filename, $dumpedDefinition);
         include $filename;
-//        unlink($filename);
+        unlink($filename);
 
         create_object_serializer:
         /** @var ObjectSerializer $objectSerializer */

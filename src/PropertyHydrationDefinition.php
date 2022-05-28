@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use BackedEnum;
+
+use function is_a;
+
 /**
  * @internal
  */
@@ -18,5 +22,10 @@ final class PropertyHydrationDefinition
         public bool $isEnum,
         public ?string $concreteTypeName,
     ) {
+    }
+
+    public function isBackedEnum(): bool
+    {
+        return is_a((string) $this->concreteTypeName, BackedEnum::class, true);
     }
 }
