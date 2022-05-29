@@ -14,6 +14,7 @@ use ReflectionProperty;
 
 use ReflectionUnionType;
 
+use Throwable;
 use UnitEnum;
 
 use function array_key_exists;
@@ -22,9 +23,6 @@ use function function_exists;
 use function get_class;
 use function is_a;
 use function is_object;
-use function is_scalar;
-use function var_dump;
-use function var_export;
 
 class ObjectSerializerUsingReflection implements ObjectSerializer
 {
@@ -42,54 +40,73 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
     public function serializeObject(object $object): mixed
     {
         $result = [];
-        $objectType = get_class($object);
+        $className = get_class($object);
 
-        if ($serializer = $this->serializers->serializerForType($objectType)) {
-            [$serializerClass, $arguments] = $serializer;
+        try {
+            if ($serializer = $this->serializers->serializerForType($className)) {
+                [$serializerClass, $arguments] = $serializer;
 
-            return (new $serializerClass(...$arguments))->serialize($object, $this);
-        }
-
-        $reflection = new ReflectionClass($objectType);
-        $publicMethod = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
-
-        foreach ($publicMethod as $method) {
-            if ($method->isStatic() || $method->getNumberOfParameters() !== 0) {
-                continue;
+                return (new $serializerClass(...$arguments))->serialize($object, $this);
             }
 
-            $methodName = $method->getShortName();
-            $returnType = $method->getReturnType();
-            $key = $this->keyFormatter->propertyNameToKey($methodName);
-            $value = $method->invoke($object);
-            $value = $this->serializeValue($returnType->getName(), $returnType->isBuiltin(), $value, $method->getAttributes());
-            $result[$key] = $value;
-        }
+            $reflection = new ReflectionClass($className);
+            $publicMethod = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
 
-        $publicProperties = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
-
-        foreach ($publicProperties as $property) {
-            if ($property->isStatic()) {
-                continue;
-            }
-
-            $key = $this->keyFormatter->propertyNameToKey($property->getName());
-            $value = $property->getValue($object);
-            $propertyType = $property->getType();
-
-            if ($propertyType instanceof ReflectionUnionType) {
-                foreach ($propertyType->getTypes() as $namedType) {
-                    if (is_a($value, $namedType->getName())) {
-                        $value = $this->serializeValue($namedType->getName(), $namedType->isBuiltin(), $value, $property->getAttributes());
-                    }
+            foreach ($publicMethod as $method) {
+                if ($method->isStatic() || $method->getNumberOfParameters() !== 0) {
+                    continue;
                 }
-            } else {
-                $value = $this->serializeValue($propertyType->getName(), $propertyType->isBuiltin(), $value, $property->getAttributes());
-            }
-            $result[$key] = $value;
-        }
 
-        return $result;
+                $methodName = $method->getShortName();
+                $returnType = $method->getReturnType();
+                $key = $this->keyFormatter->propertyNameToKey($methodName);
+                $value = $method->invoke($object);
+                $value = $this->serializeValue(
+                    $returnType->getName(),
+                    $returnType->isBuiltin(),
+                    $value,
+                    $method->getAttributes()
+                );
+                $result[$key] = $value;
+            }
+
+            $publicProperties = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
+
+            foreach ($publicProperties as $property) {
+                if ($property->isStatic()) {
+                    continue;
+                }
+
+                $key = $this->keyFormatter->propertyNameToKey($property->getName());
+                $value = $property->getValue($object);
+                $propertyType = $property->getType();
+
+                if ($propertyType instanceof ReflectionUnionType) {
+                    foreach ($propertyType->getTypes() as $namedType) {
+                        if (is_a($value, $namedType->getName())) {
+                            $value = $this->serializeValue(
+                                $namedType->getName(),
+                                $namedType->isBuiltin(),
+                                $value,
+                                $property->getAttributes()
+                            );
+                        }
+                    }
+                } else {
+                    $value = $this->serializeValue(
+                        $propertyType->getName(),
+                        $propertyType->isBuiltin(),
+                        $value,
+                        $property->getAttributes()
+                    );
+                }
+                $result[$key] = $value;
+            }
+
+            return $result;
+        } catch (Throwable $throwable) {
+            throw UnableToSerializeObject::dueToError($className, $throwable);
+        }
     }
 
     /**

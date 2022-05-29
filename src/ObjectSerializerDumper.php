@@ -14,6 +14,11 @@ use function implode;
 use function str_replace;
 use function var_export;
 
+/**
+ * BEWARE, here be dragons: this code generates code. It is ugly, it's dirty, but very
+ * effective. The generated code contains a number of optimisations that are beneficial
+ * for the runtime performance.
+ */
 final class ObjectSerializerDumper
 {
     private SerializationDefinitionProviderUsingReflection $definitionProvider;
