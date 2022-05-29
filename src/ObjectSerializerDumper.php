@@ -193,8 +193,16 @@ CODE;
 CODE;
             }
 
+            $prefix = 'serializeObject';
+
+            if ($this->definitionProvider->provideSerializer($firstType->name) !== null) {
+                $prefix = 'serializeValue';
+            }
+
+            $method = $prefix . str_replace('\\', '', $firstType->name);
+
             return <<<CODE
-        \$result['$key'] = \$this->serializeObject(\$result['$key']);
+        \$result['$key'] = \$this->$method(\$result['$key']);
 
 CODE;
         }
