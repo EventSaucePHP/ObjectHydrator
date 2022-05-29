@@ -127,4 +127,9 @@ class SerializationDefinitionProviderUsingReflection
 
         return null;
     }
+
+    public function hasSerializerFor(string $name): bool
+    {
+        return $this->serializers->serializerForType($name) !== null;
+    }
 }

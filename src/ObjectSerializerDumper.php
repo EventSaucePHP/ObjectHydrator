@@ -244,8 +244,23 @@ CODE;
         $propertyType = $definition->propertyType;
 
         if (count($serializers) === 0 && ! $propertyType->containsBuiltInType()) {
+            $matchStatement = '';
+
+            foreach ($propertyType->concreteTypes() as $concreteType) {
+                $serializerName = $this->definitionProvider->hasSerializerFor($concreteType->name)
+                    ? 'serializeValue' . str_replace('\\', '', $concreteType->name)
+                    : 'serializeObject' . str_replace('\\', '', $concreteType->name);
+                $matchStatement .= <<<CODE
+            '$concreteType->name' => \$this->$serializerName(\$result['$key']),
+
+CODE;
+
+            }
+
             return <<<CODE
-        \$result['$key'] = \$this->serializeObject(\$result['$key']);
+        \$result['$key'] = match(get_class(\$result['$key'])) {
+            $matchStatement
+        };
 
 CODE;
         }
