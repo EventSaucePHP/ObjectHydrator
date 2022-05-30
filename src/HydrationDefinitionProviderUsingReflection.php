@@ -45,7 +45,6 @@ final class HydrationDefinitionProviderUsingReflection implements HydrationDefin
 
             $attributes = $parameter->getAttributes();
             $casters = [];
-            $serializers = [];
 
             foreach ($attributes as $attribute) {
                 $attributeName = $attribute->getName();
@@ -56,10 +55,6 @@ final class HydrationDefinitionProviderUsingReflection implements HydrationDefin
 
                 if (is_a($attributeName, PropertyCaster::class, true)) {
                     $casters[] = [$attributeName, $attribute->getArguments()];
-                }
-
-                if (is_a($attributeName, PropertySerializer::class, true)) {
-                    $serializers[] = [$attributeName, $attribute->getArguments()];
                 }
             }
 
@@ -73,7 +68,6 @@ final class HydrationDefinitionProviderUsingReflection implements HydrationDefin
                 $keys,
                 $accessorName,
                 $casters,
-                $serializers,
                 $parameterType,
                 $parameterType->canBeHydrated(),
                 $parameterType->isEnum(),

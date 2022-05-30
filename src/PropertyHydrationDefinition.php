@@ -20,14 +20,12 @@ final class PropertyHydrationDefinition
         public array $keys,
         public string $accessorName,
         public array $casters,
-        public array $serializers,
         public PropertyType $propertyType,
         public bool $canBeHydrated,
         public bool $isEnum,
         public bool $nullable,
         public ?string $firstTypeName,
     ) {
-        $this->serializers = array_reverse(array_filter($this->serializers));
     }
 
     public function isBackedEnum(): bool
