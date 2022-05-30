@@ -7,15 +7,15 @@ namespace EventSauce\ObjectHydrator;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
-use EventSauce\ObjectHydrator\TypeSerializers\SerializeArrayItems;
-use EventSauce\ObjectHydrator\TypeSerializers\SerializeDateTime;
-use EventSauce\ObjectHydrator\TypeSerializers\SerializeUuidToString;
+use EventSauce\ObjectHydrator\PropertySerializers\SerializeArrayItems;
+use EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime;
+use EventSauce\ObjectHydrator\PropertySerializers\SerializeUuidToString;
 use Ramsey\Uuid\UuidInterface;
 
 class DefaultSerializerRepository
 {
     /**
-     * @param array<string, array{0: class-string<TypeSerializer> $serializersPerType
+     * @param array<string, array{0: class-string<PropeertySerializer> $serializersPerType
      */
     public function __construct(private array $serializersPerType)
     {
@@ -33,7 +33,7 @@ class DefaultSerializerRepository
     }
 
     /**
-     * @param class-string<TypeSerializer> $serializerClass
+     * @param class-string<PropeertySerializer> $serializerClass
      */
     public function registerTypeSerializer(string $type, string $serializerClass, array $arguments = []): void
     {

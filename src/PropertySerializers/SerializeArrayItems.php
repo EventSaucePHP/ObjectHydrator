@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace EventSauce\ObjectHydrator\TypeSerializers;
+namespace EventSauce\ObjectHydrator\PropertySerializers;
 
 use Attribute;
 use EventSauce\ObjectHydrator\ObjectSerializer;
-use EventSauce\ObjectHydrator\TypeSerializer;
+use EventSauce\ObjectHydrator\PropeertySerializer;
 
 use function is_array;
 use function is_object;
 
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_METHOD | Attribute::TARGET_PROPERTY)]
-class SerializeArrayItems implements TypeSerializer
+class SerializeArrayItems implements PropeertySerializer
 {
     public function serialize(mixed $value, ObjectSerializer $serializer): mixed
     {

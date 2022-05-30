@@ -7,7 +7,7 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
-use EventSauce\ObjectHydrator\TypeSerializers\SerializeDateTime;
+use EventSauce\ObjectHydrator\PropertySerializers\SerializeDateTime;
 
 class ClassWithCustomDateTimeSerialization
 {

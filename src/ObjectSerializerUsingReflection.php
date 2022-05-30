@@ -127,7 +127,7 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
         foreach ($attributes as $attribute) {
             $t = $attribute->getName();
 
-            if (is_a($t, TypeSerializer::class, true)) {
+            if (is_a($t, PropeertySerializer::class, true)) {
                 $serializer = [$attribute->getName(), $attribute->getArguments()];
                 break;
             }
@@ -137,7 +137,7 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
 
         if ($serializer !== null) {
             [$serializerClass, $arguments] = $serializer;
-            /** @var TypeSerializer $serializer */
+            /** @var PropeertySerializer $serializer */
             $serializer = new $serializerClass(...$arguments);
             $value = $serializer->serialize($value, $this);
         } elseif ( ! $builtIn) {

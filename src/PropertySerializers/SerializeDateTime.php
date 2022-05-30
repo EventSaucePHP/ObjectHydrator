@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace EventSauce\ObjectHydrator\TypeSerializers;
+namespace EventSauce\ObjectHydrator\PropertySerializers;
 
 use Attribute;
 use DateTimeInterface;
 use EventSauce\ObjectHydrator\ObjectSerializer;
-use EventSauce\ObjectHydrator\TypeSerializer;
+use EventSauce\ObjectHydrator\PropeertySerializer;
 
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_METHOD | Attribute::TARGET_PROPERTY)]
-class SerializeDateTime implements TypeSerializer
+class SerializeDateTime implements PropeertySerializer
 {
     public function __construct(private string $format = 'Y-m-d H:i:s.uO')
     {

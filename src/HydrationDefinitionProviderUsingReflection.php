@@ -58,7 +58,7 @@ final class HydrationDefinitionProviderUsingReflection implements HydrationDefin
                     $casters[] = [$attributeName, $attribute->getArguments()];
                 }
 
-                if (is_a($attributeName, TypeSerializer::class, true)) {
+                if (is_a($attributeName, PropeertySerializer::class, true)) {
                     $serializers[] = [$attributeName, $attribute->getArguments()];
                 }
             }

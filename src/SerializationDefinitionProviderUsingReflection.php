@@ -122,7 +122,7 @@ class SerializationDefinitionProviderUsingReflection
         foreach ($attributes as $attribute) {
             $name = $attribute->getName();
 
-            if (is_a($name, TypeSerializer::class, true)) {
+            if (is_a($name, PropeertySerializer::class, true)) {
                 return [$attribute->getName(), $attribute->getArguments()];
             }
         }
