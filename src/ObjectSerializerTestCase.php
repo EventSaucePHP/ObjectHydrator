@@ -8,16 +8,17 @@ use DateTime;
 use DateTimeImmutable;
 use EventSauce\ObjectHydrator\Fixtures\ClassReferencedByUnionOne;
 use EventSauce\ObjectHydrator\Fixtures\ClassReferencedByUnionTwo;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatRenamesInputForClassWithMultipleProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCaseProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCasePublicMethod;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCustomDateTimeSerialization;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithListOfObjects;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithMultipleProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUnionProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\CustomEnum;
 use PHPUnit\Framework\TestCase;
-
-use function json_encode;
 
 abstract class ObjectSerializerTestCase extends TestCase
 {
@@ -158,5 +159,31 @@ abstract class ObjectSerializerTestCase extends TestCase
             'nullable_mixed_union' => null,
             'nullable_via_union' => ['number' => 1234],
         ], $payload2);
+    }
+
+    /**
+     * @test
+     */
+    public function mapping_to_a_different_key(): void
+    {
+        $serializer = $this->objectSerializer();
+        $object = new ClassWithMappedStringProperty(name: 'Frank');
+
+        $payload = $serializer->serializeObject($object);
+        self::assertEquals(['my_name' => 'Frank'], $payload);
+    }
+
+    /**
+     * @test
+     */
+    public function mapping_to_multiple_keys(): void
+    {
+        $serializer = $this->objectSerializer();
+        $object = new ClassThatRenamesInputForClassWithMultipleProperties(
+            new ClassWithMultipleProperties(age: 34, name: 'Frank')
+        );
+
+        $payload = $serializer->serializeObject($object);
+        self::assertEquals(['mapped_age' => 34, 'name' => 'Frank'], $payload);
     }
 }

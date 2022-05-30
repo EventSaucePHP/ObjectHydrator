@@ -14,10 +14,10 @@ class PropertySerializationDefinition
     public function __construct(
         public string $type,
         public string $accessorName,
-        public string $key,
         public array $serializers,
         public PropertyType $propertyType,
-        public bool $nullable
+        public bool $nullable,
+        public array $keys = [],
     ) {
         $this->serializers = array_filter($this->serializers);
     }

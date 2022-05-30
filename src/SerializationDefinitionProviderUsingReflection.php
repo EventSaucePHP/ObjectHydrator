@@ -41,13 +41,14 @@ class SerializationDefinitionProviderUsingReflection
             $methodName = $method->getShortName();
             $key = $this->keyFormatter->propertyNameToKey($methodName);
             $returnType = $method->getReturnType();
+            $attributes = $method->getAttributes();
             $properties[] = new PropertySerializationDefinition(
                 PropertySerializationDefinition::TYPE_METHOD,
                 $methodName,
-                $key,
-                $this->resolveSerializers($returnType, $method->getAttributes()),
+                $this->resolveSerializers($returnType, $attributes),
                 PropertyType::fromReflectionType($returnType),
                 $returnType->allowsNull(),
+                $this->resolveKeys($key, $attributes),
             );
         }
 
@@ -60,13 +61,14 @@ class SerializationDefinitionProviderUsingReflection
 
             $key = $this->keyFormatter->propertyNameToKey($property->getName());
             $propertyType = $property->getType();
+            $attributes = $property->getAttributes();
             $properties[] = new PropertySerializationDefinition(
                 PropertySerializationDefinition::TYPE_PROPERTY,
                 $property->getName(),
-                $key,
-                $this->resolveSerializers($propertyType, $property->getAttributes()),
+                $this->resolveSerializers($propertyType, $attributes),
                 PropertyType::fromReflectionType($propertyType),
                 $propertyType->allowsNull(),
+                $this->resolveKeys($key, $attributes),
             );
         }
 
@@ -131,5 +133,24 @@ class SerializationDefinitionProviderUsingReflection
     public function hasSerializerFor(string $name): bool
     {
         return $this->serializers->serializerForType($name) !== null;
+    }
+
+    /**
+     * @param ReflectionAttribute[] $attributes
+     *
+     * @return array<string, array<string>>
+     */
+    private function resolveKeys(string $defaultKey, array $attributes): array
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->getName() === MapFrom::class) {
+                /** @var MapFrom $mapFrom */
+                $mapFrom = $attribute->newInstance();
+
+                return $mapFrom->keys;
+            }
+        }
+
+        return [$defaultKey => [$defaultKey]];
     }
 }

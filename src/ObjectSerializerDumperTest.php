@@ -21,7 +21,8 @@ class ObjectSerializerDumperTest extends ObjectSerializerTestCase
     public function dumping_a_serializer(): void
     {
         $dumper = new ObjectSerializerDumper();
-        $code = $dumper->dump([ClassWithCustomDateTimeSerialization::class], $className = 'SomeNamespace\\SomeClassName');
+        $code = $dumper->dump([ClassWithCustomDateTimeSerialization::class],
+                              $className = 'SomeNamespace\\SomeClassName');
         file_put_contents(__DIR__ . '/testSerializationDumper.php', $code);
         include __DIR__ . '/testSerializationDumper.php';
         unlink(__DIR__ . '/testSerializationDumper.php');
@@ -41,8 +42,11 @@ class ObjectSerializerDumperTest extends ObjectSerializerTestCase
         self::assertEquals($expectedPayload, $payload);
     }
 
-    private function createDumpedObjectSerializer(string $directory, string $className, SerializationDefinitionProviderUsingReflection $definitionProvider): ObjectSerializer
-    {
+    private function createDumpedObjectSerializer(
+        string $directory,
+        string $className,
+        SerializationDefinitionProviderUsingReflection $definitionProvider
+    ): ObjectSerializer {
         if (class_exists($className, false)) {
             goto create_object_serializer;
         }
@@ -54,7 +58,7 @@ class ObjectSerializerDumperTest extends ObjectSerializerTestCase
             $classes,
             $className
         );
-        $filename = __DIR__ . '/test' . ( ! str_contains($directory, '81') ? '80' : '81') . '.php';
+        $filename = __DIR__ . '/test' . (! str_contains($directory, '81') ? '80' : '81') . '.php';
 
         file_put_contents($filename, $dumpedDefinition);
         include $filename;

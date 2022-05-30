@@ -11,7 +11,10 @@ use function array_pop;
 use function count;
 use function explode;
 use function implode;
+use function is_array;
+use function join;
 use function str_replace;
+use function var_dump;
 use function var_export;
 
 /**
@@ -136,17 +139,16 @@ CODE;
         $propertyType = $definition->propertyType;
         $accessorName = $definition->accessorName;
         $accessor = $definition->formattedAccessor();
-        $key = $definition->key;
         $code = <<<CODE
 
-        \$result['$key'] = \$object->$accessor;
+        \$$definition->accessorName = \$object->$accessor;
 
 CODE;
 
         if ($propertyType->allowsNull()) {
             $code .= <<<CODE
 
-        if (\$result['$key'] === null) {
+        if (\$$definition->accessorName === null) {
             goto after_$accessorName;
         }
 
@@ -162,6 +164,7 @@ CODE;
         $code .= <<<CODE
         after_$accessorName:
 CODE;
+        $code .= $this->dumpResultHydrator($definition);
 
         return $code;
     }
@@ -176,7 +179,6 @@ CODE;
      */
     private function dumpSimpleClassProperty(PropertySerializationDefinition $definition): string
     {
-        $key = $definition->key;
         $serializers = $definition->serializers;
         /** @var ConcreteType $firstType */
         $firstType = $definition->propertyType->concreteTypes()[0];
@@ -188,13 +190,13 @@ CODE;
 
             if ($firstType->isBackedEnum()) {
                 return <<<CODE
-        \$result['$key'] = \$result['$key']->value;
+        \$$definition->accessorName = \$$definition->accessorName->value;
 CODE;
             }
 
             if ($firstType->isUnitEnum()) {
                 return <<<CODE
-        \$result['$key'] = \$result['$key']->name;
+        \$$definition->accessorName = \$$definition->accessorName->name;
 CODE;
             }
 
@@ -207,7 +209,7 @@ CODE;
             $method = $prefix . str_replace('\\', '', $firstType->name);
 
             return <<<CODE
-        \$result['$key'] = \$this->$method(\$result['$key']);
+        \$$definition->accessorName = \$this->$method(\$$definition->accessorName);
 
 CODE;
         }
@@ -224,7 +226,7 @@ CODE;
             $serializerName = new \\$class(...$arguments);
         }
         
-        \$result['$key'] = {$serializerName}->serialize(\$result['$key'], \$this);
+        \$$definition->accessorName = {$serializerName}->serialize(\$$definition->accessorName, \$this);
 
 CODE;
     }
@@ -245,7 +247,6 @@ CODE;
             return $this->dumpSimpleClassProperty($definition);
         }
 
-        $key = $definition->key;
         $propertyType = $definition->propertyType;
 
         if (count($serializers) === 0 && ! $propertyType->containsBuiltInType()) {
@@ -256,14 +257,14 @@ CODE;
                     ? 'serializeValue' . str_replace('\\', '', $concreteType->name)
                     : 'serializeObject' . str_replace('\\', '', $concreteType->name);
                 $matchStatement .= <<<CODE
-            '$concreteType->name' => \$this->$serializerName(\$result['$key']),
+            '$concreteType->name' => \$this->$serializerName(\$$definition->accessorName),
 
 CODE;
 
             }
 
             return <<<CODE
-        \$result['$key'] = match(get_class(\$result['$key'])) {
+        \$$definition->accessorName = match(get_class(\$$definition->accessorName)) {
             $matchStatement
         };
 
@@ -296,8 +297,8 @@ CODE;
 
         if ( ! $propertyType->containsOnlyBuiltInTypes()) {
             $code .= <<<CODE
-        if (is_object(\$result['$key'])) {
-            \$result['$key'] = \$this->serializeObject(\$result['$key']);
+        if (is_object(\$$definition->accessorName)) {
+            \$$definition->accessorName = \$this->serializeObject(\$$definition->accessorName);
         }
 
 CODE;
@@ -311,23 +312,48 @@ CODE;
         PropertySerializationDefinition $definition,
         int $index,
     ): string {
-        $key = $definition->key;
         [$class, $arguments] = $definition->serializers[$type];
         $serializerName = '$' . $definition->accessorName . 'Serializer' . $index;
         $arguments = var_export($arguments, true);
 
         return <<<CODE
-        if (\$result['$key'] instanceof \\$type) {
+        if (\$$definition->accessorName instanceof \\$type) {
             static $serializerName;
             
             if ($serializerName === null) {
                 $serializerName = new \\$class(...$arguments);
             }
             
-            \$result['$key'] = {$serializerName}->serialize(\$result['$key'], \$this);
+            \$$definition->accessorName = {$serializerName}->serialize(\$$definition->accessorName, \$this);
             goto after_$definition->accessorName;
         }
 
 CODE;
+    }
+
+    private function dumpResultHydrator(PropertySerializationDefinition $definition): string
+    {
+        $tempVariable = '$' . $definition->accessorName;
+        $keys = $definition->keys;
+
+        if (count($keys) === 1) {
+            $key = '[\'' . implode('\'][\'', array_pop($keys)) . '\']';
+
+            return <<<CODE
+        \$result$key = $tempVariable;
+
+CODE;
+        }
+
+        $code = '';
+
+        foreach ($keys as $tempKey => $resultKey) {
+            $key = '[\'' . implode('\'][\'', $resultKey) . '\']';
+            $code .= <<<CODE
+        \$result$key = {$tempVariable}['$tempKey'];
+CODE;
+        }
+
+        return $code;
     }
 }

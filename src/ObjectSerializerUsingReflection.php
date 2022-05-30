@@ -18,10 +18,14 @@ use Throwable;
 use UnitEnum;
 
 use function array_key_exists;
+use function array_pop;
+use function assert;
+use function count;
 use function enum_exists;
 use function function_exists;
 use function get_class;
 use function is_a;
+use function is_array;
 use function is_object;
 
 class ObjectSerializerUsingReflection implements ObjectSerializer
@@ -61,13 +65,15 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
                 $returnType = $method->getReturnType();
                 $key = $this->keyFormatter->propertyNameToKey($methodName);
                 $value = $method->invoke($object);
+                $attributes = $method->getAttributes();
                 $value = $this->serializeValue(
                     $returnType->getName(),
                     $returnType->isBuiltin(),
                     $value,
-                    $method->getAttributes()
+                    $attributes
                 );
-                $result[$key] = $value;
+
+                $this->assignToResult($key, $attributes, $result, $value);
             }
 
             $publicProperties = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
@@ -80,6 +86,7 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
                 $key = $this->keyFormatter->propertyNameToKey($property->getName());
                 $value = $property->getValue($object);
                 $propertyType = $property->getType();
+                $attributes = $property->getAttributes();
 
                 if ($propertyType instanceof ReflectionUnionType) {
                     foreach ($propertyType->getTypes() as $namedType) {
@@ -88,7 +95,7 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
                                 $namedType->getName(),
                                 $namedType->isBuiltin(),
                                 $value,
-                                $property->getAttributes()
+                                $attributes
                             );
                         }
                     }
@@ -97,10 +104,11 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
                         $propertyType->getName(),
                         $propertyType->isBuiltin(),
                         $value,
-                        $property->getAttributes()
+                        $attributes
                     );
                 }
-                $result[$key] = $value;
+
+                $this->assignToResult($key, $attributes, $result, $value);
             }
 
             return $result;
@@ -143,5 +151,42 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
         }
 
         return $value;
+    }
+
+    /**
+     * @param ReflectionAttribute[] $attributes
+     *
+     * @return array<string, array<string>>
+     */
+    private function resolveKeys(string $defaultKey, array $attributes): array
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->getName() === MapFrom::class) {
+                /** @var MapFrom $mapFrom */
+                $mapFrom = $attribute->newInstance();
+
+                return $mapFrom->keys;
+            }
+        }
+
+        return [$defaultKey => [$defaultKey]];
+    }
+
+    private function assignToResult(string $key, array $attributes, array &$result, mixed $value): void
+    {
+        $keys = $this->resolveKeys($key, $attributes);
+        $mapFromSingleKey = count($keys) === 1;
+
+        foreach ($keys as $payloadKey => $toPath) {
+            $lastKey = array_pop($toPath);
+            $r = &$result;
+
+            foreach ($toPath as $to) {
+                $r[$to] ??= [];
+                $r = &$r[$to];
+            }
+
+            $r[$lastKey] = $mapFromSingleKey ? $value : $value[$payloadKey];
+        }
     }
 }
