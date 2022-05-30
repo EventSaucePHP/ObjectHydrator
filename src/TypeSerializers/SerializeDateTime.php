@@ -9,7 +9,6 @@ use DateTimeInterface;
 use EventSauce\ObjectHydrator\ObjectSerializer;
 use EventSauce\ObjectHydrator\TypeSerializer;
 
-
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_METHOD | Attribute::TARGET_PROPERTY)]
 class SerializeDateTime implements TypeSerializer
 {
