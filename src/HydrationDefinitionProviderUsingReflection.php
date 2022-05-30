@@ -7,8 +7,6 @@ namespace EventSauce\ObjectHydrator;
 use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionMethod;
-use ReflectionType;
-use ReflectionUnionType;
 use function count;
 use function is_a;
 
@@ -43,22 +41,25 @@ final class HydrationDefinitionProviderUsingReflection implements HydrationDefin
             $key = $this->keyFormatter->propertyNameToKey($paramName);
             $parameterType = PropertyType::fromReflectionType($parameter->getType());
             $firstTypeName = $parameterType->firstTypeName();
-            $definition = [
-                'property' => $paramName,
-                'keys' => [$key => [$key]],
-                'enum' => $parameterType->isEnum(),
-            ];
+            $keys = [$key => [$key]];
 
             $attributes = $parameter->getAttributes();
             $casters = [];
+            $serializers = [];
 
             foreach ($attributes as $attribute) {
                 $attributeName = $attribute->getName();
 
                 if ($attributeName === MapFrom::class) {
-                    $definition['keys'] = $attribute->newInstance()->keys;
-                } elseif (is_a($attributeName, PropertyCaster::class, true)) {
+                    $keys = $attribute->newInstance()->keys;
+                }
+
+                if (is_a($attributeName, PropertyCaster::class, true)) {
                     $casters[] = [$attributeName, $attribute->getArguments()];
+                }
+
+                if (is_a($attributeName, TypeSerializer::class, true)) {
+                    $serializers[] = [$attributeName, $attribute->getArguments()];
                 }
             }
 
@@ -69,29 +70,19 @@ final class HydrationDefinitionProviderUsingReflection implements HydrationDefin
             }
 
             $definitions[] = new PropertyHydrationDefinition(
-                $definition['keys'],
-                $definition['property'],
+                $keys,
+                $paramName,
                 $casters,
+                $serializers,
+                $parameterType,
                 $parameterType->canBeHydrated(),
-                $definition['enum'] ?? false,
-                $firstTypeName
+                $parameterType->isEnum(),
+                $parameterType->allowsNull(),
+                $firstTypeName,
             );
         }
 
         return new ClassHydrationDefinition($constructorName, $constructionStyle, ...$definitions);
-    }
-
-    private function normalizeType(?ReflectionType $type): PropertyType
-    {
-        if ($type === null) {
-            return PropertyType::mixed();
-        }
-
-        if ($type instanceof ReflectionUnionType || $type instanceof ReflectionIntersectionType) {
-            return PropertyType::fromCompositeType($type);
-        }
-
-        return PropertyType::fromNamedType($type);
     }
 
     private function resolveConstructor(ReflectionClass $reflectionClass): ?ReflectionMethod

@@ -21,7 +21,8 @@ final class ConcreteType
 
     public function isUnitEnum(): bool
     {
-        return function_exists('enum_exists') && is_a($this->name, UnitEnum::class, true);
+        return function_exists('enum_exists') && is_a($this->name, UnitEnum::class, true)
+            && ! $this->isBackedEnum();
     }
 
     public function isBackedEnum(): bool

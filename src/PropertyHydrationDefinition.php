@@ -16,16 +16,19 @@ final class PropertyHydrationDefinition
     public function __construct(
         /** @var array<string, array<string>> */
         public array $keys,
-        public string $property,
-        public array $propertyCasters,
+        public string $accessorName,
+        public array $casters,
+        public array $serializers,
+        public PropertyType $propertyType,
         public bool $canBeHydrated,
         public bool $isEnum,
-        public ?string $concreteTypeName,
+        public bool $nullable,
+        public ?string $firstTypeName,
     ) {
     }
 
     public function isBackedEnum(): bool
     {
-        return is_a((string) $this->concreteTypeName, BackedEnum::class, true);
+        return $this->propertyType->isBackedEnum();
     }
 }

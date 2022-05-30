@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use BackedEnum;
+use EventSauce\ObjectHydrator\FixturesFor81\IntegerEnum;
 use Generator;
 use Throwable;
 use UnitEnum;
@@ -14,7 +15,6 @@ use function call_user_func;
 use function constant;
 use function count;
 use function current;
-use function is_a;
 use function is_array;
 use function json_encode;
 
@@ -77,23 +77,21 @@ class ObjectHydrator
                     $value = current($value);
                 }
 
-                $property = $definition->property;
+                $property = $definition->accessorName;
 
-                foreach ($definition->propertyCasters as $index => [$caster, $options]) {
+                foreach ($definition->casters as $index => [$caster, $options]) {
                     $key = "$className-$index-$caster-" . json_encode($options);
                     /** @var PropertyCaster $propertyCaster */
                     $propertyCaster = $this->casterInstances[$key] ??= new $caster(...$options);
                     $value = $propertyCaster->cast($value, $this);
                 }
 
-                $typeName = $definition->concreteTypeName;
+                $typeName = $definition->firstTypeName;
 
-                if ($definition->isEnum) {
-                    if (is_a($typeName, BackedEnum::class, true)) {
-                        $value = $typeName::from($value);
-                    } else {
-                        $value = constant("$typeName::$value");
-                    }
+                if ($definition->isBackedEnum()) {
+                    $value = $typeName::from($value);
+                } elseif ($definition->isEnum) {
+                    $value = constant("$typeName::$value");
                 } elseif ($definition->canBeHydrated && is_array($value)) {
                     $value = $this->hydrateObject($typeName, $value);
                 }

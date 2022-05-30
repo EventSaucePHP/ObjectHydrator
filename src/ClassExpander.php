@@ -34,7 +34,7 @@ final class ClassExpander
                     continue;
                 }
 
-                $className = (string) $propertyDefinition->concreteTypeName;
+                $className = (string) $propertyDefinition->firstTypeName;
 
                 if ( ! in_array($className, $classes) && static::isClass($className)) {
                     $classes[] = $className;

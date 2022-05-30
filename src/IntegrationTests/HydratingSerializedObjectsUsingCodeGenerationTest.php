@@ -34,7 +34,7 @@ class HydratingSerializedObjectsUsingCodeGenerationTest extends HydratingSeriali
 
         file_put_contents(__DIR__ . '/testSerializer.php', $code);
         include __DIR__ . '/testSerializer.php';
-//        unlink(__DIR__ . '/testSerializer.php');
+        unlink(__DIR__ . '/testSerializer.php');
 
         make_it:
 
@@ -55,7 +55,7 @@ class HydratingSerializedObjectsUsingCodeGenerationTest extends HydratingSeriali
 
         file_put_contents(__DIR__ . '/testHydrator.php', $code);
         include __DIR__ . '/testHydrator.php';
-//        unlink(__DIR__ . '/testHydrator.php');
+        unlink(__DIR__ . '/testHydrator.php');
 
         make_it:
 

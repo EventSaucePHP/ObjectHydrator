@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use BackedEnum;
+use EventSauce\ObjectHydrator\FixturesFor81\IntegerEnum;
 use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
@@ -11,6 +13,7 @@ use ReflectionUnionType;
 use function count;
 use function enum_exists;
 use function function_exists;
+use function is_a;
 
 /**
  * @internal
@@ -22,7 +25,7 @@ final class PropertyType
 
     private bool $allowsNull;
 
-    private function __construct(bool $allowsNull, ConcreteType ...$concreteTypes)
+    public function __construct(bool $allowsNull, ConcreteType ...$concreteTypes)
     {
         $this->concreteTypes = $concreteTypes;
         $this->allowsNull = $allowsNull;
@@ -124,5 +127,10 @@ final class PropertyType
         return count($this->concreteTypes) === 1
             && function_exists('enum_exists')
             && enum_exists($this->concreteTypes[0]->name);
+    }
+
+    public function isBackedEnum(): bool
+    {
+        return $this->isEnum() && is_a($this->concreteTypes[0]->name, BackedEnum::class, true);
     }
 }

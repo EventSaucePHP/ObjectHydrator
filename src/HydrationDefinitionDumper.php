@@ -45,8 +45,10 @@ declare(strict_types=1);
 namespace $namespace {
 
 use EventSauce\ObjectHydrator\ClassHydrationDefinition;
+use EventSauce\ObjectHydrator\ConcreteType;
 use EventSauce\ObjectHydrator\HydrationDefinitionProvider;
 use EventSauce\ObjectHydrator\PropertyHydrationDefinition;
+use EventSauce\ObjectHydrator\PropertyType;
 use LogicException;
 
 class $shortName implements HydrationDefinitionProvider
@@ -99,19 +101,40 @@ CODE;
 
     private function dumpPropertyDefinition(PropertyHydrationDefinition $propertyDefinition): string
     {
+        $propertyType = $propertyDefinition->propertyType;
+        $dumpedPropertyType = 'new PropertyType(' . ($propertyType->allowsNull() ? 'true' : 'false') . ',';
+
+        foreach ($propertyType->concreteTypes() as $concreteType) {
+
+            $dumpedPropertyType .= 'new ConcreteType(\''
+                . $concreteType->name
+                . '\', '
+                . ($concreteType->isBuiltIn ? 'true' : 'false')
+                . '),';
+        }
+
+        $dumpedPropertyType .= ')';
+
         $keys = var_export($propertyDefinition->keys, true);
-        $propertyCasters = var_export($propertyDefinition->propertyCasters, true);
+        $propertyCasters = var_export($propertyDefinition->casters, true);
+        $serialisers = var_export($propertyDefinition->serializers, true);
         $canBeHydrated = var_export($propertyDefinition->canBeHydrated, true);
         $isEnum = var_export($propertyDefinition->isEnum, true);
-        $concreteTypeName = var_export($propertyDefinition->concreteTypeName, true);
+        $allowsNull = var_export($propertyDefinition->nullable, true);
+        $concreteTypeName = var_export($propertyDefinition->firstTypeName, true);
+
+
 
         return <<<CODE
             new PropertyHydrationDefinition(
                 $keys,
-                '$propertyDefinition->property',
+                '$propertyDefinition->accessorName',
                 $propertyCasters,
+                $serialisers,
+                $dumpedPropertyType,
                 $canBeHydrated,
                 $isEnum,
+                $allowsNull,
                 $concreteTypeName
             )
 CODE;

@@ -83,7 +83,7 @@ CODE;
         $body = '';
         foreach ($classDefinition->propertyDefinitions as $definition) {
             $keys = $definition->keys;
-            $property = $definition->property;
+            $property = $definition->accessorName;
 
             if (count($keys) === 1) {
                 $from = array_values($keys)[0];
@@ -126,7 +126,7 @@ CODE;
 CODE;
             }
 
-            foreach ($definition->propertyCasters as $index => [$caster, $options]) {
+            foreach ($definition->casters as $index => [$caster, $options]) {
                 ++$index;
                 $casterOptions = var_export($options, true);
                 $casterName = $property . 'Caster' . $index;
@@ -149,19 +149,19 @@ CODE;
             if ($definition->isBackedEnum()) {
                 $body .= <<<CODE
 
-            \$value = \\{$definition->concreteTypeName}::from(\$value);
+            \$value = \\{$definition->firstTypeName}::from(\$value);
 
 CODE;
             } elseif ($definition->isEnum) {
                 $body .= <<<CODE
-            \$value = constant("$definition->concreteTypeName::\$value");
+            \$value = constant("$definition->firstTypeName::\$value");
 CODE;
 
             } elseif ($definition->canBeHydrated) {
                 $body .= <<<CODE
 
             if (is_array(\$value)) {
-                \$value = \$this->hydrateObject('{$definition->concreteTypeName}', \$value);
+                \$value = \$this->hydrateObject('{$definition->firstTypeName}', \$value);
             }
 
 CODE;

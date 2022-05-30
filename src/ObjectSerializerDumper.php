@@ -11,10 +11,7 @@ use function array_pop;
 use function count;
 use function explode;
 use function implode;
-use function is_array;
-use function join;
 use function str_replace;
-use function var_dump;
 use function var_export;
 
 /**
