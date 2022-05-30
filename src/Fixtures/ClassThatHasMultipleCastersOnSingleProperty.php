@@ -12,7 +12,7 @@ use EventSauce\ObjectHydrator\PropertyCasters\CastToType;
 final class ClassThatHasMultipleCastersOnSingleProperty
 {
     public function __construct(
-        #[CastToType('string')]
+        #[CastToType('string', 'int')]
         #[CastToArrayWithKey('name')]
         public ClassWithStaticConstructor $child,
     ) {

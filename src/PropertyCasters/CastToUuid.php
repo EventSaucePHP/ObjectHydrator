@@ -6,13 +6,17 @@ namespace EventSauce\ObjectHydrator\PropertyCasters;
 
 use Attribute;
 use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectSerializer;
 use EventSauce\ObjectHydrator\PropertyCaster;
+use EventSauce\ObjectHydrator\PropertySerializer;
 use LogicException;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
+use function assert;
+
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
-final class CastToUuid implements PropertyCaster
+final class CastToUuid implements PropertyCaster, PropertySerializer
 {
     public function __construct(private string $type = 'string')
     {
@@ -27,6 +31,19 @@ final class CastToUuid implements PropertyCaster
             'bytes' => Uuid::fromBytes($value),
             'int' => Uuid::fromInteger($value),
             'integer' => Uuid::fromInteger($value),
+            default => throw new LogicException('Unexpected UUID type: ' . $this->type),
+        };
+    }
+
+    public function serialize(mixed $value, ObjectSerializer $serializer): string
+    {
+        assert($value instanceof UuidInterface);
+
+        return match ($this->type) {
+            'string' => $value->toString(),
+            'bytes' => $value->getBytes(),
+            'int' => $value->getInteger()->toString(),
+            'integer' => $value->getInteger()->toString(),
             default => throw new LogicException('Unexpected UUID type: ' . $this->type),
         };
     }

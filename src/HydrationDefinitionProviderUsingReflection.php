@@ -37,8 +37,8 @@ final class HydrationDefinitionProviderUsingReflection implements HydrationDefin
         $parameters = $constructor instanceof ReflectionMethod ? $constructor->getParameters() : [];
 
         foreach ($parameters as $parameter) {
-            $paramName = $parameter->getName();
-            $key = $this->keyFormatter->propertyNameToKey($paramName);
+            $accessorName = $parameter->getName();
+            $key = $this->keyFormatter->propertyNameToKey($accessorName);
             $parameterType = PropertyType::fromReflectionType($parameter->getType());
             $firstTypeName = $parameterType->firstTypeName();
             $keys = [$key => [$key]];
@@ -58,7 +58,7 @@ final class HydrationDefinitionProviderUsingReflection implements HydrationDefin
                     $casters[] = [$attributeName, $attribute->getArguments()];
                 }
 
-                if (is_a($attributeName, PropeertySerializer::class, true)) {
+                if (is_a($attributeName, PropertySerializer::class, true)) {
                     $serializers[] = [$attributeName, $attribute->getArguments()];
                 }
             }
@@ -71,7 +71,7 @@ final class HydrationDefinitionProviderUsingReflection implements HydrationDefin
 
             $definitions[] = new PropertyHydrationDefinition(
                 $keys,
-                $paramName,
+                $accessorName,
                 $casters,
                 $serializers,
                 $parameterType,

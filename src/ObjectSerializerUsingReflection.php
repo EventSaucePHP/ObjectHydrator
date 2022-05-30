@@ -19,6 +19,7 @@ use UnitEnum;
 
 use function array_key_exists;
 use function array_pop;
+use function array_reverse;
 use function assert;
 use function count;
 use function enum_exists;
@@ -27,6 +28,7 @@ use function get_class;
 use function is_a;
 use function is_array;
 use function is_object;
+use function var_dump;
 
 class ObjectSerializerUsingReflection implements ObjectSerializer
 {
@@ -122,24 +124,29 @@ class ObjectSerializerUsingReflection implements ObjectSerializer
      */
     private function serializeValue(string $type, bool $builtIn, mixed $value, array $attributes): mixed
     {
-        $serializer = null;
+        $serializers = [];
 
         foreach ($attributes as $attribute) {
             $t = $attribute->getName();
 
-            if (is_a($t, PropeertySerializer::class, true)) {
-                $serializer = [$attribute->getName(), $attribute->getArguments()];
-                break;
+            if (is_a($t, PropertySerializer::class, true)) {
+                $serializers[] = [$attribute->getName(), $attribute->getArguments()];
             }
         }
 
-        $serializer ??= $this->serializers->serializerForType($type);
+        $serializers = array_reverse($serializers, true);
 
-        if ($serializer !== null) {
-            [$serializerClass, $arguments] = $serializer;
-            /** @var PropeertySerializer $serializer */
-            $serializer = new $serializerClass(...$arguments);
-            $value = $serializer->serialize($value, $this);
+        if (count($serializers) === 0 && $default = $this->serializers->serializerForType($type)) {
+            $serializers[] = $default;
+        }
+
+        if (count($serializers) !== 0) {
+            foreach ($serializers as $serializer) {
+                [$serializerClass, $arguments] = $serializer;
+                /** @var PropertySerializer $serializer */
+                $serializer = new $serializerClass(...$arguments);
+                $value = $serializer->serialize($value, $this);
+            }
         } elseif ( ! $builtIn) {
             if ($value instanceof BackedEnum) {
                 return $value->value;

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator\IntegrationTests;
 
 use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToDifferentTypes;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatHasMultipleCastersOnSingleProperty;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyCasting;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithIntegerEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithUnitEnumProperty;
@@ -47,6 +49,16 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
                     ['age' => 31],
                 ],
             ]
+        ];
+
+        yield "class with property type convertion" => [
+            ClassWithPropertyCasting::class,
+            ['age' => '34']
+        ];
+
+        yield "class with property mapped to a key" => [
+            ClassThatHasMultipleCastersOnSingleProperty::class,
+            ['child' => 12345],
         ];
 
         if (version_compare(PHP_VERSION, '8.1.0', '>=')) {

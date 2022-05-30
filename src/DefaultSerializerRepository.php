@@ -15,7 +15,7 @@ use Ramsey\Uuid\UuidInterface;
 class DefaultSerializerRepository
 {
     /**
-     * @param array<string, array{0: class-string<PropeertySerializer> $serializersPerType
+     * @param array<string, array{0: class-string<PropertySerializer> $serializersPerType
      */
     public function __construct(private array $serializersPerType)
     {
@@ -33,7 +33,7 @@ class DefaultSerializerRepository
     }
 
     /**
-     * @param class-string<PropeertySerializer> $serializerClass
+     * @param class-string<PropertySerializer> $serializerClass
      */
     public function registerTypeSerializer(string $type, string $serializerClass, array $arguments = []): void
     {

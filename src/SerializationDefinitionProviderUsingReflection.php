@@ -77,9 +77,13 @@ class SerializationDefinitionProviderUsingReflection
 
     private function resolveSerializer(string $type, array $attributes): ?array
     {
-        $serializer = $this->resolveSerializerFromAttributes($attributes);
+        $serializers = $this->resolveSerializersFromAttributes($attributes);
 
-        return $serializer ?? $this->serializers->serializerForType($type);
+        if (count($serializers) === 0 && $default = $this->serializers->serializerForType($type)) {
+            $serializers[] = $default;
+        }
+
+        return $serializers;
     }
 
     public function provideSerializer(string $type): ?array
@@ -94,10 +98,10 @@ class SerializationDefinitionProviderUsingReflection
 
     private function resolveSerializers(ReflectionUnionType|ReflectionNamedType $type, array $attributes): array
     {
-        $attributeSerializer = $this->resolveSerializerFromAttributes($attributes);
+        $attributeSerializer = $this->resolveSerializersFromAttributes($attributes);
 
-        if ($attributeSerializer !== null) {
-            return [$attributeSerializer];
+        if (count($attributeSerializer) !== 0) {
+            return $attributeSerializer;
         }
 
         if ($type instanceof ReflectionNamedType) {
@@ -117,17 +121,19 @@ class SerializationDefinitionProviderUsingReflection
     /**
      * @param ReflectionAttribute[] $attributes
      */
-    private function resolveSerializerFromAttributes(array $attributes): ?array
+    private function resolveSerializersFromAttributes(array $attributes): array
     {
+        $serializers = [];
+
         foreach ($attributes as $attribute) {
             $name = $attribute->getName();
 
-            if (is_a($name, PropeertySerializer::class, true)) {
-                return [$attribute->getName(), $attribute->getArguments()];
+            if (is_a($name, PropertySerializer::class, true)) {
+                $serializers[] = [$attribute->getName(), $attribute->getArguments()];
             }
         }
 
-        return null;
+        return $serializers;
     }
 
     public function hasSerializerFor(string $name): bool

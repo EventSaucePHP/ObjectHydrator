@@ -6,12 +6,17 @@ namespace EventSauce\ObjectHydrator\PropertyCasters;
 
 use Attribute;
 use DateTimeImmutable;
+use DateTimeInterface;
 use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectSerializer;
 use EventSauce\ObjectHydrator\PropertyCaster;
+use EventSauce\ObjectHydrator\PropertySerializer;
+
+use function assert;
 use function is_int;
 
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
-final class CastToDateTimeImmutable implements PropertyCaster
+final class CastToDateTimeImmutable implements PropertyCaster, PropertySerializer
 {
     public function __construct(private ?string $format = null)
     {
@@ -28,5 +33,12 @@ final class CastToDateTimeImmutable implements PropertyCaster
         }
 
         return new DateTimeImmutable($value);
+    }
+
+    public function serialize(mixed $value, ObjectSerializer $serializer): mixed
+    {
+        assert($value instanceof DateTimeInterface);
+
+        return $value->format($this->format ?: 'Y-m-d H:i:s.uO');
     }
 }

@@ -7,10 +7,10 @@ namespace EventSauce\ObjectHydrator\PropertySerializers;
 use Attribute;
 use DateTimeInterface;
 use EventSauce\ObjectHydrator\ObjectSerializer;
-use EventSauce\ObjectHydrator\PropeertySerializer;
+use EventSauce\ObjectHydrator\PropertySerializer;
 
-#[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_METHOD | Attribute::TARGET_PROPERTY)]
-class SerializeDateTime implements PropeertySerializer
+#[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_METHOD | Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
+class SerializeDateTime implements PropertySerializer
 {
     public function __construct(private string $format = 'Y-m-d H:i:s.uO')
     {

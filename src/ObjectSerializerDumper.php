@@ -212,13 +212,16 @@ CODE;
         }
 
         $accessorName = $definition->accessorName;
-        [$class, $arguments] = $serializers[0];
-        $arguments = var_export($arguments, true);
-        $serializerName = '$' . $accessorName . 'Serializer';
+        $code = '';
 
-        return <<<CODE
+        foreach ($serializers as $index => $serializer) {
+            [$class, $arguments] = $serializer;
+            $arguments = var_export($arguments, true);
+            $serializerName = '$' . $accessorName . 'Serializer' . $index;
+
+            $code .= <<<CODE
         static $serializerName;
-        
+
         if ($serializerName === null) {
             $serializerName = new \\$class(...$arguments);
         }
@@ -226,6 +229,8 @@ CODE;
         \$$definition->accessorName = {$serializerName}->serialize(\$$definition->accessorName, \$this);
 
 CODE;
+        }
+        return $code;
     }
 
     /**
@@ -309,23 +314,36 @@ CODE;
         PropertySerializationDefinition $definition,
         int $index,
     ): string {
-        [$class, $arguments] = $definition->serializers[$type];
-        $serializerName = '$' . $definition->accessorName . 'Serializer' . $index;
-        $arguments = var_export($arguments, true);
-
-        return <<<CODE
+        $code = <<<CODE
         if (\$$definition->accessorName instanceof \\$type) {
+
+CODE;
+;
+
+        foreach ($definition->serializers[$type] as $i => $serializer) {
+            [$class, $arguments] = $serializer;
+            $serializerName = '$' . $definition->accessorName . 'Serializer' . $index . $i;
+            $arguments = var_export($arguments, true);
+
+            return <<<CODE
             static $serializerName;
-            
+
             if ($serializerName === null) {
                 $serializerName = new \\$class(...$arguments);
             }
             
             \$$definition->accessorName = {$serializerName}->serialize(\$$definition->accessorName, \$this);
+
+CODE;
+        }
+
+        $code .= <<<CODE
             goto after_$definition->accessorName;
         }
 
 CODE;
+
+        return $code;
     }
 
     private function dumpResultHydrator(PropertySerializationDefinition $definition): string

@@ -6,6 +6,8 @@ namespace EventSauce\ObjectHydrator;
 
 use BackedEnum;
 
+use function array_filter;
+use function array_reverse;
 use function is_a;
 
 /**
@@ -25,6 +27,7 @@ final class PropertyHydrationDefinition
         public bool $nullable,
         public ?string $firstTypeName,
     ) {
+        $this->serializers = array_reverse(array_filter($this->serializers));
     }
 
     public function isBackedEnum(): bool
