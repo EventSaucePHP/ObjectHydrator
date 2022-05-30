@@ -42,7 +42,6 @@ converted from data to (complex) objects.
     - [**Static constructors**](#static-constructors)
 - [**Maximizing performance**](#maximizing-performance)
     - [**Dumping an optimized hydrator**](#dumping-an-optimized-hydrator)
-    - [**Dumping an optimized definition provider**](#dumping-an-optimized-definition-provider)
 
 ## Design goals
 
@@ -441,26 +440,6 @@ file_put_contents('src/AcmeCorp/YourOptimizedHydrator.php', $code);
 /** @var ObjectHydrator $hydrator */
 $hydrator = new AcmeCorp\YourOptimizedHydrator();
 $someObject = $hydrator->hydrateObject(SomeObject::class, $payload);
-```
-
-### Dumping an optimized definition provider
-
-When only need a cached version of the class and property definitions, you can dump those too.
-
-```php
-use EventSauce\ObjectHydrator\HydrationDefinitionProvider;
-use EventSauce\ObjectHydrator\HydrationDefinitionDumper;
-
-$dumpedClassNamed = "AcmeCorp\\YourOptimizedHydrationDefinitionProvider";
-$dumper = new HydrationDefinitionDumper();
-$classesToDump = [SomeCommand::class, AnotherCommand::class];
-
-$code = $dumper->dump($classesToDump, $dumpedClassNamed);
-file_put_contents('src/AcmeCorp/YourOptimizedHydrationDefinitionProvider.php', $code);
-
-/** @var HydrationDefinitionProvider $hydrator */
-$hydrator = new AcmeCorp\YourOptimizedHydrationDefinitionProvider();
-$definitionForSomeObject = $hydrator->provideDefinition(SomeObject::class);
 ```
 
 ### Tip: Use `league/construct-finder`
