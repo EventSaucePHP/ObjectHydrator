@@ -8,27 +8,17 @@ use BackedEnum;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
-use ReflectionObject;
-
 use ReflectionProperty;
-
 use ReflectionUnionType;
-
 use Throwable;
 use UnitEnum;
 
-use function array_key_exists;
 use function array_pop;
 use function array_reverse;
-use function assert;
 use function count;
-use function enum_exists;
-use function function_exists;
 use function get_class;
 use function is_a;
-use function is_array;
 use function is_object;
-use function var_dump;
 
 class ObjectSerializerUsingReflection implements ObjectSerializer
 {

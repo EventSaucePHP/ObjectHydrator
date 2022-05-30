@@ -9,7 +9,6 @@ use EventSauce\ObjectHydrator\ObjectHydrator;
 use EventSauce\ObjectHydrator\ObjectSerializer;
 use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\PropertySerializer;
-
 use function assert;
 use function in_array;
 use function is_array;
@@ -18,7 +17,7 @@ use function settype;
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
 final class CastListToType implements PropertyCaster, PropertySerializer
 {
-    const NATIVE_TYPES = ['bool', 'boolean', 'int', 'integer', 'float', 'double', 'string', 'array', 'object', 'null'];
+    public const NATIVE_TYPES = ['bool', 'boolean', 'int', 'integer', 'float', 'double', 'string', 'array', 'object', 'null'];
 
     private bool $nativePropertyType;
 
