@@ -45,7 +45,7 @@ class ObjectSerializerDumperTest extends ObjectSerializerTestCase
     private function createDumpedObjectSerializer(
         string $directory,
         string $className,
-        SerializationDefinitionProviderUsingReflection $definitionProvider
+        SerializationDefinitionProvider $definitionProvider
     ): ObjectSerializer {
         if (class_exists($className, false)) {
             goto create_object_serializer;
@@ -73,7 +73,7 @@ class ObjectSerializerDumperTest extends ObjectSerializerTestCase
 
     public function objectSerializer(): ObjectSerializer
     {
-        $definitionProvider = new SerializationDefinitionProviderUsingReflection();
+        $definitionProvider = new SerializationDefinitionProvider();
         $className = 'AcmeCorp\\DumpedSerializer';
 
         return $this->createDumpedObjectSerializer(__DIR__ . '/Fixtures', $className, $definitionProvider);
@@ -81,7 +81,7 @@ class ObjectSerializerDumperTest extends ObjectSerializerTestCase
 
     protected function objectSerializerFor81(): ObjectSerializer
     {
-        $definitionProvider = new SerializationDefinitionProviderUsingReflection();
+        $definitionProvider = new SerializationDefinitionProvider();
         $className = 'AcmeCorp\\DumpedSerializerFor81';
 
         return $this->createDumpedObjectSerializer(__DIR__ . '/FixturesFor81', $className, $definitionProvider);

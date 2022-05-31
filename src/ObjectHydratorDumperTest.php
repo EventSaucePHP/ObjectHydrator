@@ -13,14 +13,14 @@ use function unlink;
 
 class ObjectHydratorDumperTest extends ObjectHydratorTestCase
 {
-    private HydrationDefinitionProviderUsingReflection $defaultDefinitionProvider;
+    private HydrationDefinitionProvider $defaultDefinitionProvider;
 
     /**
      * @before
      */
     public function setupDefaultDefinitionProvider(): void
     {
-        $this->defaultDefinitionProvider ??= new HydrationDefinitionProviderUsingReflection(
+        $this->defaultDefinitionProvider ??= new HydrationDefinitionProvider(
             keyFormatter: new KeyFormatterWithoutConversion(),
         );
     }

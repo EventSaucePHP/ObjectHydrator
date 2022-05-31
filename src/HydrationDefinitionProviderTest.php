@@ -7,14 +7,14 @@ namespace EventSauce\ObjectHydrator;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use PHPUnit\Framework\TestCase;
 
-class HydrationDefinitionProviderUsingReflectionTest extends TestCase
+class HydrationDefinitionProviderTest extends TestCase
 {
     /**
      * @test
      */
     public function internal_classes_are_not_hydratable(): void
     {
-        $provider = new HydrationDefinitionProviderUsingReflection();
+        $provider = new HydrationDefinitionProvider();
 
         $definition = $provider->provideDefinition(ClassWithFormattedDateTimeInput::class);
         $dateTimeProperty = $definition->propertyDefinitions[0];

@@ -62,7 +62,7 @@ final class ClassExpander
 
     public static function expandClassesForSerialization(
         array $classes,
-        SerializationDefinitionProviderUsingReflection $definitionProvider
+        SerializationDefinitionProvider $definitionProvider
     ): array {
         $classes = array_values($classes);
 

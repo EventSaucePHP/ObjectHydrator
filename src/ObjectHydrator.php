@@ -4,14 +4,9 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
-use BackedEnum;
-use EventSauce\ObjectHydrator\FixturesFor81\IntegerEnum;
 use Generator;
 use Throwable;
-use UnitEnum;
-
 use function array_key_exists;
-use function call_user_func;
 use function constant;
 use function count;
 use function current;
@@ -24,7 +19,7 @@ use function json_encode;
  */
 class ObjectHydrator
 {
-    private ?HydrationDefinitionProvider $definitionProvider;
+    private HydrationDefinitionProvider $definitionProvider;
 
     /**
      * @var array<class-string<I>, I>
@@ -34,14 +29,16 @@ class ObjectHydrator
     public function __construct(
         ?HydrationDefinitionProvider $definitionProvider = null,
     ) {
-        $this->definitionProvider = $definitionProvider ?: new HydrationDefinitionProviderUsingReflection();
+        $this->definitionProvider = $definitionProvider ?? new HydrationDefinitionProvider();
     }
 
     /**
      * @template T
+     *
      * @param class-string<T> $className
      *
      * @return T
+     *
      * @throws UnableToHydrateObject
      */
     public function hydrateObject(string $className, array $payload): object
@@ -110,10 +107,12 @@ class ObjectHydrator
 
     /**
      * @template T
+     *
      * @param class-string<T> $className
      * @param iterable<array> $payloads;
      *
      * @return ListOfObjects<T>
+     *
      * @throws UnableToHydrateObject
      */
     public function hydrateObjects(string $className, iterable $payloads): ListOfObjects

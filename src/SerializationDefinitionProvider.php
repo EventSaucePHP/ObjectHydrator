@@ -14,7 +14,7 @@ use ReflectionUnionType;
 
 use function is_a;
 
-class SerializationDefinitionProviderUsingReflection
+class SerializationDefinitionProvider
 {
     private KeyFormatter $keyFormatter;
     private DefaultSerializerRepository $serializers;

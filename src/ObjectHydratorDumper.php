@@ -18,7 +18,7 @@ final class ObjectHydratorDumper
 
     public function __construct(HydrationDefinitionProvider $definitionProvider = null)
     {
-        $this->definitionProvider = $definitionProvider ?? new HydrationDefinitionProviderUsingReflection();
+        $this->definitionProvider = $definitionProvider ?? new HydrationDefinitionProvider();
     }
 
     public function dump(array $classes, string $dumpedClassName): string

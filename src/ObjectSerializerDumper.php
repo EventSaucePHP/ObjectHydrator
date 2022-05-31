@@ -21,12 +21,12 @@ use function var_export;
  */
 final class ObjectSerializerDumper
 {
-    private SerializationDefinitionProviderUsingReflection $definitionProvider;
+    private SerializationDefinitionProvider $definitionProvider;
 
     public function __construct(
-        SerializationDefinitionProviderUsingReflection $definitionProvider = null
+        SerializationDefinitionProvider $definitionProvider = null
     ) {
-        $this->definitionProvider = $definitionProvider ?? new SerializationDefinitionProviderUsingReflection();
+        $this->definitionProvider = $definitionProvider ?? new SerializationDefinitionProvider();
     }
 
     public function dump(array $classes, string $dumpedClassName): string
