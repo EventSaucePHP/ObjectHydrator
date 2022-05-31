@@ -6,5 +6,5 @@ namespace EventSauce\ObjectHydrator;
 
 interface PropertySerializer
 {
-    public function serialize(mixed $value, ObjectSerializer $serializer): mixed;
+    public function serialize(mixed $value, ObjectHydrator $hydrator): mixed;
 }

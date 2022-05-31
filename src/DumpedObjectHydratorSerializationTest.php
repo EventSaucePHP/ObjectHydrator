@@ -11,7 +11,7 @@ use function spl_object_hash;
 use function strpos;
 use function unlink;
 
-class ObjectHydratorDumperTest extends ObjectHydratorTestCase
+class DumpedObjectHydratorSerializationTest extends ObjectSerializerTestCase
 {
     private DefinitionProvider $defaultDefinitionProvider;
 
@@ -21,7 +21,7 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
     public function setupDefaultDefinitionProvider(): void
     {
         $this->defaultDefinitionProvider ??= new DefinitionProvider(
-            keyFormatter: new KeyFormatterWithoutConversion(),
+            keyFormatter: new KeyFormatterForSnakeCasing(),
         );
     }
 
@@ -71,7 +71,12 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
         return $this->createDumpedObjectHydrator(__DIR__ . '/Fixtures', $className, $definitionProvider);
     }
 
-    protected function createObjectHydratorFor81(): ObjectHydrator
+    public function objectHydrator(): ObjectHydrator
+    {
+        return $this->createDumpedObjectHydrator(__DIR__ . '/Fixtures', 'AcmeCorp\\DumpedHydrator', $this->defaultDefinitionProvider);
+    }
+
+    protected function objectHydratorFor81(): ObjectHydrator
     {
         return $this->createDumpedObjectHydrator(__DIR__ . '/FixturesFor81', 'AcmeCorp\\DumpedHydratorFor81', $this->defaultDefinitionProvider);
     }

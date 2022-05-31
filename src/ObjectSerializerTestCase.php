@@ -22,16 +22,15 @@ use PHPUnit\Framework\TestCase;
 
 abstract class ObjectSerializerTestCase extends TestCase
 {
-    abstract public function objectSerializer(): ObjectSerializer;
-
-    abstract protected function objectSerializerFor81(): ObjectSerializer;
+    abstract public function objectHydrator(): ObjectHydrator;
+    abstract protected function objectHydratorFor81(): ObjectHydrator;
 
     /**
      * @test
      */
     public function serializing_an_object_with_a_public_property(): void
     {
-        $serializer = $this->objectSerializer();
+        $serializer = $this->objectHydrator();
         $object = new ClassWithCamelCaseProperty('some_property');
 
         $payload = $serializer->serializeObject($object);
@@ -44,7 +43,7 @@ abstract class ObjectSerializerTestCase extends TestCase
      */
     public function serializing_an_object_with_a_public_method(): void
     {
-        $serializer = $this->objectSerializer();
+        $serializer = $this->objectHydrator();
         $object = new ClassWithCamelCasePublicMethod('some_property');
 
         $payload = $serializer->serializeObject($object);
@@ -57,7 +56,7 @@ abstract class ObjectSerializerTestCase extends TestCase
      */
     public function serializing_a_list_of_custom_objects(): void
     {
-        $serializer = $this->objectSerializer();
+        $serializer = $this->objectHydrator();
         $object = new ClassWithListOfObjects([
             new ClassWithCamelCasePublicMethod('first_element'),
             new ClassWithCamelCasePublicMethod('second_element'),
@@ -76,7 +75,7 @@ abstract class ObjectSerializerTestCase extends TestCase
      */
     public function serializing_a_list_of_internal_objects(): void
     {
-        $serializer = $this->objectSerializer();
+        $serializer = $this->objectHydrator();
         $now = new DateTimeImmutable();
         $nowFormatted = $now->format('Y-m-d H:i:s.uO');
         $object = new ClassWithListOfObjects([$now]);
@@ -91,7 +90,7 @@ abstract class ObjectSerializerTestCase extends TestCase
      */
     public function serializing_using_custom_date_time_formats(): void
     {
-        $serializer = $this->objectSerializer();
+        $serializer = $this->objectHydrator();
         $object = new ClassWithCustomDateTimeSerialization(
             promotedPublicProperty: DateTimeImmutable::createFromFormat('!Y-m-d', '1987-11-24'),
             regularPublicProperty: DateTimeImmutable::createFromFormat('!Y-m-d', '1987-11-25'),
@@ -113,7 +112,7 @@ abstract class ObjectSerializerTestCase extends TestCase
      */
     public function serializing_a_class_with_an_enum(): void
     {
-        $serializer = $this->objectSerializerFor81();
+        $serializer = $this->objectHydratorFor81();
         $object = new ClassWithEnumProperty(CustomEnum::VALUE_ONE);
 
         $payload = $serializer->serializeObject($object);
@@ -126,7 +125,7 @@ abstract class ObjectSerializerTestCase extends TestCase
      */
     public function serializing_a_class_with_a_union(): void
     {
-        $serializer = $this->objectSerializer();
+        $serializer = $this->objectHydrator();
         $object1 = new ClassWithUnionProperty(
             new ClassReferencedByUnionOne(1234),
             'name',
@@ -166,7 +165,7 @@ abstract class ObjectSerializerTestCase extends TestCase
      */
     public function mapping_to_a_different_key(): void
     {
-        $serializer = $this->objectSerializer();
+        $serializer = $this->objectHydrator();
         $object = new ClassWithMappedStringProperty(name: 'Frank');
 
         $payload = $serializer->serializeObject($object);
@@ -178,7 +177,7 @@ abstract class ObjectSerializerTestCase extends TestCase
      */
     public function mapping_to_multiple_keys(): void
     {
-        $serializer = $this->objectSerializer();
+        $serializer = $this->objectHydrator();
         $object = new ClassThatRenamesInputForClassWithMultipleProperties(
             new ClassWithMultipleProperties(age: 34, name: 'Frank')
         );

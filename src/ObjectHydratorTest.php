@@ -6,11 +6,11 @@ namespace EventSauce\ObjectHydrator;
 
 class ObjectHydratorTest extends ObjectHydratorTestCase
 {
-    protected function createObjectHydrator(HydrationDefinitionProvider $definitionProvider = null): ObjectHydrator
+    protected function createObjectHydrator(DefinitionProvider $definitionProvider = null): ObjectHydrator
     {
-        $definitionProvider ??= new HydrationDefinitionProvider(
+        $definitionProvider ??= new DefinitionProvider(
             keyFormatter: new KeyFormatterWithoutConversion()
         );
-        return new ObjectHydrator($definitionProvider);
+        return new ObjectHydratorUsingReflection($definitionProvider);
     }
 }

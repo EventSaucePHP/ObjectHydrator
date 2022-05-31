@@ -21,13 +21,13 @@ final class ClassExpander
     {
     }
 
-    public static function expandClassesForHydration(array $classes, HydrationDefinitionProvider $definitionProvider): array
+    public static function expandClassesForHydration(array $classes, DefinitionProvider $definitionProvider): array
     {
         $classes = array_values($classes);
 
         for ($i = 0; array_key_exists($i, $classes); ++$i) {
             $class = $classes[$i];
-            $classDefinition = $definitionProvider->provideDefinition($class);
+            $classDefinition = $definitionProvider->provideHydrationDefinition($class);
 
             foreach ($classDefinition->propertyDefinitions as $propertyDefinition) {
                 if ($propertyDefinition->canBeHydrated === false) {
@@ -62,13 +62,13 @@ final class ClassExpander
 
     public static function expandClassesForSerialization(
         array $classes,
-        SerializationDefinitionProvider $definitionProvider
+        DefinitionProvider $definitionProvider
     ): array {
         $classes = array_values($classes);
 
         for ($i = 0; array_key_exists($i, $classes); ++$i) {
             $class = $classes[$i];
-            $classDefinition = $definitionProvider->provideDefinition($class);
+            $classDefinition = $definitionProvider->provideSerializationDefinition($class);
 
             /** @var PropertySerializationDefinition $property */
             foreach ($classDefinition->properties as $property) {

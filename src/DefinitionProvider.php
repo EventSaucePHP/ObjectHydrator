@@ -11,22 +11,113 @@ use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionUnionType;
 
+use function count;
 use function is_a;
 
-class SerializationDefinitionProvider
+final class DefinitionProvider
 {
+    private DefaultCasterRepository $defaultCasters;
+
     private KeyFormatter $keyFormatter;
-    private DefaultSerializerRepository $serializers;
+
+    private DefaultSerializerRepository $defaultSerializers;
 
     public function __construct(
-        DefaultSerializerRepository $serializers = null,
+        DefaultCasterRepository $defaultCasterRepository = null,
         KeyFormatter $keyFormatter = null,
+        DefaultSerializerRepository $defaultSerializerRepository = null,
     ) {
-        $this->serializers = $serializers ?? DefaultSerializerRepository::builtIn();
+        $this->defaultCasters = $defaultCasterRepository ?? DefaultCasterRepository::builtIn();
         $this->keyFormatter = $keyFormatter ?? new KeyFormatterForSnakeCasing();
+        $this->defaultSerializers = $defaultSerializerRepository ?? DefaultSerializerRepository::builtIn();
     }
 
-    public function provideDefinition(string $className): ClassSerializationDefinition
+    /**
+     * BC method.
+     *
+     * @deprecated
+     */
+    public function provideDefinition(string $className): ClassHydrationDefinition
+    {
+        return $this->provideHydrationDefinition($className);
+    }
+
+    public function provideHydrationDefinition(string $className): ClassHydrationDefinition
+    {
+        $reflectionClass = new ReflectionClass($className);
+        $constructor = $this->resolveConstructor($reflectionClass);
+
+        /** @var PropertyHydrationDefinition[] $definitions */
+        $definitions = [];
+
+        $constructionStyle = $constructor instanceof ReflectionMethod ? $constructor->isConstructor(
+        ) ? 'new' : 'static' : 'new';
+        $constructorName = $constructionStyle === 'new' ? $className : $this->stringifyConstructor($constructor);
+        $parameters = $constructor instanceof ReflectionMethod ? $constructor->getParameters() : [];
+
+        foreach ($parameters as $parameter) {
+            $accessorName = $parameter->getName();
+            $key = $this->keyFormatter->propertyNameToKey($accessorName);
+            $parameterType = PropertyType::fromReflectionType($parameter->getType());
+            $firstTypeName = $parameterType->firstTypeName();
+            $keys = [$key => [$key]];
+            $attributes = $parameter->getAttributes();
+            $casters = [];
+
+            foreach ($attributes as $attribute) {
+                $attributeName = $attribute->getName();
+
+                if ($attributeName === MapFrom::class) {
+                    $keys = $attribute->newInstance()->keys;
+                }
+
+                if (is_a($attributeName, PropertyCaster::class, true)) {
+                    $casters[] = [$attributeName, $attribute->getArguments()];
+                }
+            }
+
+            if ($firstTypeName && count($casters) === 0 && $defaultCaster = $this->defaultCasters->casterFor(
+                    $firstTypeName
+                )) {
+                $casters = [$defaultCaster];
+            }
+
+            $definitions[] = new PropertyHydrationDefinition(
+                $keys,
+                $accessorName,
+                $casters,
+                $parameterType,
+                $parameterType->canBeHydrated(),
+                $parameterType->isEnum(),
+                $parameterType->allowsNull(),
+                $firstTypeName,
+            );
+        }
+
+        return new ClassHydrationDefinition($constructorName, $constructionStyle, ...$definitions);
+    }
+
+    private function resolveConstructor(ReflectionClass $reflectionClass): ?ReflectionMethod
+    {
+        $methods = $reflectionClass->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
+
+        foreach ($methods as $method) {
+            $isConstructor = $method->getAttributes(Constructor::class);
+
+            if (count($isConstructor) !== 0) {
+                return $method;
+            }
+        }
+
+        return $reflectionClass->getConstructor();
+    }
+
+    private function stringifyConstructor(ReflectionMethod $constructor): string
+    {
+        return $constructor->getDeclaringClass()->getName() . '::' . $constructor->getName();
+    }
+
+    public function provideSerializationDefinition(string $className): ClassSerializationDefinition
     {
         $reflection = new ReflectionClass($className);
         $publicMethod = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
@@ -78,7 +169,7 @@ class SerializationDefinitionProvider
     {
         $serializers = $this->resolveSerializersFromAttributes($attributes);
 
-        if (count($serializers) === 0 && $default = $this->serializers->serializerForType($type)) {
+        if (count($serializers) === 0 && $default = $this->defaultSerializers->serializerForType($type)) {
             $serializers[] = $default;
         }
 
@@ -87,12 +178,12 @@ class SerializationDefinitionProvider
 
     public function provideSerializer(string $type): ?array
     {
-        return $this->serializers->serializerForType($type);
+        return $this->defaultSerializers->serializerForType($type);
     }
 
     public function allSerializers(): array
     {
-        return $this->serializers->allSerializersPerType();
+        return $this->defaultSerializers->allSerializersPerType();
     }
 
     private function resolveSerializers(ReflectionUnionType|ReflectionNamedType $type, array $attributes): array
@@ -104,7 +195,7 @@ class SerializationDefinitionProvider
         }
 
         if ($type instanceof ReflectionNamedType) {
-            return [$this->serializers->serializerForType($type->getName())];
+            return [$this->defaultSerializers->serializerForType($type->getName())];
         }
 
         $serializersPerType = [];
@@ -137,7 +228,7 @@ class SerializationDefinitionProvider
 
     public function hasSerializerFor(string $name): bool
     {
-        return $this->serializers->serializerForType($name) !== null;
+        return $this->defaultSerializers->serializerForType($name) !== null;
     }
 
     /**

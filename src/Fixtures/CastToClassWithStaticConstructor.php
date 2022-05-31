@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator\Fixtures;
 
 use Attribute;
+use EventSauce\ObjectHydrator\ObjectHydratorUsingReflection;
 use EventSauce\ObjectHydrator\ObjectHydrator;
 use EventSauce\ObjectHydrator\PropertyCaster;
 

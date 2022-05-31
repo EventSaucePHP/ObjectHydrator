@@ -8,7 +8,6 @@ use Attribute;
 use DateTimeImmutable;
 use DateTimeInterface;
 use EventSauce\ObjectHydrator\ObjectHydrator;
-use EventSauce\ObjectHydrator\ObjectSerializer;
 use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\PropertySerializer;
 
@@ -35,7 +34,7 @@ final class CastToDateTimeImmutable implements PropertyCaster, PropertySerialize
         return new DateTimeImmutable($value);
     }
 
-    public function serialize(mixed $value, ObjectSerializer $serializer): mixed
+    public function serialize(mixed $value, ObjectHydrator $hydrator): mixed
     {
         assert($value instanceof DateTimeInterface);
 

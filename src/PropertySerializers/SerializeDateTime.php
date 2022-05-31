@@ -6,7 +6,7 @@ namespace EventSauce\ObjectHydrator\PropertySerializers;
 
 use Attribute;
 use DateTimeInterface;
-use EventSauce\ObjectHydrator\ObjectSerializer;
+use EventSauce\ObjectHydrator\ObjectHydrator;
 use EventSauce\ObjectHydrator\PropertySerializer;
 
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_METHOD | Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
@@ -16,7 +16,7 @@ class SerializeDateTime implements PropertySerializer
     {
     }
 
-    public function serialize(mixed $value, ObjectSerializer $serializer): mixed
+    public function serialize(mixed $value, ObjectHydrator $hydrator): mixed
     {
         return $value instanceof DateTimeInterface
             ? $value->format($this->format)

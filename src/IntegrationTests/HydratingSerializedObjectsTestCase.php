@@ -11,12 +11,10 @@ use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithIntegerEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithUnitEnumProperty;
 use EventSauce\ObjectHydrator\ObjectHydrator;
-use EventSauce\ObjectHydrator\ObjectSerializer;
 use PHPUnit\Framework\TestCase;
 
 abstract class HydratingSerializedObjectsTestCase extends TestCase
 {
-    abstract public function objectSerializer(): ObjectSerializer;
     abstract public function objectHydrator(): ObjectHydrator;
 
     /**
@@ -26,10 +24,9 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
     public function serializing_a_hydrated_class(string $className, array $input): void
     {
         $hydrator = $this->objectHydrator();
-        $serializer = $this->objectSerializer();
 
         $object = $hydrator->hydrateObject($className, $input);
-        $payload = $serializer->serializeObject($object);
+        $payload = $hydrator->serializeObject($object);
 
         self::assertInstanceOf($className, $object);
         self::assertEquals($input, $payload);

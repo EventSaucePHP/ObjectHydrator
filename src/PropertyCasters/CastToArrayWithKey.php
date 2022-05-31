@@ -6,7 +6,6 @@ namespace EventSauce\ObjectHydrator\PropertyCasters;
 
 use Attribute;
 use EventSauce\ObjectHydrator\ObjectHydrator;
-use EventSauce\ObjectHydrator\ObjectSerializer;
 use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\PropertySerializer;
 
@@ -24,10 +23,10 @@ final class CastToArrayWithKey implements PropertyCaster, PropertySerializer
         return [$this->key => $value];
     }
 
-    public function serialize(mixed $value, ObjectSerializer $serializer): mixed
+    public function serialize(mixed $value, ObjectHydrator $hydrator): mixed
     {
         if (is_object($value)) {
-            $value = $serializer->serializeObject($value);
+            $value = $hydrator->serializeObject($value);
         }
 
         return $value[$this->key] ?? null;

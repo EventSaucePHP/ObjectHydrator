@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator\Benchmarks;
 
 use EventSauce\ObjectHydrator\Fixtures\ExampleData;
+use EventSauce\ObjectHydrator\ObjectHydratorUsingReflection;
 use EventSauce\ObjectHydrator\ObjectHydrator;
 use Generator;
 use League\ConstructFinder\ConstructFinder;
@@ -23,7 +24,7 @@ use function gc_enable;
 
 abstract class HydrationBenchCase
 {
-    private ObjectHydrator $objectHydrator;
+    private ObjectHydratorUsingReflection $objectHydrator;
 
     private array $examples = [];
 

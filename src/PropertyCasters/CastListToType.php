@@ -6,7 +6,6 @@ namespace EventSauce\ObjectHydrator\PropertyCasters;
 
 use Attribute;
 use EventSauce\ObjectHydrator\ObjectHydrator;
-use EventSauce\ObjectHydrator\ObjectSerializer;
 use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\PropertySerializer;
 use function assert;
@@ -61,7 +60,7 @@ final class CastListToType implements PropertyCaster, PropertySerializer
         return $value;
     }
 
-    public function serialize(mixed $value, ObjectSerializer $serializer): mixed
+    public function serialize(mixed $value, ObjectHydrator $hydrator): mixed
     {
         assert(is_array($value), 'value should be an array');
 
@@ -74,7 +73,7 @@ final class CastListToType implements PropertyCaster, PropertySerializer
         }
 
         foreach ($value as $i => $item) {
-            $value[$i] = $serializer->serializeObject($item);
+            $value[$i] = $hydrator->serializeObject($item);
         }
 
         return $value;

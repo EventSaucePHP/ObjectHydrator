@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator\Benchmarks;
 
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectHydratorUsingReflection;
 use EventSauce\ObjectHydrator\ObjectHydratorDumper;
+use EventSauce\ObjectHydrator\ObjectHydrator;
 use League\ConstructFinder\ConstructFinder;
 
 use function class_exists;
