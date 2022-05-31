@@ -7,6 +7,7 @@ namespace EventSauce\ObjectHydrator;
 use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionMethod;
+
 use function count;
 use function is_a;
 
@@ -42,7 +43,6 @@ final class HydrationDefinitionProvider
             $parameterType = PropertyType::fromReflectionType($parameter->getType());
             $firstTypeName = $parameterType->firstTypeName();
             $keys = [$key => [$key]];
-
             $attributes = $parameter->getAttributes();
             $casters = [];
 
@@ -96,9 +96,6 @@ final class HydrationDefinitionProvider
 
     private function stringifyConstructor(ReflectionMethod $constructor): string
     {
-        $name = $constructor->getName();
-        $className = $constructor->getDeclaringClass()->getName();
-
-        return "$className::$name";
+        return $constructor->getDeclaringClass()->getName() . '::' . $constructor->getName();
     }
 }

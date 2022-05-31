@@ -35,7 +35,7 @@ class DefaultSerializerRepository
     /**
      * @param class-string<PropertySerializer> $serializerClass
      */
-    public function registerTypeSerializer(string $type, string $serializerClass, array $arguments = []): void
+    public function registerDefaultSerializer(string $type, string $serializerClass, array $arguments = []): void
     {
         $this->serializersPerType[$type] = [$serializerClass, $arguments];
     }
