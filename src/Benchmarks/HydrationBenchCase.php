@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator\Benchmarks;
 
 use EventSauce\ObjectHydrator\Fixtures\ExampleData;
-use EventSauce\ObjectHydrator\ObjectHydratorUsingReflection;
 use EventSauce\ObjectHydrator\ObjectHydrator;
 use Generator;
 use League\ConstructFinder\ConstructFinder;
