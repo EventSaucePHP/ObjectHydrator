@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator\PropertyCasters;
 
 use Attribute;
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectMapper;
 use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\PropertySerializer;
 use function assert;
@@ -27,7 +27,7 @@ final class CastListToType implements PropertyCaster, PropertySerializer
         $this->nativePropertyType = in_array($this->propertyType, self::NATIVE_TYPES);
     }
 
-    public function cast(mixed $value, ObjectHydrator $hydrator): mixed
+    public function cast(mixed $value, ObjectMapper $hydrator): mixed
     {
         assert(is_array($value), 'value is expected to be an array');
 
@@ -51,7 +51,7 @@ final class CastListToType implements PropertyCaster, PropertySerializer
         return $value;
     }
 
-    private function castToObjectType(array $value, ObjectHydrator $hydrator): array
+    private function castToObjectType(array $value, ObjectMapper $hydrator): array
     {
         foreach ($value as $i => $item) {
             $value[$i] = $hydrator->hydrateObject($this->propertyType, $item);
@@ -60,7 +60,7 @@ final class CastListToType implements PropertyCaster, PropertySerializer
         return $value;
     }
 
-    public function serialize(mixed $value, ObjectHydrator $hydrator): mixed
+    public function serialize(mixed $value, ObjectMapper $hydrator): mixed
     {
         assert(is_array($value), 'value should be an array');
 

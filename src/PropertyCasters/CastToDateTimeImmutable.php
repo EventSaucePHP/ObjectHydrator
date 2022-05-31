@@ -7,7 +7,7 @@ namespace EventSauce\ObjectHydrator\PropertyCasters;
 use Attribute;
 use DateTimeImmutable;
 use DateTimeInterface;
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectMapper;
 use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\PropertySerializer;
 
@@ -21,7 +21,7 @@ final class CastToDateTimeImmutable implements PropertyCaster, PropertySerialize
     {
     }
 
-    public function cast(mixed $value, ObjectHydrator $hydrator): mixed
+    public function cast(mixed $value, ObjectMapper $hydrator): mixed
     {
         if ($this->format !== null) {
             return DateTimeImmutable::createFromFormat($this->format, $value);
@@ -34,7 +34,7 @@ final class CastToDateTimeImmutable implements PropertyCaster, PropertySerialize
         return new DateTimeImmutable($value);
     }
 
-    public function serialize(mixed $value, ObjectHydrator $hydrator): mixed
+    public function serialize(mixed $value, ObjectMapper $hydrator): mixed
     {
         assert($value instanceof DateTimeInterface);
 

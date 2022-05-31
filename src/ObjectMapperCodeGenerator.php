@@ -15,7 +15,7 @@ use function implode;
 use function str_replace;
 use function var_export;
 
-final class ObjectHydratorDumper
+final class ObjectMapperCodeGenerator
 {
     private DefinitionProvider $definitionProvider;
 
@@ -75,8 +75,7 @@ declare(strict_types=1);
 namespace $namespace;
 
 use EventSauce\ObjectHydrator\IterableList;
-use EventSauce\ObjectHydrator\ObjectHydrator;
-use EventSauce\ObjectHydrator\ObjectSerializer;
+use EventSauce\ObjectHydrator\ObjectMapper;
 use EventSauce\ObjectHydrator\UnableToHydrateObject;
 use EventSauce\ObjectHydrator\UnableToSerializeObject;
 use Generator;
@@ -84,7 +83,7 @@ use Generator;
 /**
  * @template T
  */
-class $shortName implements ObjectHydrator
+class $shortName implements ObjectMapper
 {
     public function __construct() {}
 
@@ -366,7 +365,7 @@ CODE;
      * The serialization of this type can be done in either of these 3 ways.
      *
      *    1. There is NO serializer defined and the type is built-in => no conversion
-     *    2. There is NO serializer defined and the type is NOT built-in => serialize through ObjectSerializer
+     *    2. There is NO serializer defined and the type is NOT built-in => serialize through ObjectMapper
      *    3. There IS a serializer defined => serialize through value serializer
      */
     private function dumpSimpleClassProperty(PropertySerializationDefinition $definition): string
@@ -434,7 +433,7 @@ CODE;
      *
      * There are a couple of aspects that influence serialization. First off, a property serializer
      * may have been defined. In this case that serializer is always used. If no serializers are
-     * defined, custom types are serialized through the ObjectSerializer.
+     * defined, custom types are serialized through the ObjectMapper.
      */
     private function dumpComplexClassProperty(PropertySerializationDefinition $definition): string
     {

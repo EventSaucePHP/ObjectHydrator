@@ -20,10 +20,10 @@ use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\CustomEnum;
 use PHPUnit\Framework\TestCase;
 
-abstract class ObjectSerializerTestCase extends TestCase
+abstract class ObjectSerializationTestCase extends TestCase
 {
-    abstract public function objectHydrator(): ObjectHydrator;
-    abstract protected function objectHydratorFor81(): ObjectHydrator;
+    abstract public function objectHydrator(): ObjectMapper;
+    abstract protected function objectHydratorFor81(): ObjectMapper;
 
     /**
      * @test

@@ -11,7 +11,7 @@ use function spl_object_hash;
 use function strpos;
 use function unlink;
 
-class ObjectHydratorDumperTest extends ObjectHydratorTestCase
+class ObjectMapperCodeGeneratorHydrationTest extends ObjectHydrationTestCase
 {
     private DefinitionProvider $defaultDefinitionProvider;
 
@@ -37,14 +37,14 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
         self::assertInstanceOf(ClassWithMappedStringProperty::class, $object);
     }
 
-    private function createDumpedObjectHydrator(string $directory, string $className, DefinitionProvider $definitionProvider): ObjectHydrator
+    private function createDumpedObjectHydrator(string $directory, string $className, DefinitionProvider $definitionProvider): ObjectMapper
     {
         if (class_exists($className, false)) {
             goto create_object_hydrator;
         }
 
         $classes = ConstructFinder::locatedIn($directory)->findClassNames();
-        $dumper = new ObjectHydratorDumper($definitionProvider);
+        $dumper = new ObjectMapperCodeGenerator($definitionProvider);
 
         $dumpedDefinition = $dumper->dump(
             $classes,
@@ -57,13 +57,13 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
         unlink($filename);
 
         create_object_hydrator:
-        /** @var ObjectHydrator $objectHydrator */
+        /** @var ObjectMapper $objectHydrator */
         $objectHydrator = new $className();
 
         return $objectHydrator;
     }
 
-    protected function createObjectHydrator(DefinitionProvider $definitionProvider = null): ObjectHydrator
+    protected function createObjectHydrator(DefinitionProvider $definitionProvider = null): ObjectMapper
     {
         $definitionProvider ??= $this->defaultDefinitionProvider;
         $className = 'AcmeCorp\\DumpedHydrator' . spl_object_hash($definitionProvider);
@@ -71,7 +71,7 @@ class ObjectHydratorDumperTest extends ObjectHydratorTestCase
         return $this->createDumpedObjectHydrator(__DIR__ . '/Fixtures', $className, $definitionProvider);
     }
 
-    protected function createObjectHydratorFor81(): ObjectHydrator
+    protected function createObjectHydratorFor81(): ObjectMapper
     {
         return $this->createDumpedObjectHydrator(__DIR__ . '/FixturesFor81', 'AcmeCorp\\DumpedHydratorFor81', $this->defaultDefinitionProvider);
     }

@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator\Benchmarks;
 
-use EventSauce\ObjectHydrator\ObjectHydratorUsingReflection;
-use EventSauce\ObjectHydrator\DefinitionProvider;
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
+use EventSauce\ObjectHydrator\ObjectMapper;
 
 class ReflectionHydrationBench extends HydrationBenchCase
 {
-    protected function createObjectHydrator(): ObjectHydrator
+    protected function createObjectMapper(): ObjectMapper
     {
-        return new ObjectHydratorUsingReflection();
+        return new ObjectMapperUsingReflection();
     }
 }

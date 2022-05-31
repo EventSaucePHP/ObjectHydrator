@@ -7,9 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.0] - UNRELEASED
 
+### Deprecations
+
+- The `ObjectHydrator` class was deprecated, use `ObjectMapperUsingReflection` and hint against the new `ObjectMapper` interface.
+- The `ListOfObjects` class was deprecated, use the `IterableList` object instead.
+- The `KeyFormattingWithoutConversion` class was deprecated, use the `KeyFormatterWithoutConversion` class instead.
+
 ### Breaking Changes
 
-- The `ObjectHydrator` class was converted into an interface, the main implementation is `ObjectHydratorUsingReflection`.
+- The `ObjectHydrator` class was converted into an interface, the main implementation is `ObjectMapperUsingReflection`.
 - The `PropertyDefintion` class was renamed to `PropertyHydrationDefinition` to be symmetrical with the new `PropertySerializationDefinition`.
 - The `DefinitionProvider::provideDefinition` method was deprecated in favour of the new `provideHydrationDefinition` for symmetry with `provideSerializationDefinition`.
 - The `KeyFormatter` interface was changed by adding a `keyToPropertyName` method, needed for serialization.
@@ -17,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The `ObjectMapper` interface was introduced, which represents both generated and reflection based mappers.
 - [Major Feature] Serialization was added to the main `ObjectHydrator` interface.
 
 ## [0.3.1] - 2022-05-27

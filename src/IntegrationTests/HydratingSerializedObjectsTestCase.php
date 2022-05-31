@@ -10,12 +10,12 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyCasting;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithIntegerEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithUnitEnumProperty;
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectMapper;
 use PHPUnit\Framework\TestCase;
 
 abstract class HydratingSerializedObjectsTestCase extends TestCase
 {
-    abstract public function objectHydrator(): ObjectHydrator;
+    abstract public function objectHydrator(): ObjectMapper;
 
     /**
      * @test

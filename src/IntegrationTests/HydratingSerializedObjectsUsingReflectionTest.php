@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator\IntegrationTests;
 
-use EventSauce\ObjectHydrator\ObjectHydratorUsingReflection;
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
+use EventSauce\ObjectHydrator\ObjectMapper;
 
 class HydratingSerializedObjectsUsingReflectionTest extends HydratingSerializedObjectsTestCase
 {
-    public function objectHydrator(): ObjectHydrator
+    public function objectHydrator(): ObjectMapper
     {
-        return new ObjectHydratorUsingReflection();
+        return new ObjectMapperUsingReflection();
     }
 }

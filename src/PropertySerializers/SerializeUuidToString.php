@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator\PropertySerializers;
 
 use Attribute;
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectMapper;
 use EventSauce\ObjectHydrator\PropertySerializer;
 use LogicException;
 use Ramsey\Uuid\UuidInterface;
@@ -17,7 +17,7 @@ class SerializeUuidToString implements PropertySerializer
     {
     }
 
-    public function serialize(mixed $value, ObjectHydrator $hydrator): mixed
+    public function serialize(mixed $value, ObjectMapper $hydrator): mixed
     {
         assert($value instanceof UuidInterface);
 

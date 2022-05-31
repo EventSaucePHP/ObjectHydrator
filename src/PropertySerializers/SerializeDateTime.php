@@ -6,7 +6,7 @@ namespace EventSauce\ObjectHydrator\PropertySerializers;
 
 use Attribute;
 use DateTimeInterface;
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectMapper;
 use EventSauce\ObjectHydrator\PropertySerializer;
 
 use function assert;
@@ -18,7 +18,7 @@ class SerializeDateTime implements PropertySerializer
     {
     }
 
-    public function serialize(mixed $value, ObjectHydrator $hydrator): mixed
+    public function serialize(mixed $value, ObjectMapper $hydrator): mixed
     {
         assert($value instanceof DateTimeInterface);
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator\IntegrationTests;
 
-use EventSauce\ObjectHydrator\ObjectHydratorDumper;
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectMapperCodeGenerator;
+use EventSauce\ObjectHydrator\ObjectMapper;
 use League\ConstructFinder\ConstructFinder;
 
 use function array_push;
@@ -18,7 +18,7 @@ use const PHP_VERSION;
 
 class HydratingSerializedObjectsUsingCodeGenerationTest extends HydratingSerializedObjectsTestCase
 {
-    public function objectHydrator(): ObjectHydrator
+    public function objectHydrator(): ObjectMapper
     {
         $className = 'AcmeCorp\\GeneratedHydrator';
 
@@ -27,7 +27,7 @@ class HydratingSerializedObjectsUsingCodeGenerationTest extends HydratingSeriali
         }
 
         $classes = $this->findClasses();
-        $dumper = new ObjectHydratorDumper();
+        $dumper = new ObjectMapperCodeGenerator();
         $code = $dumper->dump($classes, $className);
 
         file_put_contents(__DIR__ . '/testHydrator.php', $code);

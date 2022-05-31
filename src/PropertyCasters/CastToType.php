@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator\PropertyCasters;
 
 use Attribute;
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectMapper;
 use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\PropertySerializer;
 
@@ -21,14 +21,14 @@ final class CastToType implements PropertyCaster, PropertySerializer
     ) {
     }
 
-    public function cast(mixed $value, ObjectHydrator $hydrator): mixed
+    public function cast(mixed $value, ObjectMapper $hydrator): mixed
     {
         settype($value, $this->propertyType);
 
         return $value;
     }
 
-    public function serialize(mixed $value, ObjectHydrator $hydrator): mixed
+    public function serialize(mixed $value, ObjectMapper $hydrator): mixed
     {
         if ($this->serializedType) {
             settype($value, $this->serializedType);

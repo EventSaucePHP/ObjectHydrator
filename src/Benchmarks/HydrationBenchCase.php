@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator\Benchmarks;
 
 use EventSauce\ObjectHydrator\Fixtures\ExampleData;
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectMapper;
 use Generator;
 use League\ConstructFinder\ConstructFinder;
 use PhpBench\Attributes\AfterMethods;
@@ -23,7 +23,7 @@ use function gc_enable;
 
 abstract class HydrationBenchCase
 {
-    private ObjectHydrator $objectHydrator;
+    private ObjectMapper $objectHydrator;
 
     private array $examples = [];
 
@@ -80,7 +80,7 @@ abstract class HydrationBenchCase
     public function prepareHydrator(array $params): void
     {
         gc_disable();
-        $this->objectHydrator = $this->createObjectHydrator();
+        $this->objectHydrator = $this->createObjectMapper();
         $examples = [];
         [$scale] = $params;
 
@@ -103,5 +103,5 @@ abstract class HydrationBenchCase
         yield ($exampleCount * 250) => [250];
     }
 
-    abstract protected function createObjectHydrator(): ObjectHydrator;
+    abstract protected function createObjectMapper(): ObjectMapper;
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator\PropertyCasters;
 
 use Attribute;
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectMapper;
 use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\PropertySerializer;
 
@@ -18,12 +18,12 @@ final class CastToArrayWithKey implements PropertyCaster, PropertySerializer
     {
     }
 
-    public function cast(mixed $value, ObjectHydrator $hydrator): mixed
+    public function cast(mixed $value, ObjectMapper $hydrator): mixed
     {
         return [$this->key => $value];
     }
 
-    public function serialize(mixed $value, ObjectHydrator $hydrator): mixed
+    public function serialize(mixed $value, ObjectMapper $hydrator): mixed
     {
         if (is_object($value)) {
             $value = $hydrator->serializeObject($value);

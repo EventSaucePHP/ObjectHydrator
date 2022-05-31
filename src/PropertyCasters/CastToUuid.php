@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator\PropertyCasters;
 
 use Attribute;
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectMapper;
 use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\PropertySerializer;
 use LogicException;
@@ -21,7 +21,7 @@ final class CastToUuid implements PropertyCaster, PropertySerializer
     {
     }
 
-    public function cast(mixed $value, ObjectHydrator $hydrator): UuidInterface
+    public function cast(mixed $value, ObjectMapper $hydrator): UuidInterface
     {
         $value = (string) $value;
 
@@ -34,7 +34,7 @@ final class CastToUuid implements PropertyCaster, PropertySerializer
         };
     }
 
-    public function serialize(mixed $value, ObjectHydrator $hydrator): string
+    public function serialize(mixed $value, ObjectMapper $hydrator): string
     {
         assert($value instanceof UuidInterface);
 

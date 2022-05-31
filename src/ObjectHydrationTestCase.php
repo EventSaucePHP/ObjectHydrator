@@ -27,7 +27,7 @@ use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
-abstract class ObjectHydratorTestCase extends TestCase
+abstract class ObjectHydrationTestCase extends TestCase
 {
     /**
      * @test
@@ -361,10 +361,10 @@ abstract class ObjectHydratorTestCase extends TestCase
         self::assertContainsOnlyInstancesOf(ClassWithPropertyCasting::class, $object->second);
     }
 
-    protected function createObjectHydratorFor81(): ObjectHydrator
+    protected function createObjectHydratorFor81(): ObjectMapper
     {
         return $this->createObjectHydrator();
     }
 
-    abstract protected function createObjectHydrator(DefinitionProvider $definitionProvider = null): ObjectHydrator;
+    abstract protected function createObjectHydrator(DefinitionProvider $definitionProvider = null): ObjectMapper;
 }

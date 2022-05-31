@@ -26,7 +26,7 @@ use function json_encode;
  * @template T
  * @template I
  */
-class ObjectHydratorUsingReflection implements ObjectHydrator
+class ObjectMapperUsingReflection implements ObjectMapper
 {
     private DefinitionProvider $definitionProvider;
 
