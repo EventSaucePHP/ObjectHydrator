@@ -60,7 +60,8 @@ abstract class HydrationBenchCase
     public function benchObjectHydration(): void
     {
         foreach ($this->examples as [$className, $data]) {
-            $this->objectHydrator->hydrateObject($className, $data);
+            $object = $this->objectHydrator->hydrateObject($className, $data);
+            $this->objectHydrator->serializeObject($object);
         }
     }
 
@@ -99,7 +100,7 @@ abstract class HydrationBenchCase
         yield ($exampleCount * 1) => [1];
         yield ($exampleCount * 10) => [10];
         yield ($exampleCount * 100) => [100];
-        yield ($exampleCount * 500) => [500];
+        yield ($exampleCount * 250) => [250];
     }
 
     abstract protected function createObjectHydrator(): ObjectHydrator;
