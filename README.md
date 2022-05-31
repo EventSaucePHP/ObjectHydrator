@@ -452,12 +452,7 @@ composer require league/construct-finder
 ```
 
 ```php
-use EventSauce\ObjectHydrator\HydrationDefinitionProvider;
-
 $classesToDump = ConstructFinder::locatedIn($directoryName)->findClassNames();
-
-$code = $dumper->dump($classesToDump, $dumpedClassNamed);
-file_put_contents('src/AcmeCorp/YourOptimizedHydrationDefinitionProvider.php', $code);
 ```
 
 
