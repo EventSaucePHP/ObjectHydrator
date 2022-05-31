@@ -60,7 +60,8 @@ composer require eventsauce/object-hydrator
 
 ## Usage
 
-By default, input is mapped by property name, and types need to match.
+By default, input is mapped by property name, and types need to match. By default, keys are mapped from snake_case input
+to camelCase properties.
 
 ```php
 use EventSauce\ObjectHydrator\ObjectHydrator;
@@ -79,7 +80,7 @@ $command = $hydrator->hydrateObject(
     ExampleCommand::class,
     [
         'name' => 'de Jonge',
-        'birthYear' => 1987
+        'birth_year' => 1987
     ],
 );
 
@@ -125,7 +126,7 @@ class ExampleCommand
 {
     public function __construct(
         public readonly string $name,
-        #[MapFrom('birth_year')]
+        #[MapFrom('year')]
         public readonly int $birthYear,
     ) {}
 }
