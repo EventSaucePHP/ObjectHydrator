@@ -76,8 +76,8 @@ class ObjectHydrator
 
                 $property = $definition->accessorName;
 
-                foreach ($definition->casters as $index => [$caster, $options]) {
-                    $key = "$className-$index-$caster-" . json_encode($options);
+                foreach ($definition->casters as [$caster, $options]) {
+                    $key = $className . json_encode($options);
                     /** @var PropertyCaster $propertyCaster */
                     $propertyCaster = $this->casterInstances[$key] ??= new $caster(...$options);
                     $value = $propertyCaster->cast($value, $this);
