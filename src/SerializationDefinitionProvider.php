@@ -9,7 +9,6 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionProperty;
-
 use ReflectionUnionType;
 
 use function is_a;
