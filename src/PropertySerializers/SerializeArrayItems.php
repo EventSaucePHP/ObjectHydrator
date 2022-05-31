@@ -8,6 +8,7 @@ use Attribute;
 use EventSauce\ObjectHydrator\ObjectHydrator;
 use EventSauce\ObjectHydrator\PropertySerializer;
 
+use function assert;
 use function is_array;
 use function is_object;
 
@@ -16,9 +17,7 @@ class SerializeArrayItems implements PropertySerializer
 {
     public function serialize(mixed $value, ObjectHydrator $hydrator): mixed
     {
-        if ( ! is_array($value)) {
-            return $value;
-        }
+        assert(is_array($value));
 
         foreach ($value as $index => $item) {
             if (is_object($item)) {

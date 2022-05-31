@@ -9,6 +9,8 @@ use DateTimeInterface;
 use EventSauce\ObjectHydrator\ObjectHydrator;
 use EventSauce\ObjectHydrator\PropertySerializer;
 
+use function assert;
+
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_METHOD | Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 class SerializeDateTime implements PropertySerializer
 {
@@ -18,8 +20,8 @@ class SerializeDateTime implements PropertySerializer
 
     public function serialize(mixed $value, ObjectHydrator $hydrator): mixed
     {
-        return $value instanceof DateTimeInterface
-            ? $value->format($this->format)
-            : $value;
+        assert($value instanceof DateTimeInterface);
+
+        return $value->format($this->format);
     }
 }
