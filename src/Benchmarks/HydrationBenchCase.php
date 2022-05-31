@@ -24,7 +24,7 @@ use function gc_enable;
 
 abstract class HydrationBenchCase
 {
-    private ObjectHydratorUsingReflection $objectHydrator;
+    private ObjectHydrator $objectHydrator;
 
     private array $examples = [];
 
