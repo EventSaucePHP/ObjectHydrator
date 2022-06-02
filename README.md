@@ -1,28 +1,36 @@
 # Object Hydrator
 
+This library allows magic-less conversion from serialized data to object and back. Unlike other
+object mappers, this library does not rely on magic reflection to set private properties. It
+hydrates and serializes objects as if you would do it by hand. The hydration mechanism inspects
+the constructor and figures out which keys need to map to which properties. The serialization
+mechanism inspects all public properties and getter-methods, converts the values from objects
+to plain data-structures. Unlike "magic" hydration mechanisms, that are able to grab
+private properties, this way to map objects opens the door to object mapping without reflection.
+You get all the convenience with none of the guilt (or performance hits).
+
 This is a utility that converts structured request data (for example: decoded JSON) into a
 complex object structure. The intended use of this utility is to receive request data and
 convert this into Command or Query object. The library is designed to follow a convention
 and does __not__ validate input.
 
-The object hydration can be achieved at **zero** expense, due to a ahead-of-time resolving of
-hydration steps using an [optimized dumper](#maximizing-performance).
+## When and why would you use this?
 
-## Why does this library exist?
+That's a good question, so let's dig in. Initially, this library was created to map plain
+data (like JSON request bodies) to strict object structures. The use of object (DTOs, Query
+and Command objects) is a great way to create expressive code that is easy to understand. Objects
+can be trusted to correctly represent concepts in your domain. The downside of using these
+objects is that they can be tedious to use. Construction and serialization becomes repetitive
+and writing the same code over and over is boring.  This library aims to remove the boring parts
+of object hydration and serialization.
 
-That's a good question, so let's dig in. The primary driver for creating this tool was the desire
-to use objects (DTOs, Query and Command objects) to interact with a software model instead of
-using plain (raw) data. The use of objects makes code easier to understand as it provides clarity
-over what data is available, and what the data is intended for. The use of objects also prevents
-having to check for the availability and correctness of the data at every place of use, it can be
-checked once and trusted many times.
+This library was built with two specific use-cases in mind:
 
-The use of objects also has down-sides, some more impactful than others. One of these is the
-burden of converting data into objects, which is what this library aims to eliminate. By
-providing a predictable convention much of the conversion can be automated away. The use of
-instrumentation (in the form of property casters) expands these capabilities by allowing
-users to provide re-usable building blocks that provide full control as to how properties are
-converted from data to (complex) objects.
+1. Construction of DTOs, Query-object, and Command-objects.
+2. Serialization and hydration of Event-objects.
+
+Object hydration and serialization can be achieved at **zero** expense, due to an ahead-of-time
+resolving steps using an [optimized dumper](#maximizing-performance).
 
 #### Quick links:
 
