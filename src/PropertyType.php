@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use BackedEnum;
-use EventSauce\ObjectHydrator\FixturesFor81\IntegerEnum;
 use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
