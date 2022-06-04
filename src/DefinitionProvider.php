@@ -12,12 +12,13 @@ use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
 
+use function array_key_exists;
 use function count;
 use function is_a;
-use function var_dump;
 
 final class DefinitionProvider
 {
+    private array $definitionCache = [];
     private DefaultCasterRepository $defaultCasters;
     private KeyFormatter $keyFormatter;
     private DefaultSerializerRepository $defaultSerializers;
@@ -47,6 +48,10 @@ final class DefinitionProvider
 
     public function provideHydrationDefinition(string $className): ClassHydrationDefinition
     {
+        if (array_key_exists($className, $this->definitionCache)) {
+            return $this->definitionCache[$className];
+        }
+
         $reflectionClass = new ReflectionClass($className);
         $constructor = $this->resolveConstructor($reflectionClass);
 
@@ -99,7 +104,7 @@ final class DefinitionProvider
             );
         }
 
-        return new ClassHydrationDefinition($constructorName, $constructionStyle, ...$definitions);
+        return $this->definitionCache[$className] = new ClassHydrationDefinition($constructorName, $constructionStyle, ...$definitions);
     }
 
     private function resolveConstructor(ReflectionClass $reflectionClass): ?ReflectionMethod
