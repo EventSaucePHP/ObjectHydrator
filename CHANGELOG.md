@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking Changes
 
-- The `ObjectHydrator` class was converted into an interface, the main implementation is `ObjectMapperUsingReflection`.
+- The `ObjectHydrator` class was converted into an interface named `ObjectMapper`, the main implementation is `ObjectMapperUsingReflection`.
 - The `PropertyDefintion` class was renamed to `PropertyHydrationDefinition` to be symmetrical with the new `PropertySerializationDefinition`.
 - The `DefinitionProvider::provideDefinition` method was deprecated in favour of the new `provideHydrationDefinition` for symmetry with `provideSerializationDefinition`.
 - The `KeyFormatter` interface was changed by adding a `keyToPropertyName` method, needed for serialization.
@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The `ObjectMapper` interface was introduced, which represents both generated and reflection based mappers.
 - [Major Feature] Serialization was added to the main `ObjectHydrator` interface.
+- Array hydration now also has rudimentary support for docblock type hints (`@param Type[] $name`, `@param array<Type> $name`, `@param array<string, Type> $name`).
 
 ## [0.3.1] - 2022-05-27
 
