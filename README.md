@@ -38,7 +38,7 @@ This library was built with two specific use-cases in mind:
 2. Serialization and hydration of Event-objects.
 
 Object hydration and serialization can be achieved at **zero** expense, due to an ahead-of-time
-resolving steps using an [optimized dumper](#maximizing-performance).
+resolving steps using [code generation](#maximizing-performance).
 
 #### Quick links:
 
@@ -58,7 +58,6 @@ resolving steps using an [optimized dumper](#maximizing-performance).
     - [**Creating your own property casters**](#creating-your-own-property-casters)
     - [**Static constructors**](#static-constructors)
 - [**Maximizing performance**](#maximizing-performance)
-    - [**Generating an optimized hydrator**](#generating-an-optimized-hydrator)
 
 ## Design goals
 
@@ -71,6 +70,13 @@ This package was created with a couple design goals in mind. They are the follow
 
 
 ## Usage
+
+This library supports hydration and serialization of objects.
+
+- [**Hydration Usage**](#hydration-usage)
+- [**Serilization Usage**](#serialization-usage)
+
+## Hydration Usage
 
 By default, input is mapped by property name, and types need to match. By default, keys are mapped from snake_case input
 to camelCase properties.
@@ -426,13 +432,73 @@ class ExampleCommand
 }
 ```
 
+## Serialization Usage
+
+By default, this library maps the public properties and getters to `snake_cased` arrays with plain data. 
+When user-defined objects are encountered, these are automatically converted to the plain data counterpart.
+
+```php
+class ExampleCommand
+{
+    public function __construct(
+        public readonly string $name,
+        public readonly int $birthYear,
+    ) {}
+}
+
+
+$command = new ExampleCommand('de Jonge', 1987);
+$payload = $mapper->serializeObject($command);
+
+$payload['name'] === 'de Jonge';
+$payload['birth_year'] === 1987;
+```
+
+### Custom Key Mapping
+
+Serialization inverts the key mapping used by hydration in a symmetrical way, including
+the mapping from multiple keys.
+
+```php
+use EventSauce\ObjectHydrator\MapFrom;
+
+class BirthDate
+{
+    public function __construct(
+        public int $year,
+        public int $month,
+        public int $day
+    ){}
+}
+
+class ExampleCommand
+{
+    public function __construct(
+        #[MapFrom('my_name')]
+        public readonly string $name,
+        #[MapFrom(['year_of_birth' => 'year', 'month', 'day'])]
+        public readonly BirthDate $birthDate,
+    ) {}
+}
+
+$command = new ExampleCommand(
+  'de Jonge',
+  new BirthDate(1987, 11, 24)
+);
+
+$payload = $mapper->serializeObject($command);
+
+$payload['my_name'] === 'de Jonge';
+$payload['year_of_birth'] === 1987;
+$payload['month'] === 11;
+$payload['day'] === 24;
+```
+
 ## Maximizing performance
 
 Reflection and dynamic code paths can be a performance "issue" in the hot-path. To remove the expense,
 optimized version can be dumped. These dumps are generated PHP files that perform the same construction
 of classes as the dynamic would, in an optimized way.
-
-### Generating an optimized mapper
 
 You can dump a fully optimized hydrator for a known set of classes. This dumper will dump the code required
 for  constructing the entire object tree, it automatically resolves the nested classes it can hydrate.
