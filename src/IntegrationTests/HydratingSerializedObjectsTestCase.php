@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator\IntegrationTests;
 
+use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToBasedOnDocComments;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToDifferentTypes;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatHasMultipleCastersOnSingleProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyCasting;
@@ -34,7 +35,7 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
 
     public function dataProvider(): iterable
     {
-        yield "class with two lists" => [
+        yield 'class with two lists' => [
             ClassThatCastsListsToDifferentTypes::class,
             [
                 'first' => [
@@ -45,29 +46,39 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
                     ['age' => 34],
                     ['age' => 31],
                 ],
-            ]
+            ],
         ];
 
-        yield "class with property type convertion" => [
+        yield 'class with list type resolve from doc comment' => [
+            ClassThatCastsListsToBasedOnDocComments::class,
+            [
+                'first' => [
+                    ['snake_case' => 'Frank'],
+                    ['snake_case' => 'Renske'],
+                ],
+            ],
+        ];
+
+        yield 'class with property type convertion' => [
             ClassWithPropertyCasting::class,
-            ['age' => '34']
+            ['age' => '34'],
         ];
 
-        yield "class with property mapped to a key" => [
+        yield 'class with property mapped to a key' => [
             ClassThatHasMultipleCastersOnSingleProperty::class,
             ['child' => 12345],
         ];
 
         if (version_compare(PHP_VERSION, '8.1.0', '>=')) {
-            yield "class with backed enum property" => [
+            yield 'class with backed enum property' => [
                 ClassWithEnumProperty::class,
                 ['enum' => 'two'],
             ];
-            yield "class with unit enum property" => [
+            yield 'class with unit enum property' => [
                 ClassWithUnitEnumProperty::class,
                 ['enum' => 'OptionA'],
             ];
-            yield "class with integer enum property" => [
+            yield 'class with integer enum property' => [
                 ClassWithIntegerEnumProperty::class,
                 ['enum' => 1],
             ];
