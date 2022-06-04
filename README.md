@@ -137,6 +137,44 @@ $command = $mapper->hydrateObject(
 );
 ```
 
+A simple doc-comment ensures that arrays of objects are automagically converted.
+
+```php
+class ChildObject
+{
+    public function __construct(
+        public readonly string $value,
+    ) {}
+}
+
+class ParentObject
+{
+    /**
+     * @param ChildObject[] $list
+     */
+    public function __construct(
+        public readonly array $list,
+    ) {}
+}
+
+$object = $mapper->hydrateObject(ParentObject::class, [
+  'list' => [
+    ['value' => 'one'],
+    ['value' => 'two'],
+  ],
+]);
+
+$object->list[0]->value === 'one';
+$object->list[1]->value === 'two';
+```
+
+The library supports the following formats:
+
+- `@param Type[] $name`
+- `@param array<Type> $name`
+- `@param array<string, Type> $name`
+- `@param array<int, Type> $name`
+
 ### Custom mapping key
 
 ```php
@@ -408,7 +446,7 @@ class ExampleCommand
 }
 ```
 
-## Static constructors
+### Static constructors
 
 Objects that require construction through static construction are supported. Mark the static method using
 the `Constructor` attribute. In these cases, the attributes should be placed on the parameters of the
