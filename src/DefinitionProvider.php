@@ -33,7 +33,7 @@ final class DefinitionProvider
         $this->defaultCasters = $defaultCasterRepository ?? DefaultCasterRepository::builtIn();
         $this->keyFormatter = $keyFormatter ?? new KeyFormatterForSnakeCasing();
         $this->defaultSerializers = $defaultSerializerRepository ?? DefaultSerializerRepository::builtIn();
-        $this->propertyTypeResolver = $propertyTypeResolver ?? new PropertyTypeResolver();
+        $this->propertyTypeResolver = $propertyTypeResolver ?? new NaivePropertyTypeResolver();
     }
 
     /**
