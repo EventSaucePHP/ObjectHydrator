@@ -76,7 +76,7 @@ This library supports hydration and serialization of objects.
 - [**Hydration Usage**](#hydration-usage)
 - [**Serilization Usage**](#serialization-usage)
 
-## Hydration Usage
+## Hydration usage
 
 By default, input is mapped by property name, and types need to match. By default, keys are mapped from snake_case input
 to camelCase properties.
@@ -135,7 +135,7 @@ $command = $mapper->hydrateObject(
 );
 ```
 
-### Custom Mapping Key
+### Custom mapping key
 
 ```php
 use EventSauce\ObjectHydrator\MapFrom;
@@ -432,7 +432,7 @@ class ExampleCommand
 }
 ```
 
-## Serialization Usage
+## Serialization usage
 
 By default, this library maps the public properties and getters to `snake_cased` arrays with plain data. 
 When user-defined objects are encountered, these are automatically converted to the plain data counterpart.
@@ -454,7 +454,7 @@ $payload['name'] === 'de Jonge';
 $payload['birth_year'] === 1987;
 ```
 
-### Custom Key Mapping
+### Custom key mapping
 
 Serialization inverts the key mapping used by hydration in a symmetrical way, including
 the mapping from multiple keys.
@@ -492,6 +492,45 @@ $payload['my_name'] === 'de Jonge';
 $payload['year_of_birth'] === 1987;
 $payload['month'] === 11;
 $payload['day'] === 24;
+```
+
+### Property serialization
+
+Similar to casters, custom serialization logic can be added by using "property serializers". Property
+serialization are custom annotations that provide a hook into the serialization process, allowing you
+to gain full control over the serialization mechanism whenever you need it.
+
+```php
+use EventSauce\ObjectHydrator\ObjectMapper;
+use EventSauce\ObjectHydrator\PropertySerializer;
+
+#[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_METHOD | Attribute::TARGET_PROPERTY)]
+class UppercaseString implements PropertySerializer
+{
+    public function serialize(mixed $value, ObjectMapper $hydrator): string
+    {
+        assert(is_string($value));
+        
+        return strtoupper($value);
+    }
+}
+
+class Shout
+{
+    public function __construct(
+        private readonly string $message
+    ) {}
+    
+    #[UppercaseString]
+    public function what(): string
+    {
+        return $this->message();
+    }
+}
+
+$payload = $mapper->serializeObject(new Shout('Hello, World!');
+
+$payload['what'] === 'HELLO, WORLD!';
 ```
 
 ## Maximizing performance
