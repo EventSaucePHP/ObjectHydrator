@@ -64,7 +64,7 @@ class PropertyTypeResolver
         $className = $declaringClass->name;
 
         if (array_key_exists($className, $cache)) {
-//            return $cache[$className];
+            return $cache[$className];
         }
 
         $fileName = $declaringClass->getFileName();
