@@ -1,4 +1,4 @@
-# Object Hydrator
+# Object Hydrator (and Serializer)
 
 ## Installation
 
@@ -58,7 +58,7 @@ resolving steps using an [optimized dumper](#maximizing-performance).
     - [**Creating your own property casters**](#creating-your-own-property-casters)
     - [**Static constructors**](#static-constructors)
 - [**Maximizing performance**](#maximizing-performance)
-    - [**Dumping an optimized hydrator**](#dumping-an-optimized-hydrator)
+    - [**Generating an optimized hydrator**](#generating-an-optimized-hydrator)
 
 ## Design goals
 
@@ -76,9 +76,9 @@ By default, input is mapped by property name, and types need to match. By defaul
 to camelCase properties.
 
 ```php
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
 
-$hydrator = new ObjectHydrator();
+$mapper = new ObjectMapperUsingReflection();
 
 class ExampleCommand
 {
@@ -88,7 +88,7 @@ class ExampleCommand
     ) {}
 }
 
-$command = $hydrator->hydrateObject(
+$command = $mapper->hydrateObject(
     ExampleCommand::class,
     [
         'name' => 'de Jonge',
@@ -118,7 +118,7 @@ class ParentObject
     ) {}
 }
 
-$command = $hydrator->hydrateObject(
+$command = $mapper->hydrateObject(
     ParentObject::class,
     [
         'value' => 'parent value',
@@ -172,7 +172,7 @@ class ExampleCommand
     ) {}
 }
 
-$hydrator->hydrateObject(ExampleCommand::class, [
+$mapper->hydrateObject(ExampleCommand::class, [
     'name' => 'Frank',
     'year_of_birth' => 1987,
     'month' => 11,
@@ -198,7 +198,7 @@ class ExampleCommand
     ) {}
 }
 
-$command = $hydrator->hydrateObject(
+$command = $mapper->hydrateObject(
     ExampleCommand::class,
     [
         'number' => '1234',
@@ -219,7 +219,7 @@ class ExampleCommand
     ) {}
 }
 
-$command = $hydrator->hydrateObject(
+$command = $mapper->hydrateObject(
     ExampleCommand::class,
     [
         'numbers' => ['1234', '2345'],
@@ -247,7 +247,7 @@ class ExampleCommand
     ) {}
 }
 
-$command = $hydrator->hydrateObject(
+$command = $mapper->hydrateObject(
     ExampleCommand::class,
     [
         'members' => [
@@ -271,7 +271,7 @@ class ExampleCommand
     ) {}
 }
 
-$command = $hydrator->hydrateObject(
+$command = $mapper->hydrateObject(
     ExampleCommand::class,
     [
         'birthDate' => '1987-11-24',
@@ -293,7 +293,7 @@ class ExampleCommand
     ) {}
 }
 
-$command = $hydrator->hydrateObject(
+$command = $mapper->hydrateObject(
     ExampleCommand::class,
     [
         'id' => '9f960d77-7c9b-4bfd-9fc4-62d141efc7e5',
@@ -321,7 +321,7 @@ class ExampleCommand
     ) {}
 }
 
-$command = $hydrator->hydrateObject(
+$command = $mapper->hydrateObject(
     ExampleCommand::class,
     [
         'number' => [1234],
@@ -344,7 +344,7 @@ Let's look at an example of a property caster:
 
 ```php
 use Attribute;
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectMapper;
 use EventSauce\ObjectHydrator\PropertyCaster;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
@@ -354,7 +354,7 @@ class CastToMoney implements PropertyCaster
         private string $currency
     ) {}
 
-    public function cast(mixed $value, ObjectHydrator $hydrator) : mixed
+    public function cast(mixed $value, ObjectMapper $mapper) : mixed
     {
         return new Money($value, Currency::fromString($this->currency));
     }
@@ -369,7 +369,7 @@ class CastUnionToType implements PropertyCaster
         private array $typeToClassMap
     ) {}
 
-    public function cast(mixed $value, ObjectHydrator $hydrator) : mixed
+    public function cast(mixed $value, ObjectMapper $mapper) : mixed
     {
         assert(is_array($value));
 
@@ -381,7 +381,7 @@ class CastUnionToType implements PropertyCaster
             throw new LogicException("Unable to map type '$type' to class.");
         }
 
-        return $hydrator->hydrateObject($className, $value);
+        return $mapper->hydrateObject($className, $value);
     }
 }
 ```
@@ -432,7 +432,7 @@ Reflection and dynamic code paths can be a performance "issue" in the hot-path. 
 optimized version can be dumped. These dumps are generated PHP files that perform the same construction
 of classes as the dynamic would, in an optimized way.
 
-### Dumping an optimized hydrator
+### Generating an optimized mapper
 
 You can dump a fully optimized hydrator for a known set of classes. This dumper will dump the code required
 for  constructing the entire object tree, it automatically resolves the nested classes it can hydrate.
@@ -440,19 +440,19 @@ for  constructing the entire object tree, it automatically resolves the nested c
 The dumped code is **3-10x faster** than the reflection based implementation. 
 
 ```php
-use EventSauce\ObjectHydrator\ObjectHydrator;
-use EventSauce\ObjectHydrator\ObjectHydratorDumper;
+use EventSauce\ObjectHydrator\ObjectMapper;
+use EventSauce\ObjectHydrator\ObjectMapperCodeGenerator;
 
-$dumpedClassNamed = "AcmeCorp\\YourOptimizedHydrator";
-$dumper = new ObjectHydratorDumper();
+$dumpedClassNamed = "AcmeCorp\\YourOptimizedMapper";
+$dumper = new ObjectMapperCodeGenerator();
 $classesToDump = [SomeCommand::class, AnotherCommand::class];
 
 $code = $dumper->dump($classesToDump, $dumpedClassNamed);
-file_put_contents('src/AcmeCorp/YourOptimizedHydrator.php', $code);
+file_put_contents('src/AcmeCorp/YourOptimizedMapper.php', $code);
 
-/** @var ObjectHydrator $hydrator */
-$hydrator = new AcmeCorp\YourOptimizedHydrator();
-$someObject = $hydrator->hydrateObject(SomeObject::class, $payload);
+/** @var ObjectMapper $mapper */
+$mapper = new AcmeCorp\YourOptimizedMapper();
+$someObject = $mapper->hydrateObject(SomeObject::class, $payload);
 ```
 
 ### Tip: Use `league/construct-finder`
