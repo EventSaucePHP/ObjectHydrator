@@ -10,6 +10,7 @@ use Throwable;
 use UnitEnum;
 
 use function array_key_exists;
+use function array_key_first;
 use function array_keys;
 use function array_pop;
 use function constant;
@@ -100,7 +101,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
                     $propertyType = $definition->propertyType;
 
                     if ($propertyType->isCollection()) {
-                        if (is_array($value[0] ?? false)) {
+                        if (is_array($value[array_key_first($value)] ?? false)) {
                             $value = $this->hydrateObjects($propertyType->firstTypeName(), $value)->toArray();
                         }
                     } else {
@@ -174,7 +175,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
 
                 $serializers = $property->serializers;
 
-                if (array_keys($serializers)[0] === 0) {
+                if (array_key_first($serializers) === 0) {
                     foreach ($serializers as $serializer) {
                         /** @var class-string<PropertySerializer> $serializerClass */
                         [$serializerClass, $arguments] = $serializer;
