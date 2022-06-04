@@ -35,6 +35,16 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
 
     public function dataProvider(): iterable
     {
+        yield 'class with list type resolve from doc comment' => [
+            ClassThatCastsListsToBasedOnDocComments::class,
+            [
+                'list' => [
+                    ['snake_case' => 'Frank'],
+                    ['snake_case' => 'Renske'],
+                ],
+            ],
+        ];
+
         yield 'class with two lists' => [
             ClassThatCastsListsToDifferentTypes::class,
             [
@@ -45,16 +55,6 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
                 'second' => [
                     ['age' => 34],
                     ['age' => 31],
-                ],
-            ],
-        ];
-
-        yield 'class with list type resolve from doc comment' => [
-            ClassThatCastsListsToBasedOnDocComments::class,
-            [
-                'first' => [
-                    ['snake_case' => 'Frank'],
-                    ['snake_case' => 'Renske'],
                 ],
             ],
         ];

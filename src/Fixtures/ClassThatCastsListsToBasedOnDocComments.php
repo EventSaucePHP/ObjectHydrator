@@ -12,7 +12,7 @@ class ClassThatCastsListsToBasedOnDocComments
      * @param CamelClass[] $list
      */
     public function __construct(
-        public array $first
+        public array $list
     ) {
     }
 }
