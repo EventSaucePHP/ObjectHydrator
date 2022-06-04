@@ -1,5 +1,13 @@
 # Object Hydrator
 
+## Installation
+
+```bash
+composer require eventsauce/object-hydrator
+```
+
+## About
+
 This library allows magic-less conversion from serialized data to object and back. Unlike other
 object mappers, this library does not rely on magic reflection to set private properties. It
 hydrates and serializes objects as if you would do it by hand. The hydration mechanism inspects
@@ -34,8 +42,9 @@ resolving steps using an [optimized dumper](#maximizing-performance).
 
 #### Quick links:
 
-- [**Design goals**](#design-goals)
 - [**Installation**](#installation)
+- [**About**](#about)
+- [**Design goals**](#design-goals)
 - [**Usage**](#usage)
     - [**Custom mapping key**](#custom-mapping-key)
     - [**Mapping from multiple keys**](#mapping-from-multiple-keys)
@@ -60,11 +69,6 @@ This package was created with a couple design goals in mind. They are the follow
 - Constructed objects should be valid from construction
 - Construction through (static) named constructors should be supported
 
-## Installation
-
-```bash
-composer require eventsauce/object-hydrator
-```
 
 ## Usage
 
