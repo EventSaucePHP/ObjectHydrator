@@ -19,6 +19,7 @@ use function in_array;
 use function is_array;
 use function is_file;
 use function is_string;
+use function preg_match;
 use function preg_match_all;
 use function str_ends_with;
 use function strpos;
@@ -132,7 +133,7 @@ class PropertyTypeResolver
         }
 
         $result = (int) preg_match_all(
-            '/\\*\\s+@param\\s+([A-Za-z\\\\\\[\\]]+)\\s+\\$([A-Aa-z_]+)/m',
+            '/\\*\\s+@param\\s+([A-Za-z0-9\\\\\\[\\] <>,]+)\\s+\\$([A-Aa-z_0-9]+)/m',
             $docBlock,
             $matches,
             PREG_SET_ORDER
@@ -180,6 +181,10 @@ class PropertyTypeResolver
     {
         if (str_ends_with($type, '[]')) {
             return substr($type, 0, -2);
+        }
+
+        if (preg_match('/array<(?:(int|string),\\s+)?([A-Za-z0-9\\\\]+)>/', $type, $matches)) {
+            return $matches[2];
         }
 
         throw new LogicException('Unable to resolve item type for type: ' . $type);

@@ -37,7 +37,7 @@ class IterableList implements IteratorAggregate
     public function toArray(): array
     {
         return $this->objects instanceof Traversable
-            ? iterator_to_array($this->objects, false)
+            ? iterator_to_array($this->objects, true)
             : (array) $this->objects;
     }
 }

@@ -42,6 +42,14 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
                     ['snake_case' => 'Frank'],
                     ['snake_case' => 'Renske'],
                 ],
+                'map' => [
+                    'one' => ['snake_case' => 'Frank'],
+                    'two' => ['snake_case' => 'Renske'],
+                ],
+                'array' => [
+                    1 => ['snake_case' => 'Frank'],
+                    '2' => ['snake_case' => 'Renske'],
+                ]
             ],
         ];
 

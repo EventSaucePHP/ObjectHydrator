@@ -138,8 +138,8 @@ class ObjectMapperUsingReflection implements ObjectMapper
 
     private function doHydrateObjects(string $className, iterable $payloads): Generator
     {
-        foreach ($payloads as $payload) {
-            yield $this->hydrateObject($className, $payload);
+        foreach ($payloads as $index => $payload) {
+            yield $index => $this->hydrateObject($className, $payload);
         }
     }
 
@@ -251,8 +251,8 @@ class ObjectMapperUsingReflection implements ObjectMapper
 
     private function doSerializeObjects(iterable $objects): Generator
     {
-        foreach ($objects as $object) {
-            yield $this->serializeObject($object);
+        foreach ($objects as $index => $object) {
+            yield $index => $this->serializeObject($object);
         }
     }
 }
