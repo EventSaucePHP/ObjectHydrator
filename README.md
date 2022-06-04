@@ -6,6 +6,8 @@
 composer require eventsauce/object-hydrator
 ```
 
+> Skip to [**usage documentation**](#usage).
+
 ## About
 
 This library allows magic-less conversion from serialized data to object and back. Unlike other
