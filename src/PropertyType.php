@@ -13,6 +13,7 @@ use function count;
 use function enum_exists;
 use function function_exists;
 use function is_a;
+use function var_dump;
 
 /**
  * @internal
@@ -24,6 +25,8 @@ final class PropertyType
 
     private bool $allowsNull;
 
+    private bool $isCollection = false;
+
     public function __construct(bool $allowsNull, ConcreteType ...$concreteTypes)
     {
         $this->concreteTypes = $concreteTypes;
@@ -33,6 +36,11 @@ final class PropertyType
     public function allowsNull(): bool
     {
         return $this->allowsNull;
+    }
+
+    public function isCollection(): bool
+    {
+        return $this->isCollection;
     }
 
     /**
@@ -67,7 +75,8 @@ final class PropertyType
 
     public function canBeHydrated(): bool
     {
-        return count($this->concreteTypes) === 1 && $this->concreteTypes[0]->isBuiltIn === false;
+        return count($this->concreteTypes) === 1
+            && ($this->concreteTypes[0]->isBuiltIn === false);
     }
 
     public static function fromReflectionType(
@@ -82,6 +91,14 @@ final class PropertyType
         }
 
         return static::fromNamedType($type);
+    }
+
+    public static function collectionContaining(ReflectionClass $reflectionClass): PropertyType
+    {
+        $type = new static(false, new ConcreteType($reflectionClass->getName(), ! $reflectionClass->isUserDefined()));
+        $type->isCollection = true;
+
+        return $type;
     }
 
     public static function fromNamedType(ReflectionNamedType $type): static

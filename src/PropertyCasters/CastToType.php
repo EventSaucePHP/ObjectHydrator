@@ -10,7 +10,6 @@ use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\PropertySerializer;
 
 use function settype;
-use function var_dump;
 
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
 final class CastToType implements PropertyCaster, PropertySerializer

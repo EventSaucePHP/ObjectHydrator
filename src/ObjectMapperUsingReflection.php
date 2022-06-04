@@ -21,11 +21,8 @@ use function is_a;
 use function is_array;
 use function is_object;
 use function json_encode;
+use function var_dump;
 
-/**
- * @template T
- * @template I
- */
 class ObjectMapperUsingReflection implements ObjectMapper
 {
     private DefinitionProvider $definitionProvider;
@@ -100,7 +97,15 @@ class ObjectMapperUsingReflection implements ObjectMapper
                 } elseif ($definition->isEnum) {
                     $value = constant("$typeName::$value");
                 } elseif ($definition->canBeHydrated && is_array($value)) {
-                    $value = $this->hydrateObject($typeName, $value);
+                    $propertyType = $definition->propertyType;
+
+                    if ($propertyType->isCollection()) {
+                        if (is_array($value[0] ?? false)) {
+                            $value = $this->hydrateObjects($propertyType->firstTypeName(), $value)->toArray();
+                        }
+                    } else {
+                        $value = $this->hydrateObject($typeName, $value);
+                    }
                 }
 
                 $properties[$property] = $value;

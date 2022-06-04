@@ -250,13 +250,23 @@ CODE;
 CODE;
 
             } elseif ($definition->canBeHydrated) {
-                $body .= <<<CODE
+                if ($definition->propertyType->isCollection()) {
+                    $body .= <<<CODE
+
+            if (is_array(\$value[array_key_first(\$value)] ?? false)) {
+                \$value = \$this->hydrateObjects('{$definition->firstTypeName}', \$value)->toArray();
+            }
+
+CODE;
+                } else {
+                    $body .= <<<CODE
 
             if (is_array(\$value)) {
                 \$value = \$this->hydrateObject('{$definition->firstTypeName}', \$value);
             }
 
 CODE;
+                }
             }
 
             $body .= <<<CODE

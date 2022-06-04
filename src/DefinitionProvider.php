@@ -8,28 +8,31 @@ use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
+use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
 
 use function count;
 use function is_a;
+use function var_dump;
 
 final class DefinitionProvider
 {
     private DefaultCasterRepository $defaultCasters;
-
     private KeyFormatter $keyFormatter;
-
     private DefaultSerializerRepository $defaultSerializers;
+    private PropertyTypeResolver $propertyTypeResolver;
 
     public function __construct(
         DefaultCasterRepository $defaultCasterRepository = null,
         KeyFormatter $keyFormatter = null,
         DefaultSerializerRepository $defaultSerializerRepository = null,
+        PropertyTypeResolver $propertyTypeResolver = null,
     ) {
         $this->defaultCasters = $defaultCasterRepository ?? DefaultCasterRepository::builtIn();
         $this->keyFormatter = $keyFormatter ?? new KeyFormatterForSnakeCasing();
         $this->defaultSerializers = $defaultSerializerRepository ?? DefaultSerializerRepository::builtIn();
+        $this->propertyTypeResolver = $propertyTypeResolver ?? new PropertyTypeResolver();
     }
 
     /**
@@ -53,12 +56,14 @@ final class DefinitionProvider
         $constructionStyle = $constructor instanceof ReflectionMethod ? $constructor->isConstructor(
         ) ? 'new' : 'static' : 'new';
         $constructorName = $constructionStyle === 'new' ? $className : $this->stringifyConstructor($constructor);
+
+        /** @var ReflectionParameter[] $parameters */
         $parameters = $constructor instanceof ReflectionMethod ? $constructor->getParameters() : [];
 
         foreach ($parameters as $parameter) {
             $accessorName = $parameter->getName();
             $key = $this->keyFormatter->propertyNameToKey($accessorName);
-            $parameterType = PropertyType::fromReflectionType($parameter->getType());
+            $parameterType = $this->propertyTypeResolver->typeFromConstructorParameter($parameter, $constructor);
             $firstTypeName = $parameterType->firstTypeName();
             $keys = [$key => [$key]];
             $attributes = $parameter->getAttributes();
