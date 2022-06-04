@@ -533,6 +533,45 @@ $payload = $mapper->serializeObject(new Shout('Hello, World!');
 $payload['what'] === 'HELLO, WORLD!';
 ```
 
+## Symmetrical conversion
+
+If configured consistently, hydration and serialization can be used to translate an object to raw data
+and back to the original object. A class can implement both the PropertyCaster` and `PropertySerializer`
+interface to become a symmetrical conversion mechanism.
+
+An example of this is the implementation of `CastToArrayWithKey`:
+
+```php
+use EventSauce\ObjectHydrator\ObjectMapper;
+use EventSauce\ObjectHydrator\PropertyCaster;
+use EventSauce\ObjectHydrator\PropertySerializer;
+
+class CastToArrayWithKey implements PropertyCaster, PropertySerializer
+{
+    public function __construct(private string $key)
+    {
+    }
+
+    public function cast(mixed $value, ObjectMapper $hydrator): mixed
+    {
+        return [$this->key => $value];
+    }
+
+    public function serialize(mixed $value, ObjectMapper $hydrator): mixed
+    {
+        if (is_object($value)) {
+            $value = $hydrator->serializeObject($value);
+        }
+
+        return $value[$this->key] ?? null;
+    }
+}
+```
+
+It's important to know that serialization and hydration hooks are triggered before any default conversion
+happens. If you wish to operate on serialized or hydrated data, you can hydrate/serialize the inner
+data/objects.
+
 ## Maximizing performance
 
 Reflection and dynamic code paths can be a performance "issue" in the hot-path. To remove the expense,
