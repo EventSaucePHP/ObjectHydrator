@@ -21,20 +21,20 @@ final class ClassExpander
     {
     }
 
-    public static function expandClasses(array $classes, DefinitionProvider $definitionProvider): array
+    public static function expandClassesForHydration(array $classes, DefinitionProvider $definitionProvider): array
     {
         $classes = array_values($classes);
 
         for ($i = 0; array_key_exists($i, $classes); ++$i) {
             $class = $classes[$i];
-            $classDefinition = $definitionProvider->provideDefinition($class);
+            $classDefinition = $definitionProvider->provideHydrationDefinition($class);
 
             foreach ($classDefinition->propertyDefinitions as $propertyDefinition) {
                 if ($propertyDefinition->canBeHydrated === false) {
                     continue;
                 }
 
-                $className = (string) $propertyDefinition->concreteTypeName;
+                $className = (string) $propertyDefinition->firstTypeName;
 
                 if ( ! in_array($className, $classes) && static::isClass($className)) {
                     $classes[] = $className;
@@ -58,5 +58,28 @@ final class ClassExpander
         } catch (Throwable) {
             return false;
         }
+    }
+
+    public static function expandClassesForSerialization(
+        array $classes,
+        DefinitionProvider $definitionProvider
+    ): array {
+        $classes = array_values($classes);
+
+        for ($i = 0; array_key_exists($i, $classes); ++$i) {
+            $class = $classes[$i];
+            $classDefinition = $definitionProvider->provideSerializationDefinition($class);
+
+            /** @var PropertySerializationDefinition $property */
+            foreach ($classDefinition->properties as $property) {
+                $type = $property->type;
+
+                if ( ! in_array($type, $classes) && self::isClass($type)) {
+                    $classes[] = $type;
+                }
+            }
+        }
+
+        return $classes;
     }
 }

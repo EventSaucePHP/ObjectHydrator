@@ -27,7 +27,7 @@ use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
-abstract class ObjectHydratorTestCase extends TestCase
+abstract class ObjectHydrationTestCase extends TestCase
 {
     /**
      * @test
@@ -168,7 +168,7 @@ abstract class ObjectHydratorTestCase extends TestCase
     public function using_default_key_conversion_from_snake_case(): void
     {
         $hydrator = $this->createObjectHydrator(
-            new ReflectionDefinitionProvider(null, new KeyFormatterForSnakeCasing())
+            new DefinitionProvider(null, new KeyFormatterForSnakeCasing())
         );
 
         $object = $hydrator->hydrateObject(ClassWithCamelCaseProperty::class, ['snake_case' => 'camelCase']);
@@ -361,10 +361,10 @@ abstract class ObjectHydratorTestCase extends TestCase
         self::assertContainsOnlyInstancesOf(ClassWithPropertyCasting::class, $object->second);
     }
 
-    protected function createObjectHydratorFor81(): ObjectHydrator
+    protected function createObjectHydratorFor81(): ObjectMapper
     {
         return $this->createObjectHydrator();
     }
 
-    abstract protected function createObjectHydrator(DefinitionProvider $definitionProvider = null): ObjectHydrator;
+    abstract protected function createObjectHydrator(DefinitionProvider $definitionProvider = null): ObjectMapper;
 }

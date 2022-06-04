@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
-class KeyFormattingWithoutConversion implements KeyFormatter
+/**
+ * @deprecated
+ * @see KeyFormatterWithoutConversion
+ */
+class KeyFormattingWithoutConversion extends KeyFormatterWithoutConversion
 {
-    public function propertyNameToKey(string $propertyName): string
-    {
-        return $propertyName;
-    }
 }

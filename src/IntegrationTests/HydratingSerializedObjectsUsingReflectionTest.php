@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace EventSauce\ObjectHydrator\Benchmarks;
+namespace EventSauce\ObjectHydrator\IntegrationTests;
 
 use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
 use EventSauce\ObjectHydrator\ObjectMapper;
 
-class ReflectionHydrationBench extends HydrationBenchCase
+class HydratingSerializedObjectsUsingReflectionTest extends HydratingSerializedObjectsTestCase
 {
-    protected function createObjectMapper(): ObjectMapper
+    public function objectHydrator(): ObjectMapper
     {
         return new ObjectMapperUsingReflection();
     }

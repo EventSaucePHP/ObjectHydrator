@@ -10,7 +10,7 @@ use EventSauce\ObjectHydrator\PropertyCasters\CastToType;
 final class ClassWithPropertyCasting
 {
     public function __construct(
-        #[CastToType('int')]
+        #[CastToType(propertyType: 'int', serializedType: 'string')]
         public int $age,
     ) {
     }

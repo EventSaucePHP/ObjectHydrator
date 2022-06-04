@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator\Benchmarks;
 
 use EventSauce\ObjectHydrator\Fixtures\ExampleData;
-use EventSauce\ObjectHydrator\ObjectHydrator;
+use EventSauce\ObjectHydrator\ObjectMapper;
 use Generator;
 use League\ConstructFinder\ConstructFinder;
 use PhpBench\Attributes\AfterMethods;
@@ -23,7 +23,7 @@ use function gc_enable;
 
 abstract class HydrationBenchCase
 {
-    private ObjectHydrator $objectHydrator;
+    private ObjectMapper $objectHydrator;
 
     private array $examples = [];
 
@@ -36,7 +36,6 @@ abstract class HydrationBenchCase
         foreach ($classes as $class) {
             $className = $class->name();
             $reflection = new ReflectionClass($className);
-
             $atttributes = $reflection->getAttributes(ExampleData::class);
 
             if (count($atttributes) === 0) {
@@ -61,7 +60,8 @@ abstract class HydrationBenchCase
     public function benchObjectHydration(): void
     {
         foreach ($this->examples as [$className, $data]) {
-            $this->objectHydrator->hydrateObject($className, $data);
+            $object = $this->objectHydrator->hydrateObject($className, $data);
+            $this->objectHydrator->serializeObject($object);
         }
     }
 
@@ -80,7 +80,7 @@ abstract class HydrationBenchCase
     public function prepareHydrator(array $params): void
     {
         gc_disable();
-        $this->objectHydrator = $this->createObjectHydrator();
+        $this->objectHydrator = $this->createObjectMapper();
         $examples = [];
         [$scale] = $params;
 
@@ -100,8 +100,8 @@ abstract class HydrationBenchCase
         yield ($exampleCount * 1) => [1];
         yield ($exampleCount * 10) => [10];
         yield ($exampleCount * 100) => [100];
-        yield ($exampleCount * 500) => [500];
+        yield ($exampleCount * 250) => [250];
     }
 
-    abstract protected function createObjectHydrator(): ObjectHydrator;
+    abstract protected function createObjectMapper(): ObjectMapper;
 }

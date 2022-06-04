@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator\Benchmarks;
 
-use EventSauce\ObjectHydrator\ObjectHydrator;
-use EventSauce\ObjectHydrator\ObjectHydratorDumper;
+use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
+use EventSauce\ObjectHydrator\ObjectMapperCodeGenerator;
+use EventSauce\ObjectHydrator\ObjectMapper;
 use League\ConstructFinder\ConstructFinder;
 
 use function class_exists;
@@ -14,12 +15,12 @@ use function unlink;
 
 class DumpedHydrationBench extends HydrationBenchCase
 {
-    protected function createObjectHydrator(): ObjectHydrator
+    protected function createObjectMapper(): ObjectMapper
     {
         if ( ! class_exists(DumpedObjectHydrator::class, true)) {
             $className = DumpedObjectHydrator::class;
             $classes = ConstructFinder::locatedIn(__DIR__ . '/../Fixtures')->findClassNames();
-            $dumper = new ObjectHydratorDumper();
+            $dumper = new ObjectMapperCodeGenerator();
             $code = $dumper->dump($classes, $className);
             file_put_contents(__DIR__.'/DumpedObjectHydrator.php', $code);
             include __DIR__ . '/DumpedObjectHydrator.php';

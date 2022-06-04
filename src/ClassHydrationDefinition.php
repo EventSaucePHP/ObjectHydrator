@@ -7,14 +7,14 @@ namespace EventSauce\ObjectHydrator;
 /**
  * @internal
  */
-final class ClassDefinition
+final class ClassHydrationDefinition
 {
     public array $propertyDefinitions;
 
     public function __construct(
         public string $constructor,
         public string $constructionStyle,
-        PropertyDefinition ...$propertyDefinitions,
+        PropertyHydrationDefinition ...$propertyDefinitions,
     ) {
         $this->propertyDefinitions = $propertyDefinitions;
     }

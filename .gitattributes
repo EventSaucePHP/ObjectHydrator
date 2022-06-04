@@ -6,6 +6,7 @@ src/**/*TestCase.php export-ignore
 src/Fixtures export-ignore
 src/Benchmarks export-ignore
 src/FixturesFor81 export-ignore
+src/IntegrationTests export-ignore
 phpunit.xml.dist export-ignore
 .gitignore export-ignore
 .gitattributes export-ignore
