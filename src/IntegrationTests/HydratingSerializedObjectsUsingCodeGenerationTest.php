@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator\IntegrationTests;
 
-use EventSauce\ObjectHydrator\ObjectMapperCodeGenerator;
+use const PHP_VERSION;
 use EventSauce\ObjectHydrator\ObjectMapper;
+use EventSauce\ObjectHydrator\ObjectMapperCodeGenerator;
 use League\ConstructFinder\ConstructFinder;
-
 use function array_push;
 use function class_exists;
 use function file_put_contents;
 use function unlink;
 use function version_compare;
-
-use const PHP_VERSION;
 
 class HydratingSerializedObjectsUsingCodeGenerationTest extends HydratingSerializedObjectsTestCase
 {
@@ -36,7 +34,7 @@ class HydratingSerializedObjectsUsingCodeGenerationTest extends HydratingSeriali
 
         make_it:
 
-        return new $className;
+        return new $className();
     }
 
     private function findClasses(): array

@@ -23,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 abstract class ObjectSerializationTestCase extends TestCase
 {
     abstract public function objectHydrator(): ObjectMapper;
+
     abstract protected function objectHydratorFor81(): ObjectMapper;
 
     /**

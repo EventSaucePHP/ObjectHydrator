@@ -248,7 +248,6 @@ CODE;
                 $body .= <<<CODE
             \$value = constant("$definition->firstTypeName::\$value");
 CODE;
-
             } elseif ($definition->canBeHydrated) {
                 if ($definition->propertyType->isCollection()) {
                     $body .= <<<CODE
@@ -434,6 +433,7 @@ CODE;
 
 CODE;
         }
+
         return $code;
     }
 
@@ -466,7 +466,6 @@ CODE;
             '$concreteType->name' => \$this->$serializerName(\$$definition->accessorName),
 
 CODE;
-
             }
 
             return <<<CODE
@@ -522,7 +521,6 @@ CODE;
         if (\$$definition->accessorName instanceof \\$type) {
 
 CODE;
-        ;
 
         foreach ($definition->serializers[$type] as $i => $serializer) {
             [$class, $arguments] = $serializer;

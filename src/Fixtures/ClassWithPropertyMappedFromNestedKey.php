@@ -12,7 +12,6 @@ class ClassWithPropertyMappedFromNestedKey
     public function __construct(
         #[MapFrom('nested.name', separator: '.')]
         public string $name
-    )
-    {
+    ) {
     }
 }

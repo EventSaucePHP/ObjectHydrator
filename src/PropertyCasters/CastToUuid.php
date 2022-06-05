@@ -11,7 +11,6 @@ use EventSauce\ObjectHydrator\PropertySerializer;
 use LogicException;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-
 use function assert;
 
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]

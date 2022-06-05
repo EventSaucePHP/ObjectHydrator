@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator\IntegrationTests;
 
-use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
 use EventSauce\ObjectHydrator\ObjectMapper;
+use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
 
 class HydratingSerializedObjectsUsingReflectionTest extends HydratingSerializedObjectsTestCase
 {

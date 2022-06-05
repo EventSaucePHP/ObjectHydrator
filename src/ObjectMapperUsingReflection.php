@@ -8,10 +8,8 @@ use BackedEnum;
 use Generator;
 use Throwable;
 use UnitEnum;
-
 use function array_key_exists;
 use function array_key_first;
-use function array_keys;
 use function array_pop;
 use function constant;
 use function count;
@@ -22,7 +20,6 @@ use function is_a;
 use function is_array;
 use function is_object;
 use function json_encode;
-use function var_dump;
 
 class ObjectMapperUsingReflection implements ObjectMapper
 {

@@ -16,7 +16,7 @@ final class DefaultCasterRepository
     private array $casters = [];
 
     /**
-     * BC forwarding function
+     * BC forwarding function.
      */
     public static function buildIn(): static
     {

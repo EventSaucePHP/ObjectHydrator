@@ -13,7 +13,6 @@ use function count;
 use function enum_exists;
 use function function_exists;
 use function is_a;
-use function var_dump;
 
 /**
  * @internal

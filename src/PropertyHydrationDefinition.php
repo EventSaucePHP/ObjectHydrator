@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
-use BackedEnum;
-
-use function array_filter;
-use function array_reverse;
-use function is_a;
-
 /**
  * @internal
  */

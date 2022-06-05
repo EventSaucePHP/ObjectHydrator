@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use Attribute;
-
 use function explode;
 use function is_string;
 

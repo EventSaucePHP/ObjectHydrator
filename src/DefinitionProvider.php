@@ -11,7 +11,6 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
-
 use function array_key_exists;
 use function count;
 use function is_a;

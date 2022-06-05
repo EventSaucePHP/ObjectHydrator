@@ -6,7 +6,6 @@ namespace EventSauce\ObjectHydrator;
 
 use BackedEnum;
 use UnitEnum;
-
 use function function_exists;
 use function is_a;
 

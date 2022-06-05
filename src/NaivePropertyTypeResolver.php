@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use const T_AS;
+use const T_NAME_QUALIFIED;
+use const T_STRING;
+use const T_USE;
+use const T_WHITESPACE;
 use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
 use RuntimeException;
-
 use function array_key_exists;
 use function array_shift;
 use function assert;
@@ -27,14 +31,6 @@ use function strrpos;
 use function substr;
 use function token_get_all;
 use function trim;
-
-use function var_dump;
-
-use const T_AS;
-use const T_NAME_QUALIFIED;
-use const T_STRING;
-use const T_USE;
-use const T_WHITESPACE;
 
 class NaivePropertyTypeResolver implements PropertyTypeResolver
 {
@@ -73,9 +69,7 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
             throw new RuntimeException("No filename available for class $className");
         }
 
-        $phpCode = file_get_contents($fileName) ?: throw new RuntimeException(
-            'Unable to read source file: ' . $fileName
-        );
+        $phpCode = file_get_contents($fileName) ?: throw new RuntimeException('Unable to read source file: ' . $fileName);
         $useMap = [];
         $tokens = token_get_all($phpCode);
 
@@ -133,7 +127,7 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
         }
 
         $result = (int) preg_match_all(
-            '/\\*\\s+@param\\s+([A-Za-z0-9\\\\\\[\\] <>,]+)\\s+\\$([A-Aa-z_0-9]+)/m',
+            '/\\*\\s+@param\\s+([A-Za-z0-9\\\\\\[\\]<>,]+)\\s\\$([A-Aa-z_0-9]+)/m',
             $docBlock,
             $matches,
             PREG_SET_ORDER
@@ -146,7 +140,7 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
         $commentTypeMap = [];
 
         foreach ($matches as [, $type, $paramName]) {
-            $type = $this->extractItemType($type);
+            $type = $this->extractItemType(trim($type));
 
             if (str_starts_with($type, '\\')) {
                 $commentTypeMap[$paramName] = $type;

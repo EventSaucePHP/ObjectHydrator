@@ -21,8 +21,7 @@ class ClassWithCustomDateTimeSerialization
         public DateTimeImmutable $promotedPublicProperty,
         DateTimeInterface $regularPublicProperty,
         DateTime $getterProperty
-    )
-    {
+    ) {
         $this->regularPublicProperty = $regularPublicProperty;
         $this->getterProperty = $getterProperty;
     }

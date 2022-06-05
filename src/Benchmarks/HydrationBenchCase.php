@@ -15,7 +15,6 @@ use PhpBench\Attributes\ParamProviders;
 use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
 use ReflectionClass;
-
 use function count;
 use function gc_collect_cycles;
 use function gc_disable;

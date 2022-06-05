@@ -7,7 +7,6 @@ namespace EventSauce\ObjectHydrator\Fixtures;
 use EventSauce\ObjectHydrator\PropertyCasters\CastToArrayWithKey;
 use EventSauce\ObjectHydrator\PropertyCasters\CastToType;
 
-
 #[ExampleData(['child' => 12345])]
 final class ClassThatHasMultipleCastersOnSingleProperty
 {

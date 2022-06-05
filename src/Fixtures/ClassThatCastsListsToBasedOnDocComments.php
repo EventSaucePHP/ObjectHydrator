@@ -9,9 +9,9 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCaseProperty as CamelClass;
 class ClassThatCastsListsToBasedOnDocComments
 {
     /**
-     * @param CamelClass[] $list
+     * @param CamelClass[]              $list
      * @param array<string, CamelClass> $map
-     * @param array<CamelClass> $map
+     * @param array<CamelClass>         $map
      */
     public function __construct(
         public array $list,

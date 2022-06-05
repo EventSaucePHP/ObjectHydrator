@@ -7,7 +7,6 @@ namespace EventSauce\ObjectHydrator\PropertySerializers;
 use Attribute;
 use EventSauce\ObjectHydrator\ObjectMapper;
 use EventSauce\ObjectHydrator\PropertySerializer;
-
 use function assert;
 use function is_array;
 use function is_object;

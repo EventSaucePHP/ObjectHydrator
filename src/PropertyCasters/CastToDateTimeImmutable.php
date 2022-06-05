@@ -10,7 +10,6 @@ use DateTimeInterface;
 use EventSauce\ObjectHydrator\ObjectMapper;
 use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\PropertySerializer;
-
 use function assert;
 use function is_int;
 

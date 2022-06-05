@@ -49,7 +49,7 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
                 'array' => [
                     1 => ['snake_case' => 'Frank'],
                     '2' => ['snake_case' => 'Renske'],
-                ]
+                ],
             ],
         ];
 

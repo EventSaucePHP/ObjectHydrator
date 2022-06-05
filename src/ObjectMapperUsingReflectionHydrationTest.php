@@ -11,6 +11,7 @@ class ObjectMapperUsingReflectionHydrationTest extends ObjectHydrationTestCase
         $definitionProvider ??= new DefinitionProvider(
             keyFormatter: new KeyFormatterWithoutConversion()
         );
+
         return new ObjectMapperUsingReflection($definitionProvider);
     }
 }

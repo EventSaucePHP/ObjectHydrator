@@ -11,6 +11,7 @@ use function iterator_to_array;
 
 /**
  * @template T
+ *
  * @internal
  */
 class IterableList implements IteratorAggregate
@@ -18,8 +19,6 @@ class IterableList implements IteratorAggregate
     public function __construct(private iterable $objects)
     {
     }
-
-
 
     /**
      * @return Traversable<T>
