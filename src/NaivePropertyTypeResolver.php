@@ -183,7 +183,7 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
             return substr($type, 0, -2);
         }
 
-        if (preg_match('/array<(?:(int|string),\\s+)?([A-Za-z0-9\\\\]+)>/', $type, $matches)) {
+        if (preg_match('/array<(?:(int(?:eger)?|string|mixed),\\s*)?([A-Za-z0-9\\\\]+)>/', $type, $matches)) {
             return $matches[2];
         }
 
