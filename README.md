@@ -612,14 +612,20 @@ It's important to know that serialization and hydration hooks are triggered befo
 happens. If you wish to operate on serialized or hydrated data, you can hydrate/serialize the inner
 data/objects.
 
+### Caster and serializer order
+
+In order to make hydration and serialization symmetrical (allowing back and forth conversion), the order
+of serializers called is reversed. 
+
 ## Maximizing performance
 
-Reflection and dynamic code paths can be a performance "issue" in the hot-path. To remove the expense,
-optimized version can be dumped. These dumps are generated PHP files that perform the same construction
-of classes as the dynamic would, in an optimized way.
+Reflection and dynamic code paths can be a performance issue in the hot-path. To remove the expense,
+an optimized implementation can be generated. The generated PHP code performs the same hydration and
+serialization of classes as the reflection-based implementation would. It's sort of a pre-compiler for
+this logic.
 
-You can dump a fully optimized hydrator for a known set of classes. This dumper will dump the code required
-for  constructing the entire object tree, it automatically resolves the nested classes it can hydrate.
+You can generate a fully optimized mapper for a known set of classes. The generator will produce the code
+required for constructing the entire object tree, automatically resolving the nested proprties it must map.
 
 The dumped code is **3-10x faster** than the reflection based implementation. 
 
@@ -652,6 +658,7 @@ composer require league/construct-finder
 $classesToDump = ConstructFinder::locatedIn($directoryName)->findClassNames();
 ```
 
+---
 
 ## Alternatives
 
