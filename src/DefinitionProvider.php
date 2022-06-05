@@ -12,6 +12,7 @@ use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
 use function array_key_exists;
+use function array_reverse;
 use function count;
 use function is_a;
 
@@ -161,10 +162,15 @@ final class DefinitionProvider
             $key = $this->keyFormatter->propertyNameToKey($property->getName());
             $propertyType = $property->getType();
             $attributes = $property->getAttributes();
+            $serializers = $this->resolveSerializers($propertyType, $attributes);
+
+            if ($property->isPromoted()) {
+                $serializers = array_reverse($serializers);
+            }
+
             $properties[] = new PropertySerializationDefinition(
                 PropertySerializationDefinition::TYPE_PROPERTY,
-                $property->getName(),
-                $this->resolveSerializers($propertyType, $attributes),
+                $property->getName(), $serializers,
                 PropertyType::fromReflectionType($propertyType),
                 $propertyType->allowsNull(),
                 $this->resolveKeys($key, $attributes),

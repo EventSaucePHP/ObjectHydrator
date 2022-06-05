@@ -20,7 +20,7 @@ class PropertySerializationDefinition
         public bool $nullable,
         public array $keys = [],
     ) {
-        $this->serializers = array_reverse(array_filter($this->serializers));
+        $this->serializers = array_filter($this->serializers);
     }
 
     public function formattedAccessor(): string

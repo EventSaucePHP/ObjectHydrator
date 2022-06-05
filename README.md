@@ -612,10 +612,10 @@ It's important to know that serialization and hydration hooks are triggered befo
 happens. If you wish to operate on serialized or hydrated data, you can hydrate/serialize the inner
 data/objects.
 
-### Caster and serializer order
+### ⚠️ Caster and serializer order
 
 In order to make hydration and serialization symmetrical (allowing back and forth conversion), the order
-of serializers called is reversed. 
+of serializers called is reversed for _promoted_ properties.
 
 ## Maximizing performance
 
