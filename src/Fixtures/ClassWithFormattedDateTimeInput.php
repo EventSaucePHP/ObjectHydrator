@@ -11,7 +11,7 @@ use EventSauce\ObjectHydrator\PropertyCasters\CastToDateTimeImmutable;
 final class ClassWithFormattedDateTimeInput
 {
     public function __construct(
-        #[CastToDateTimeImmutable('!d-m-Y')]
+        #[CastToDateTimeImmutable('!d-m-Y', 'Europe/Amsterdam')]
         public DateTimeImmutable $date
     ) {
     }

@@ -227,6 +227,7 @@ abstract class ObjectHydrationTestCase extends TestCase
 
         self::assertInstanceOf(ClassWithFormattedDateTimeInput::class, $object);
         self::assertEquals('1987-11-24 00:00:00', $object->date->format('Y-m-d H:i:s'));
+        self::assertEquals('Europe/Amsterdam', $object->date->getTimezone()->getName());
     }
 
     /**
