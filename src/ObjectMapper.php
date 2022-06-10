@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
-/**
- * @template T
- * @template I
- */
 interface ObjectMapper
 {
     /**
@@ -25,7 +21,7 @@ interface ObjectMapper
      * @template T
      *
      * @param class-string<T> $className
-     * @param iterable<array> $payloads  ;
+     * @param iterable<array> $payloads
      *
      * @return IterableList<T>
      *
@@ -41,8 +37,7 @@ interface ObjectMapper
     /**
      * @template T
      *
-     * @param class-string<T> $className
-     * @param iterable<array> $payloads  ;
+     * @param iterable<array> $payloads
      *
      * @return IterableList<T>
      *
