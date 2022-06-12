@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use function array_filter;
-use function array_reverse;
 
 class PropertySerializationDefinition
 {
