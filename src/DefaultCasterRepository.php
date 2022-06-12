@@ -12,7 +12,9 @@ use Ramsey\Uuid\UuidInterface;
 
 final class DefaultCasterRepository
 {
-    /** @var array<string, array<string, array>> */
+    /**
+     * @var array<class-string, array<class-string<PropertyCaster>, array<mixed>>>
+     */
     private array $casters = [];
 
     /**
@@ -36,6 +38,7 @@ final class DefaultCasterRepository
     /**
      * @param class-string                 $propertyClassName
      * @param class-string<PropertyCaster> $casterClassName
+     * @param array<mixed>                 $arguments
      *
      * @return $this
      */
@@ -49,6 +52,10 @@ final class DefaultCasterRepository
         return $this;
     }
 
+    /**
+     * @param string $propertyClassName
+     * @return array<class-string<PropertyCaster>, array<mixed>>|null
+     */
     public function casterFor(string $propertyClassName): ?array
     {
         return $this->casters[$propertyClassName] ?? null;

@@ -7,9 +7,10 @@ namespace EventSauce\ObjectHydrator;
 interface ObjectMapper
 {
     /**
-     * @template T
+     * @template T of object
      *
      * @param class-string<T> $className
+     * @param array<mixed> $payload
      *
      * @return T
      *
@@ -21,7 +22,7 @@ interface ObjectMapper
      * @template T
      *
      * @param class-string<T> $className
-     * @param iterable<array> $payloads  ;
+     * @param iterable<array<mixed>> $payloads  ;
      *
      * @return IterableList<T>
      *
@@ -35,12 +36,9 @@ interface ObjectMapper
     public function serializeObject(object $object): mixed;
 
     /**
-     * @template T
+     * @param iterable<object> $payloads
      *
-     * @param class-string<T> $className
-     * @param iterable<array> $payloads  ;
-     *
-     * @return IterableList<T>
+     * @return IterableList<array<mixed>>
      *
      * @throws UnableToSerializeObject
      */

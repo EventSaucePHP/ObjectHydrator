@@ -12,7 +12,8 @@
         "ramsey/uuid": "^4.2",
         "friendsofphp/php-cs-fixer": "^3.4",
         "phpbench/phpbench": "^1.2",
-        "league/construct-finder": "^1.1"
+        "league/construct-finder": "^1.1",
+        "phpstan/phpstan": "^1.7"
     },
     "suggest": {
         "league/construct-finder": "Find all classes in a directory for the best dumped hydrators."

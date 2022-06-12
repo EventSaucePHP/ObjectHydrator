@@ -14,3 +14,4 @@ phpunit.xml.dist export-ignore
 README.md export-ignore
 CHANGELOG.md export-ignore
 composer.lock export-ignore
+phpstan.neon export-ignore

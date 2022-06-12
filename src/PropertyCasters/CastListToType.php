@@ -39,7 +39,7 @@ final class CastListToType implements PropertyCaster, PropertySerializer
     }
 
     /**
-     * @param mixed $value
+     * @param array<mixed> $value
      */
     private function castToNativeType(array $value, string $type): mixed
     {

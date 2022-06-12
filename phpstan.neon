@@ -1,0 +1,16 @@
+parameters:
+    level: 5
+    paths:
+        - src
+    excludePaths:
+        - src/Benchmarks/*
+        - src/Fixtures/*
+        - src/FixturesFor81/*
+        - *TestCase.php
+        - *Test.php
+    checkGenericClassInNonGenericObjectType: false
+
+    ignoreErrors:
+        - '#expects ReflectionIntersectionType\|ReflectionNamedType\|ReflectionUnionType\|null, ReflectionType\|null given.#'
+        - '#expects ReflectionNamedType\|ReflectionUnionType, ReflectionType\|null given.#'
+        - '#Using nullsafe property access on non-nullable type EventSauce\\ObjectHydrator\\ConcreteType. Use -> instead.#'

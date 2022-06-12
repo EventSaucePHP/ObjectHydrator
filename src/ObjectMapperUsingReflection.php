@@ -28,7 +28,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
     /** @var array<string, PropertyCaster> */
     private array $casterInstances = [];
 
-    /** @var array<string, PropertySerializer */
+    /** @var array<string, PropertySerializer> */
     private array $serializerCache = [];
 
     public function __construct(
@@ -38,7 +38,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
     }
 
     /**
-     * @template T
+     * @template T of object
      *
      * @param class-string<T> $className
      *
@@ -232,12 +232,9 @@ class ObjectMapperUsingReflection implements ObjectMapper
     }
 
     /**
-     * @template T
+     * @param iterable<object> $payloads;
      *
-     * @param class-string<T> $className
-     * @param iterable<array> $payloads;
-     *
-     * @return IterableList<T>
+     * @return IterableList<array<mixed>>
      *
      * @throws UnableToSerializeObject
      */

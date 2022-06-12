@@ -14,6 +14,9 @@ final class MapFrom
     /** @var array<string, array<string>> */
     public array $keys = [];
 
+    /**
+     * @param string|array<int|string, string> $keyOrMap
+     */
     public function __construct(string|array $keyOrMap, public ?string $separator = null)
     {
         if (is_string($keyOrMap)) {

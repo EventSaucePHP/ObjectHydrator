@@ -9,6 +9,7 @@ namespace EventSauce\ObjectHydrator;
  */
 final class ClassHydrationDefinition
 {
+    /** @var PropertyHydrationDefinition[] */
     public array $propertyDefinitions;
 
     public function __construct(

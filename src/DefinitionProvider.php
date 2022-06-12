@@ -11,6 +11,7 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
+
 use function array_key_exists;
 use function array_reverse;
 use function count;
@@ -18,10 +19,15 @@ use function is_a;
 
 final class DefinitionProvider
 {
+    /** @var array<class-string, ClassHydrationDefinition> */
     private array $definitionCache = [];
+
     private DefaultCasterRepository $defaultCasters;
+
     private KeyFormatter $keyFormatter;
+
     private DefaultSerializerRepository $defaultSerializers;
+
     private PropertyTypeResolver $propertyTypeResolver;
 
     public function __construct(
@@ -104,9 +110,18 @@ final class DefinitionProvider
             );
         }
 
-        return $this->definitionCache[$className] = new ClassHydrationDefinition($constructorName, $constructionStyle, ...$definitions);
+        return $this->definitionCache[$className] = new ClassHydrationDefinition(
+            $constructorName,
+            $constructionStyle,
+            ...
+            $definitions
+        );
     }
 
+    /**
+     * @param ReflectionClass $reflectionClass
+     * @return ReflectionMethod|null
+     */
     private function resolveConstructor(ReflectionClass $reflectionClass): ?ReflectionMethod
     {
         $methods = $reflectionClass->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
@@ -140,6 +155,7 @@ final class DefinitionProvider
 
             $methodName = $method->getShortName();
             $key = $this->keyFormatter->propertyNameToKey($methodName);
+            /** @var ReflectionNamedType|ReflectionUnionType $returnType */
             $returnType = $method->getReturnType();
             $attributes = $method->getAttributes();
             $properties[] = new PropertySerializationDefinition(
@@ -170,7 +186,8 @@ final class DefinitionProvider
 
             $properties[] = new PropertySerializationDefinition(
                 PropertySerializationDefinition::TYPE_PROPERTY,
-                $property->getName(), $serializers,
+                $property->getName(),
+                $serializers,
                 PropertyType::fromReflectionType($propertyType),
                 $propertyType->allowsNull(),
                 $this->resolveKeys($key, $attributes),
@@ -180,7 +197,7 @@ final class DefinitionProvider
         return new ClassSerializationDefinition($properties);
     }
 
-    private function resolveSerializer(string $type, array $attributes): ?array
+    private function resolveSerializer(string $type, array $attributes): array
     {
         $serializers = $this->resolveSerializersFromAttributes($attributes);
 
@@ -201,6 +218,11 @@ final class DefinitionProvider
         return $this->defaultSerializers->allSerializersPerType();
     }
 
+    /**
+     * @param ReflectionAttribute[] $attributes
+     *
+     * @return array<string, array{0: class-string<PropertySerializer>, 1: array<mixed>}>|array<array{0: class-string<PropertySerializer>, 1: array<mixed>}>
+     */
     private function resolveSerializers(ReflectionUnionType|ReflectionNamedType $type, array $attributes): array
     {
         $attributeSerializer = $this->resolveSerializersFromAttributes($attributes);
