@@ -81,11 +81,13 @@ class ObjectMapperUsingReflection implements ObjectMapper
 
                 $property = $definition->accessorName;
 
-                foreach ($definition->casters as [$caster, $options]) {
-                    $key = $className . json_encode($options);
-                    /** @var PropertyCaster $propertyCaster */
-                    $propertyCaster = $this->casterInstances[$key] ??= new $caster(...$options);
-                    $value = $propertyCaster->cast($value, $this);
+                if ($value !== null) {
+                    foreach ($definition->casters as [$caster, $options]) {
+                        $key = $className . json_encode($options);
+                        /** @var PropertyCaster $propertyCaster */
+                        $propertyCaster = $this->casterInstances[$key] ??= new $caster(...$options);
+                        $value = $propertyCaster->cast($value, $this);
+                    }
                 }
 
                 $typeName = $definition->firstTypeName;
@@ -232,7 +234,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
     }
 
     /**
-     * @param iterable<object> $payloads;
+     * @param iterable<object> $payloads ;
      *
      * @return IterableList<array<mixed>>
      *
