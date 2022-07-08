@@ -234,7 +234,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
     }
 
     /**
-     * @param iterable<object> $payloads ;
+     * @param iterable<object> $payloads
      *
      * @return IterableList<array<mixed>>
      *
