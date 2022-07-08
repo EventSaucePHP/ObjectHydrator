@@ -14,6 +14,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithNotCastedDateTimeInput;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithNullableInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyCasting;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyMappedFromNestedKey;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyThatUsesListCasting;
@@ -29,6 +30,33 @@ use Ramsey\Uuid\UuidInterface;
 
 abstract class ObjectHydrationTestCase extends TestCase
 {
+
+    /**
+     * @test
+     */
+    public function nullable_property_can_be_mapped_with_null_input(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $object = $hydrator->hydrateObject(ClassWithNullableInput::class, ['date' => null]);
+
+        self::assertInstanceOf(ClassWithNullableInput::class, $object);
+        self::assertNull($object->date);
+    }
+
+    /**
+     * @test
+     */
+    public function nullable_property_can_be_mapped_with_real_input(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $object = $hydrator->hydrateObject(ClassWithNullableInput::class, ['date' => '2022-07-01']);
+
+        self::assertInstanceOf(ClassWithNullableInput::class, $object);
+        self::assertInstanceOf(\DateTimeImmutable::class, $object->date);
+    }
+
     /**
      * @test
      */
