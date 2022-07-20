@@ -6,7 +6,7 @@ namespace EventSauce\ObjectHydrator\FixturesFor81;
 
 class ClassWithIntegerEnumProperty
 {
-    public function __construct(public IntegerEnum $enum)
+    public function __construct(public readonly IntegerEnum $enum)
     {
     }
 }

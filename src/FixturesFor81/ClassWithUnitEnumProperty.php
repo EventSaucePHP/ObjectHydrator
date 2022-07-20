@@ -6,7 +6,7 @@ namespace EventSauce\ObjectHydrator\FixturesFor81;
 
 class ClassWithUnitEnumProperty
 {
-    public function __construct(public OptionUnitEnum $enum)
+    public function __construct(public readonly OptionUnitEnum $enum)
     {
     }
 }
