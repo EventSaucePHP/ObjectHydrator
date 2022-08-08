@@ -34,7 +34,7 @@ class DefaultSerializerRepository
 
     /**
      * @param class-string<PropertySerializer> $serializerClass
-     * @param array<mixed> $arguments
+     * @param array<mixed>                     $arguments
      */
     public function registerDefaultSerializer(string $type, string $serializerClass, array $arguments = []): void
     {

@@ -6,7 +6,6 @@ namespace EventSauce\ObjectHydrator;
 
 use ReflectionClass;
 use Throwable;
-
 use function array_key_exists;
 use function array_values;
 use function enum_exists;
@@ -24,6 +23,7 @@ final class ClassExpander
 
     /**
      * @param array<class-string> $classes
+     *
      * @return array<class-string>
      */
     public static function expandClassesForHydration(array $classes, DefinitionProvider $definitionProvider): array
@@ -67,6 +67,7 @@ final class ClassExpander
 
     /**
      * @param array<class-string> $classes
+     *
      * @return array<class-string>
      */
     public static function expandClassesForSerialization(

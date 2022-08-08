@@ -184,7 +184,6 @@ CODE;
                     $checkMissingFieldCode = <<<CODE
 \$missingFields[] = '$fromConcatted';
 CODE;
-
                 }
                 $from = implode('\'][\'', $from);
                 $body .= <<<CODE

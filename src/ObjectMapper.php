@@ -10,7 +10,7 @@ interface ObjectMapper
      * @template T of object
      *
      * @param class-string<T> $className
-     * @param array<mixed> $payload
+     * @param array<mixed>    $payload
      *
      * @return T
      *
@@ -21,7 +21,7 @@ interface ObjectMapper
     /**
      * @template T
      *
-     * @param class-string<T> $className
+     * @param class-string<T>        $className
      * @param iterable<array<mixed>> $payloads  ;
      *
      * @return IterableList<T>

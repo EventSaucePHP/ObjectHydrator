@@ -15,8 +15,7 @@ final class UnableToHydrateObject extends RuntimeException
         ?Throwable $previous = null,
         private array $missingFields = [],
         private array $stack = [],
-    )
-    {
+    ) {
         parent::__construct($message, 0, $previous);
     }
 

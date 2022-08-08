@@ -31,7 +31,6 @@ use Ramsey\Uuid\UuidInterface;
 
 abstract class ObjectHydrationTestCase extends TestCase
 {
-
     /**
      * @test
      */
