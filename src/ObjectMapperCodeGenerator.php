@@ -85,6 +85,7 @@ use Generator;
  */
 class $shortName implements ObjectMapper
 {
+    private array \$hydrationStack = [];
     public function __construct() {}
 
     /**
@@ -93,14 +94,10 @@ class $shortName implements ObjectMapper
      */
     public function hydrateObject(string \$className, array \$payload): object
     {
-        try {
-            return match(\$className) {
-                $hydratorMapCode
-                default => throw new \\LogicException("No hydration defined for \$className"),
-            };
-        } catch (\\Throwable \$exception) {
-            throw UnableToHydrateObject::dueToError(\$className, \$exception);
-        }
+        return match(\$className) {
+            $hydratorMapCode
+            default => throw UnableToHydrateObject::noHydrationDefined(\$className, \$this->hydrationStack),
+        };
     }
     
     $hydratorCode
@@ -192,12 +189,12 @@ CODE;
                 $from = implode('\'][\'', $from);
                 $body .= <<<CODE
 
-            \$value = \$payload['$from'] ?? null;
-
-            if (\$value === null) {
-                $checkMissingFieldCode
-                goto after_$property;
-            }
+                \$value = \$payload['$from'] ?? null;
+    
+                if (\$value === null) {
+                    $checkMissingFieldCode
+                    goto after_$property;
+                }
 
 CODE;
             } else {
@@ -207,24 +204,24 @@ CODE;
                     $from = implode('\'][\'', $from);
                     $collectKeys .= <<<CODE
 
-            \$to = \$payload['$from'] ?? null;
-
-            if (\$to !== null) {
-                \$value['$to'] = \$to;
-            }
+                \$to = \$payload['$from'] ?? null;
+    
+                if (\$to !== null) {
+                    \$value['$to'] = \$to;
+                }
 
 CODE;
                 }
 
                 $body .= <<<CODE
 
-            \$value = [];
-
-            $collectKeys
-
-            if (\$value === []) {
-                goto after_$property;
-            }
+                \$value = [];
+    
+                $collectKeys
+    
+                if (\$value === []) {
+                    goto after_$property;
+                }
 
 CODE;
             }
@@ -237,13 +234,13 @@ CODE;
                 if ($caster) {
                     $body .= <<<CODE
 
-            static \$$casterName;
-
-            if (\$$casterName === null) {
-                \$$casterName = new \\$caster(...$casterOptions);
-            }
-
-            \$value = \${$casterName}->cast(\$value, \$this);
+                static \$$casterName;
+    
+                if (\$$casterName === null) {
+                    \$$casterName = new \\$caster(...$casterOptions);
+                }
+    
+                \$value = \${$casterName}->cast(\$value, \$this);
 
 CODE;
                 }
@@ -252,28 +249,39 @@ CODE;
             if ($definition->isBackedEnum()) {
                 $body .= <<<CODE
 
-            \$value = \\{$definition->firstTypeName}::from(\$value);
+                \$value = \\{$definition->firstTypeName}::from(\$value);
 
 CODE;
             } elseif ($definition->isEnum) {
                 $body .= <<<CODE
-            \$value = constant("$definition->firstTypeName::\$value");
+                \$value = constant("$definition->firstTypeName::\$value");
 CODE;
             } elseif ($definition->canBeHydrated) {
                 if ($definition->propertyType->isCollection()) {
                     $body .= <<<CODE
 
-            if (is_array(\$value[array_key_first(\$value)] ?? false)) {
-                \$value = \$this->hydrateObjects('{$definition->firstTypeName}', \$value)->toArray();
-            }
+                if (is_array(\$value[array_key_first(\$value)] ?? false)) {
+                    try {
+                        \$this->hydrationStack[] = '$definition->accessorName';
+                        \$value = \$this->hydrateObjects('{$definition->firstTypeName}', \$value)->toArray();
+                    } finally {
+                        array_pop(\$this->hydrationStack);
+                    }
+                }
 
 CODE;
                 } else {
+                    $methodName = 'hydrate' . str_replace('\\', '', $definition->firstTypeName);
                     $body .= <<<CODE
 
-            if (is_array(\$value)) {
-                \$value = \$this->hydrateObject('{$definition->firstTypeName}', \$value);
-            }
+                if (is_array(\$value)) {
+                    try {
+                        \$this->hydrationStack[] = '$definition->accessorName';
+                        \$value = \$this->$methodName(\$value);
+                    } finally {
+                        array_pop(\$this->hydrationStack);
+                    }
+                }
 
 CODE;
                 }
@@ -281,9 +289,9 @@ CODE;
 
             $body .= <<<CODE
 
-            \$properties['$property'] = \$value;
-
-            after_$property:
+                \$properties['$property'] = \$value;
+    
+                after_$property:
 
 CODE;
         }
@@ -297,13 +305,21 @@ CODE;
         {
             \$properties = []; 
             \$missingFields = [];
-            $body
-            
-            if (count(\$missingFields) > 0) {
-                throw UnableToHydrateObject::dueToMissingFields(\\$className::class, \$missingFields);
+            try {
+                $body
+            } catch (\\Throwable \$exception) {
+                throw UnableToHydrateObject::dueToError('$className', \$exception, stack: \$this->hydrationStack);
             }
             
-            return $constructionCode;
+            if (count(\$missingFields) > 0) {
+                throw UnableToHydrateObject::dueToMissingFields(\\$className::class, \$missingFields, stack: \$this->hydrationStack);
+            }
+            
+            try {
+                return $constructionCode;
+            } catch (\\Throwable \$exception) {
+                throw UnableToHydrateObject::dueToError('$className', \$exception, stack: \$this->hydrationStack);
+            }
         }
 CODE;
     }

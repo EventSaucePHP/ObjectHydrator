@@ -11,7 +11,6 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
-
 use function array_key_exists;
 use function array_reverse;
 use function count;
@@ -114,15 +113,10 @@ final class DefinitionProvider
         return $this->definitionCache[$className] = new ClassHydrationDefinition(
             $constructorName,
             $constructionStyle,
-            ...
-            $definitions
+            ...$definitions
         );
     }
 
-    /**
-     * @param ReflectionClass $reflectionClass
-     * @return ReflectionMethod|null
-     */
     private function resolveConstructor(ReflectionClass $reflectionClass): ?ReflectionMethod
     {
         $methods = $reflectionClass->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);

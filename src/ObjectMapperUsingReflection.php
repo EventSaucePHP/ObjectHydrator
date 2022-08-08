@@ -32,6 +32,9 @@ class ObjectMapperUsingReflection implements ObjectMapper
     /** @var array<string, PropertySerializer> */
     private array $serializerCache = [];
 
+    /** @var string[] */
+    private array $hydrationStack = [];
+
     public function __construct(
         ?DefinitionProvider $definitionProvider = null,
     ) {
@@ -108,32 +111,38 @@ class ObjectMapperUsingReflection implements ObjectMapper
                 } elseif ($definition->canBeHydrated && is_array($value)) {
                     $propertyType = $definition->propertyType;
 
-                    if ($propertyType->isCollection()) {
-                        if (is_array($value[array_key_first($value)] ?? false)) {
-                            $value = $this->hydrateObjects($propertyType->firstTypeName(), $value)->toArray();
+                    try {
+                        $this->hydrationStack[] = $property;
+
+                        if ($propertyType->isCollection()) {
+                            if (is_array($value[array_key_first($value)] ?? false)) {
+                                $value = $this->hydrateObjects($propertyType->firstTypeName(), $value)->toArray();
+                            }
+                        } else {
+                            $value = $this->hydrateObject($typeName, $value);
                         }
-                    } else {
-                        $value = $this->hydrateObject($typeName, $value);
+                    } finally {
+                        array_pop($this->hydrationStack);
                     }
                 }
 
                 $properties[$property] = $value;
             }
+        } catch (Throwable $exception) {
+            throw UnableToHydrateObject::dueToError($className, $exception, $this->hydrationStack);
+        }
 
-            if (count($missingFields) > 0) {
-                throw UnableToHydrateObject::dueToMissingFields($className, $missingFields);
-            }
+        if (count($missingFields) > 0) {
+            throw UnableToHydrateObject::dueToMissingFields($className, $missingFields, $this->hydrationStack);
+        }
 
+        try {
             return match ($classDefinition->constructionStyle) {
                 'static' => ($classDefinition->constructor)(...$properties),
                 'new' => new ($classDefinition->constructor)(...$properties),
             };
         } catch (Throwable $exception) {
-            if ($exception instanceof UnableToHydrateObject) {
-                throw $exception;
-            }
-
-            throw UnableToHydrateObject::dueToError($className, $exception);
+            throw UnableToHydrateObject::dueToError($className, $exception, $this->hydrationStack);
         }
     }
 

@@ -16,7 +16,7 @@ use function version_compare;
 
 class HydratingSerializedObjectsUsingCodeGenerationTest extends HydratingSerializedObjectsTestCase
 {
-    public function objectHydrator(): ObjectMapper
+    public function objectMapper(): ObjectMapper
     {
         $className = 'AcmeCorp\\GeneratedHydrator';
 

@@ -9,7 +9,7 @@ use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
 
 class HydratingSerializedObjectsUsingReflectionTest extends HydratingSerializedObjectsTestCase
 {
-    public function objectHydrator(): ObjectMapper
+    public function objectMapper(): ObjectMapper
     {
         return new ObjectMapperUsingReflection();
     }

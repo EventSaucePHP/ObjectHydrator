@@ -317,9 +317,25 @@ abstract class ObjectHydrationTestCase extends TestCase
     {
         $hydrator = $this->createObjectHydrator();
 
-        $this->expectExceptionObject(UnableToHydrateObject::dueToError('ThisClass\\DoesNotExist'));
+        $this->expectException(UnableToHydrateObject::class);
 
         $hydrator->hydrateObject('ThisClass\\DoesNotExist', []);
+    }
+
+    /**
+     * @test
+     */
+    public function missing_a_nested_field(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+        $payload = ['child' => []];
+
+        $this->expectExceptionObject(UnableToHydrateObject::dueToError(
+            ClassThatContainsAnotherClass::class,
+            UnableToHydrateObject::dueToMissingFields(ClassWithUnmappedStringProperty::class, ['name'], ['child']),
+        ));
+
+        $hydrator->hydrateObject(ClassThatContainsAnotherClass::class, $payload);
     }
 
     /**

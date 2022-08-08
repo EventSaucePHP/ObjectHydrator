@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 abstract class HydratingSerializedObjectsTestCase extends TestCase
 {
-    abstract public function objectHydrator(): ObjectMapper;
+    abstract public function objectMapper(): ObjectMapper;
 
     /**
      * @test
@@ -24,10 +24,10 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
      */
     public function serializing_a_hydrated_class(string $className, array $input): void
     {
-        $hydrator = $this->objectHydrator();
+        $mapper = $this->objectMapper();
 
-        $object = $hydrator->hydrateObject($className, $input);
-        $payload = $hydrator->serializeObject($object);
+        $object = $mapper->hydrateObject($className, $input);
+        $payload = $mapper->serializeObject($object);
 
         self::assertInstanceOf($className, $object);
         self::assertEquals($input, $payload);
