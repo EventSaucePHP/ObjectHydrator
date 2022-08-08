@@ -11,6 +11,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassThatRenamesInputForClassWithMultiple
 use EventSauce\ObjectHydrator\Fixtures\ClassThatUsesClassWithMultipleProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCaseProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithDefaultValue;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithNotCastedDateTimeInput;
@@ -42,6 +43,19 @@ abstract class ObjectHydrationTestCase extends TestCase
 
         self::assertInstanceOf(ClassWithNullableInput::class, $object);
         self::assertNull($object->date);
+    }
+
+    /**
+     * @test
+     */
+    public function class_with_parameter_with_default_value(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $object = $hydrator->hydrateObject(ClassWithDefaultValue::class, ['requiredValue' => 'supplied']);
+
+        self::assertEquals('supplied', $object->requiredValue);
+        self::assertEquals('default', $object->defaultValue);
     }
 
     /**
@@ -94,7 +108,7 @@ abstract class ObjectHydrationTestCase extends TestCase
     {
         $hydrator = $this->createObjectHydrator();
 
-        $this->expectExceptionObject(UnableToHydrateObject::dueToError(ClassWithPropertyMappedFromNestedKey::class));
+        $this->expectExceptionObject(UnableToHydrateObject::dueToMissingFields(ClassWithPropertyMappedFromNestedKey::class, ['nested.name']));
 
         $hydrator->hydrateObject(ClassWithPropertyMappedFromNestedKey::class, ['nested' => 'Frank']);
     }
@@ -278,7 +292,7 @@ abstract class ObjectHydrationTestCase extends TestCase
     {
         $hydrator = $this->createObjectHydrator();
 
-        $this->expectExceptionObject(UnableToHydrateObject::dueToError(ClassWithUnmappedStringProperty::class));
+        $this->expectExceptionObject(UnableToHydrateObject::dueToMissingFields(ClassWithUnmappedStringProperty::class, ['name']));
 
         $hydrator->hydrateObject(ClassWithUnmappedStringProperty::class, []);
     }

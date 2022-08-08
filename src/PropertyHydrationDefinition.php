@@ -18,6 +18,7 @@ final class PropertyHydrationDefinition
         public bool $canBeHydrated,
         public bool $isEnum,
         public bool $nullable,
+        public bool $hasDefaultValue,
         public ?string $firstTypeName,
     ) {
     }

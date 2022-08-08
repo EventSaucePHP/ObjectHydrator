@@ -16,6 +16,7 @@ use function count;
 use function current;
 use function get_class;
 use function gettype;
+use function implode;
 use function is_a;
 use function is_array;
 use function is_object;
@@ -52,6 +53,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
             $classDefinition = $this->definitionProvider->provideHydrationDefinition($className);
 
             $properties = [];
+            $missingFields = [];
 
             foreach ($classDefinition->propertyDefinitions as $definition) {
                 $value = [];
@@ -72,7 +74,14 @@ class ObjectMapperUsingReflection implements ObjectMapper
                 }
 
                 if ($value === []) {
-                    continue;
+                    if ($definition->nullable) {
+                        $value = null;
+                    } else {
+                        if ( ! $definition->hasDefaultValue) {
+                            $missingFields[] = implode('.', $from);
+                        }
+                        continue;
+                    }
                 }
 
                 if (count($definition->keys) === 1) {
@@ -111,11 +120,19 @@ class ObjectMapperUsingReflection implements ObjectMapper
                 $properties[$property] = $value;
             }
 
+            if (count($missingFields) > 0) {
+                throw UnableToHydrateObject::dueToMissingFields($className, $missingFields);
+            }
+
             return match ($classDefinition->constructionStyle) {
                 'static' => ($classDefinition->constructor)(...$properties),
                 'new' => new ($classDefinition->constructor)(...$properties),
             };
         } catch (Throwable $exception) {
+            if ($exception instanceof UnableToHydrateObject) {
+                throw $exception;
+            }
+
             throw UnableToHydrateObject::dueToError($className, $exception);
         }
     }

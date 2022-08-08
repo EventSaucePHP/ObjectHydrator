@@ -106,6 +106,7 @@ final class DefinitionProvider
                 $parameterType->canBeHydrated(),
                 $parameterType->isEnum(),
                 $parameterType->allowsNull(),
+                $parameter->isDefaultValueAvailable(),
                 $firstTypeName,
             );
         }

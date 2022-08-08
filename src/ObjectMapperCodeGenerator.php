@@ -173,18 +173,29 @@ CODE;
     private function dumpClassHydrator(string $className, ClassHydrationDefinition $classDefinition)
     {
         $body = '';
+
         foreach ($classDefinition->propertyDefinitions as $definition) {
             $keys = $definition->keys;
             $property = $definition->accessorName;
 
             if (count($keys) === 1) {
                 $from = array_values($keys)[0];
+                $checkMissingFieldCode = '';
+
+                if ($definition->nullable === false && ! $definition->hasDefaultValue) {
+                    $fromConcatted = implode('.', $from);
+                    $checkMissingFieldCode = <<<CODE
+\$missingFields[] = '$fromConcatted';
+CODE;
+
+                }
                 $from = implode('\'][\'', $from);
                 $body .= <<<CODE
 
             \$value = \$payload['$from'] ?? null;
 
             if (\$value === null) {
+                $checkMissingFieldCode
                 goto after_$property;
             }
 
@@ -199,7 +210,7 @@ CODE;
             \$to = \$payload['$from'] ?? null;
 
             if (\$to !== null) {
-                \$value['$to'] = \$payload['$from'];
+                \$value['$to'] = \$to;
             }
 
 CODE;
@@ -285,7 +296,12 @@ CODE;
         private function $methodName(array \$payload): \\$className
         {
             \$properties = []; 
+            \$missingFields = [];
             $body
+            
+            if (count(\$missingFields) > 0) {
+                throw UnableToHydrateObject::dueToMissingFields(\\$className::class, \$missingFields);
+            }
             
             return $constructionCode;
         }
