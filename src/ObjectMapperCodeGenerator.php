@@ -177,13 +177,22 @@ CODE;
 
             if (count($keys) === 1) {
                 $from = array_values($keys)[0];
-                $checkMissingFieldCode = '';
+                $isNullBody = <<<CODE
+                    goto after_$property;
+CODE;
 
                 if ($definition->nullable === false && ! $definition->hasDefaultValue) {
                     $fromConcatted = implode('.', $from);
-                    $checkMissingFieldCode = <<<CODE
-\$missingFields[] = '$fromConcatted';
+                    $isNullBody = <<<CODE
+                    \$missingFields[] = '$fromConcatted';
+                    goto after_$property;
 CODE;
+                } elseif ($definition->nullable && ! $definition->hasDefaultValue) {
+                    $isNullBody = <<<CODE
+                    \$properties['$property'] = null;
+                    goto after_$property;
+CODE;
+
                 }
                 $from = implode('\'][\'', $from);
                 $body .= <<<CODE
@@ -191,7 +200,7 @@ CODE;
                 \$value = \$payload['$from'] ?? null;
     
                 if (\$value === null) {
-                    $checkMissingFieldCode
+$isNullBody
                     goto after_$property;
                 }
 
@@ -571,7 +580,6 @@ CODE;
         }
 
         $code .= <<<CODE
-            goto after_$definition->accessorName;
         }
 
 CODE;

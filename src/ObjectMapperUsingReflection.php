@@ -87,7 +87,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
                     }
                 }
 
-                if (count($definition->keys) === 1) {
+                if ($value !== null && count($definition->keys) === 1) {
                     $value = current($value);
                 }
 

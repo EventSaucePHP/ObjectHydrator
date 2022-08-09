@@ -16,6 +16,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithNotCastedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithNullableInput;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithNullableProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyCasting;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyMappedFromNestedKey;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyThatUsesListCasting;
@@ -319,6 +320,19 @@ abstract class ObjectHydrationTestCase extends TestCase
         $this->expectException(UnableToHydrateObject::class);
 
         $hydrator->hydrateObject('ThisClass\\DoesNotExist', []);
+    }
+
+    /**
+     * @test
+     */
+    public function hydrating_a_class_with_a_nullable_property_defaults_to_null(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $object = $hydrator->hydrateObject(ClassWithNullableProperty::class, []);
+
+        self::assertInstanceOf(ClassWithNullableProperty::class, $object);
+        self::assertNull($object->defaultsToNull);
     }
 
     /**
