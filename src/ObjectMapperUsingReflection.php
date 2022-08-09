@@ -77,7 +77,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
                 }
 
                 if ($value === []) {
-                    if ($definition->nullable) {
+                    if ($definition->nullable && ! $definition->hasDefaultValue) {
                         $value = null;
                     } else {
                         if ( ! $definition->hasDefaultValue) {

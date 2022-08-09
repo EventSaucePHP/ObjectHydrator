@@ -17,6 +17,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithNotCastedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithNullableInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithNullableProperty;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithNullablePropertyWithDefault;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyCasting;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyMappedFromNestedKey;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyThatUsesListCasting;
@@ -333,6 +334,19 @@ abstract class ObjectHydrationTestCase extends TestCase
 
         self::assertInstanceOf(ClassWithNullableProperty::class, $object);
         self::assertNull($object->defaultsToNull);
+    }
+
+    /**
+     * @test
+     */
+    public function class_with_nullable_property_with_default_uses_default(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $object = $hydrator->hydrateObject(ClassWithNullablePropertyWithDefault::class, []);
+
+        self::assertInstanceOf(ClassWithNullablePropertyWithDefault::class, $object);
+        self::assertEquals('default_used', $object->defaultUsed);
     }
 
     /**
