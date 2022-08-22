@@ -8,6 +8,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToDifferentTypes;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatContainsAnotherClass;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatHasMultipleCastersOnSingleProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatRenamesInputForClassWithMultipleProperties;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatTriggersUseStatementLookup;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatUsesClassWithMultipleProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCaseProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
@@ -446,6 +447,22 @@ abstract class ObjectHydrationTestCase extends TestCase
         self::assertInstanceOf(ClassThatCastsListsToDifferentTypes::class, $object);
         self::assertContainsOnlyInstancesOf(ClassWithCamelCaseProperty::class, $object->first);
         self::assertContainsOnlyInstancesOf(ClassWithPropertyCasting::class, $object->second);
+    }
+
+    /**
+     * @test
+     */
+    public function hydrating_a_class_with_use_function_statement(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+        $payload = [
+            'firstName' => 'Jane',
+            'lastName' => 'Doe',
+        ];
+
+        $object = $hydrator->hydrateObject(ClassThatTriggersUseStatementLookup::class, $payload);
+
+        self::assertInstanceOf(ClassThatTriggersUseStatementLookup::class, $object);
     }
 
     protected function createObjectHydratorFor81(): ObjectMapper
