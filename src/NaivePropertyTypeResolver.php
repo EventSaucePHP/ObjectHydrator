@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use const T_AS;
+use const T_CONST;
+use const T_FUNCTION;
 use const T_NAME_QUALIFIED;
 use const T_STRING;
 use const T_USE;
@@ -79,6 +81,10 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
             }
 
             $token = $this->tokenAfterWhitespace($tokens);
+
+            if ($token[0] === T_FUNCTION || $token[0] === T_CONST) {
+                continue;
+            }
 
             assert(in_array($token[0], [T_NAME_FULLY_QUALIFIED, T_NAME_QUALIFIED, T_STRING]));
             $fqcn = trim($token[1], '\\');
