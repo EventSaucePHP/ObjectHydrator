@@ -95,7 +95,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
 
                 if ($value !== null) {
                     foreach ($definition->casters as [$caster, $options]) {
-                        $key = $className . json_encode($options);
+                        $key = $className . '-' . $caster . '-' . json_encode($options);
                         /** @var PropertyCaster $propertyCaster */
                         $propertyCaster = $this->casterInstances[$key] ??= new $caster(...$options);
                         $value = $propertyCaster->cast($value, $this);
