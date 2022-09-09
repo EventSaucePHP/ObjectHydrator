@@ -10,6 +10,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassThatHasMultipleCastersOnSingleProper
 use EventSauce\ObjectHydrator\Fixtures\ClassThatRenamesInputForClassWithMultipleProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatTriggersUseStatementLookup;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatUsesClassWithMultipleProperties;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatUsesMutipleCastersWithoutOptions;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCaseProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithDefaultValue;
@@ -272,6 +273,24 @@ abstract class ObjectHydrationTestCase extends TestCase
         self::assertInstanceOf(ClassWithFormattedDateTimeInput::class, $object);
         self::assertEquals('1987-11-24 00:00:00', $object->date->format('Y-m-d H:i:s'));
         self::assertEquals('Europe/Amsterdam', $object->date->getTimezone()->getName());
+    }
+
+    /**
+     * @test
+     */
+    public function hydrating_a_class_with_multiple_casters_without_options(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+        $payload = [
+            'id' => '9f960d77-7c9b-4bfd-9fc4-62d141efc7e5',
+            'name' => 'Joe',
+        ];
+
+        $object = $hydrator->hydrateObject(ClassThatUsesMutipleCastersWithoutOptions::class, $payload);
+
+        self::assertInstanceOf(ClassThatUsesMutipleCastersWithoutOptions::class, $object);
+        self::assertEquals('9f960d77-7c9b-4bfd-9fc4-62d141efc7e5', $object->id->toString());
+        self::assertEquals('joe', $object->name);
     }
 
     /**
