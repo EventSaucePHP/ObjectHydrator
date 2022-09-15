@@ -28,6 +28,8 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithStaticConstructor;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUnmappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUuidProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
+use EventSauce\ObjectHydrator\FixturesFor81\ClassWithNullableEnumProperty;
+use EventSauce\ObjectHydrator\FixturesFor81\ClassWithNullableUnitEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\CustomEnum;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -329,6 +331,32 @@ abstract class ObjectHydrationTestCase extends TestCase
         $object = $hydrator->hydrateObject(ClassWithEnumProperty::class, ['enum' => 'one']);
 
         self::assertEquals(CustomEnum::VALUE_ONE, $object->enum);
+    }
+
+    /**
+     * @test
+     * @requires PHP >= 8.1
+     */
+    public function hydrating_an_object_with_a_nullable_enum(): void
+    {
+        $hydrator = $this->createObjectHydratorFor81();
+
+        $object = $hydrator->hydrateObject(ClassWithNullableUnitEnumProperty::class, ['enum' => null]);
+
+        self::assertNull($object->enum);
+    }
+
+    /**
+     * @test
+     * @requires PHP >= 8.1
+     */
+    public function hydrating_an_object_with_a_nullable_backed_enum(): void
+    {
+        $hydrator = $this->createObjectHydratorFor81();
+
+        $object = $hydrator->hydrateObject(ClassWithNullableEnumProperty::class, ['enum' => null]);
+
+        self::assertNull($object->enum);
     }
 
     /**
