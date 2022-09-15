@@ -108,9 +108,9 @@ class ObjectMapperUsingReflection implements ObjectMapper
                     goto set_value;
                 }
 
-                if ($definition->isBackedEnum() && $value !== null) {
+                if ($definition->isBackedEnum()) {
                     $value = $typeName::from($value);
-                } elseif ($definition->isEnum && $value !== null) {
+                } elseif ($definition->isEnum) {
                     $value = constant("$typeName::$value");
                 } elseif ($definition->canBeHydrated && is_array($value)) {
                     $propertyType = $definition->propertyType;
