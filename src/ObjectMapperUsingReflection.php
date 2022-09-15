@@ -104,6 +104,10 @@ class ObjectMapperUsingReflection implements ObjectMapper
 
                 $typeName = $definition->firstTypeName;
 
+                if ($value === null) {
+                    goto set_value;
+                }
+
                 if ($definition->isBackedEnum() && $value !== null) {
                     $value = $typeName::from($value);
                 } elseif ($definition->isEnum && $value !== null) {
@@ -126,6 +130,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
                     }
                 }
 
+                set_value:
                 $properties[$property] = $value;
             }
         } catch (Throwable $exception) {

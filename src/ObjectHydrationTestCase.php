@@ -28,6 +28,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithStaticConstructor;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUnmappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUuidProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
+use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumPropertyWithDefault;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithNullableEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithNullableUnitEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\CustomEnum;
@@ -344,6 +345,19 @@ abstract class ObjectHydrationTestCase extends TestCase
         $object = $hydrator->hydrateObject(ClassWithNullableUnitEnumProperty::class, ['enum' => null]);
 
         self::assertNull($object->enum);
+    }
+
+    /**
+     * @test
+     * @requires PHP >= 8.1
+     */
+    public function hydrating_an_object_with_a_default_enum_value(): void
+    {
+        $hydrator = $this->createObjectHydratorFor81();
+
+        $object = $hydrator->hydrateObject(ClassWithEnumPropertyWithDefault::class, []);
+
+        self::assertEquals(CustomEnum::VALUE_ONE, $object->enum);
     }
 
     /**
