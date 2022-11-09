@@ -201,7 +201,6 @@ CODE;
     
                 if (\$value === null) {
 $isNullBody
-                    goto after_$property;
                 }
 
 CODE;
