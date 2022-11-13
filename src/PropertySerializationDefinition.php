@@ -18,6 +18,8 @@ class PropertySerializationDefinition
         public PropertyType $propertyType,
         public bool $nullable,
         public array $keys = [],
+        public ?string $typeSpecifier = null,
+        public array $typeMap = [],
     ) {
         $this->serializers = array_filter($this->serializers);
     }

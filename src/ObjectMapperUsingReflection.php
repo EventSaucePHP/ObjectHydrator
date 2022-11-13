@@ -6,6 +6,7 @@ namespace EventSauce\ObjectHydrator;
 
 use BackedEnum;
 use Generator;
+use LogicException;
 use Throwable;
 use UnitEnum;
 use function array_key_exists;
@@ -102,6 +103,10 @@ class ObjectMapperUsingReflection implements ObjectMapper
                     }
                 }
 
+                if ($definition->typeAccessor && is_array($value)) {
+                    $value = $this->hydrateViaTypeMap($definition, $value);
+                }
+
                 $typeName = $definition->firstTypeName;
 
                 if ($value === null) {
@@ -192,12 +197,21 @@ class ObjectMapperUsingReflection implements ObjectMapper
 
             /** @var PropertySerializationDefinition $property */
             foreach ($definition->properties as $property) {
+                $defaults = [];
                 $keys = $property->keys;
                 $accessorName = $property->accessorName;
 
                 $value = $property->type === PropertySerializationDefinition::TYPE_METHOD
                     ? $object->{$accessorName}()
                     : $object->{$accessorName};
+
+                if ($value !== null && $property->typeSpecifier) {
+                    foreach ($property->typeMap as $payloadType => $valueType) {
+                        if (is_a($value, $valueType)) {
+                            $defaults[$property->typeSpecifier] = $payloadType;
+                        }
+                    }
+                }
 
                 if ($value === null || count($property->serializers) === 0) {
                     goto assign_result;
@@ -216,7 +230,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
                     }
                 } else {
                     foreach ($serializers as $valueType => $serializer) {
-                        if (is_a($value, $valueType, false) === false && $valueType !== gettype($valueType)) {
+                        if (is_a($value, $valueType) === false && $valueType !== gettype($valueType)) {
                             continue;
                         }
 
@@ -235,7 +249,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
                 } elseif ($value instanceof UnitEnum) {
                     $value = $value->name;
                 } elseif (is_object($value)) {
-                    $value = $this->serializeObject($value);
+                    $value = $defaults + $this->serializeObject($value);
                 }
 
                 $this->assignToResult($keys, $result, $value);
@@ -281,5 +295,17 @@ class ObjectMapperUsingReflection implements ObjectMapper
         foreach ($objects as $index => $object) {
             yield $index => $this->serializeObject($object);
         }
+    }
+
+    private function hydrateViaTypeMap(PropertyHydrationDefinition $definition, array $value): object
+    {
+        $type = $value[$definition->typeAccessor ?? ''] ?? '';
+        $valueType = $definition->typeMap[$type] ?? null;
+
+        if ($valueType === null) {
+            throw new LogicException("No type mapped for serialized type \"$type\"" );
+        }
+
+        return $this->hydrateObject($valueType, $value);
     }
 }

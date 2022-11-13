@@ -19,6 +19,8 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithListOfObjects;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMultipleProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUnionProperty;
+use EventSauce\ObjectHydrator\Fixtures\TypeMapping\ClassThatMapsTypes;
+use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Dog;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\CustomEnum;
 use PHPUnit\Framework\TestCase;
@@ -30,6 +32,21 @@ abstract class ObjectSerializationTestCase extends TestCase
     abstract public function objectHydrator(): ObjectMapper;
 
     abstract protected function objectHydratorFor81(): ObjectMapper;
+
+    /**
+     * @test
+     */
+    public function serializing_a_class_with_polymorphism(): void
+    {
+        $serializer = $this->objectHydrator();
+        $object = new ClassThatMapsTypes(new Dog('Rover'));
+
+        /** @var array $payload */
+        $payload = $serializer->serializeObject($object);
+        self::assertIsArray($payload);
+        self::assertEquals('dog', $payload['child']['animal'] ?? '');
+        self::assertEquals('Rover', $payload['child']['name'] ?? '');
+    }
 
     /**
      * @test

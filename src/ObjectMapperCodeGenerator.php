@@ -11,7 +11,9 @@ use function array_pop;
 use function array_values;
 use function count;
 use function explode;
+use function gettype;
 use function implode;
+use function is_a;
 use function str_replace;
 use function var_export;
 
@@ -64,7 +66,7 @@ final class ObjectMapperCodeGenerator
             $serializers[] = $this->dumpClassDefinition($class, $definition);
         }
 
-        $serializationMapCode = implode("\n                ", $serializationMap);
+        $serializationMapCode = implode("\n            ", $serializationMap);
         $serializationCode = implode("\n\n", $serializers);
 
         return <<<CODE
@@ -100,6 +102,19 @@ class $shortName implements ObjectMapper
     
     $hydratorCode
     
+    private function serializeViaTypeMap(string \$accessor, object \$object, array \$payloadToTypeMap): array
+    {
+        \$className = null;
+
+        foreach (\$payloadToTypeMap as \$payloadType => \$valueType) {
+            if (is_a(\$object, \$valueType)) {
+                return [\$accessor => \$payloadType] + \$this->{'serializeObject' . str_replace('\\\\', '', \$payloadType)}(\$object);
+            }
+        }
+
+        throw new \LogicException('No type mapped for object of class: ' . get_class(\$object));
+    }
+
     public function serializeObject(object \$object): mixed
     {
         try {
@@ -176,30 +191,30 @@ CODE;
             if (count($keys) === 1) {
                 $from = array_values($keys)[0];
                 $isNullBody = <<<CODE
-                    goto after_$property;
+                goto after_$property;
 CODE;
 
                 if ($definition->nullable === false && ! $definition->hasDefaultValue) {
                     $fromConcatted = implode('.', $from);
                     $isNullBody = <<<CODE
-                    \$missingFields[] = '$fromConcatted';
-                    goto after_$property;
+                \$missingFields[] = '$fromConcatted';
+                goto after_$property;
 CODE;
                 } elseif ($definition->nullable && ! $definition->hasDefaultValue) {
                     $isNullBody = <<<CODE
-                    \$properties['$property'] = null;
-                    goto after_$property;
+                \$properties['$property'] = null;
+                goto after_$property;
 CODE;
 
                 }
                 $from = implode('\'][\'', $from);
                 $body .= <<<CODE
 
-                \$value = \$payload['$from'] ?? null;
-    
-                if (\$value === null) {
+            \$value = \$payload['$from'] ?? null;
+
+            if (\$value === null) {
 $isNullBody
-                }
+            }
 
 CODE;
             } else {
@@ -209,24 +224,24 @@ CODE;
                     $from = implode('\'][\'', $from);
                     $collectKeys .= <<<CODE
 
-                \$to = \$payload['$from'] ?? null;
-    
-                if (\$to !== null) {
-                    \$value['$to'] = \$to;
-                }
+            \$to = \$payload['$from'] ?? null;
+
+            if (\$to !== null) {
+                \$value['$to'] = \$to;
+            }
 
 CODE;
                 }
 
                 $body .= <<<CODE
 
-                \$value = [];
+            \$value = [];
     
                 $collectKeys
     
-                if (\$value === []) {
-                    goto after_$property;
-                }
+            if (\$value === []) {
+                goto after_$property;
+            }
 
 CODE;
             }
@@ -239,13 +254,13 @@ CODE;
                 if ($caster) {
                     $body .= <<<CODE
 
-                static \$$casterName;
-    
-                if (\$$casterName === null) {
-                    \$$casterName = new \\$caster(...$casterOptions);
-                }
-    
-                \$value = \${$casterName}->cast(\$value, \$this);
+            static \$$casterName;
+
+            if (\$$casterName === null) {
+                \$$casterName = new \\$caster(...$casterOptions);
+            }
+
+            \$value = \${$casterName}->cast(\$value, \$this);
 
 CODE;
                 }
@@ -254,39 +269,70 @@ CODE;
             if ($definition->isBackedEnum()) {
                 $body .= <<<CODE
 
-                \$value = \\{$definition->firstTypeName}::from(\$value);
+            \$value = \\{$definition->firstTypeName}::from(\$value);
 
 CODE;
             } elseif ($definition->isEnum) {
                 $body .= <<<CODE
-                \$value = constant("$definition->firstTypeName::\$value");
+            \$value = constant("$definition->firstTypeName::\$value");
 CODE;
             } elseif ($definition->canBeHydrated) {
                 if ($definition->propertyType->isCollection()) {
                     $body .= <<<CODE
 
-                if (is_array(\$value[array_key_first(\$value)] ?? false)) {
-                    try {
-                        \$this->hydrationStack[] = '$definition->accessorName';
-                        \$value = \$this->hydrateObjects('{$definition->firstTypeName}', \$value)->toArray();
-                    } finally {
-                        array_pop(\$this->hydrationStack);
-                    }
+            if (is_array(\$value[array_key_first(\$value)] ?? false)) {
+                try {
+                    \$this->hydrationStack[] = '$definition->accessorName';
+                    \$value = \$this->hydrateObjects('{$definition->firstTypeName}', \$value)->toArray();
+                } finally {
+                    array_pop(\$this->hydrationStack);
                 }
+            }
+
+CODE;
+                } elseif ($definition->typeAccessor) {
+                    $typeMatchMapCode = '';
+
+                    foreach ($definition->typeMap as $payloadType => $valueType) {
+                        $methodName = 'hydrate' . str_replace('\\', '', $valueType);
+                        $typeMatchMapCode .= <<<CODE
+                    '$payloadType' => \$this->$methodName(\$value),
+
+CODE;
+                    }
+
+                    $body .= <<<CODE
+
+            if (is_array(\$value)) {
+                try {
+                    \$this->hydrationStack[] = '$definition->accessorName';
+                    \$valueType = \$value['$definition->typeAccessor'] ?? null;
+
+                    if (\$valueType === null) {
+                        throw new \LogicException('No type defined under key "$definition->typeAccessor"');
+                    }
+
+                    \$value = match (\$valueType) {
+$typeMatchMapCode                            default => throw new \LogicException("No hydrator defined for \"\$valueType\"."),
+                    };
+                } finally {
+                    array_pop(\$this->hydrationStack);
+                }
+            }
 
 CODE;
                 } else {
                     $methodName = 'hydrate' . str_replace('\\', '⚡️', $definition->firstTypeName);
                     $body .= <<<CODE
 
-                if (is_array(\$value)) {
-                    try {
-                        \$this->hydrationStack[] = '$definition->accessorName';
-                        \$value = \$this->$methodName(\$value);
-                    } finally {
-                        array_pop(\$this->hydrationStack);
-                    }
+            if (is_array(\$value)) {
+                try {
+                    \$this->hydrationStack[] = '$definition->accessorName';
+                    \$value = \$this->$methodName(\$value);
+                } finally {
+                    array_pop(\$this->hydrationStack);
                 }
+            }
 
 CODE;
                 }
@@ -294,9 +340,9 @@ CODE;
 
             $body .= <<<CODE
 
-                \$properties['$property'] = \$value;
-    
-                after_$property:
+            \$properties['$property'] = \$value;
+
+            after_$property:
 
 CODE;
         }
@@ -306,26 +352,25 @@ CODE;
 
         return <<<CODE
         
-        private function $methodName(array \$payload): \\$className
-        {
-            \$properties = []; 
-            \$missingFields = [];
-            try {
-                $body
-            } catch (\\Throwable \$exception) {
-                throw UnableToHydrateObject::dueToError('$className', \$exception, stack: \$this->hydrationStack);
-            }
-            
-            if (count(\$missingFields) > 0) {
-                throw UnableToHydrateObject::dueToMissingFields(\\$className::class, \$missingFields, stack: \$this->hydrationStack);
-            }
-            
-            try {
-                return $constructionCode;
-            } catch (\\Throwable \$exception) {
-                throw UnableToHydrateObject::dueToError('$className', \$exception, stack: \$this->hydrationStack);
-            }
+    private function $methodName(array \$payload): \\$className
+    {
+        \$properties = []; 
+        \$missingFields = [];
+        try {{$body}
+        } catch (\\Throwable \$exception) {
+            throw UnableToHydrateObject::dueToError('$className', \$exception, stack: \$this->hydrationStack);
         }
+
+        if (count(\$missingFields) > 0) {
+            throw UnableToHydrateObject::dueToMissingFields(\\$className::class, \$missingFields, stack: \$this->hydrationStack);
+        }
+
+        try {
+            return $constructionCode;
+        } catch (\\Throwable \$exception) {
+            throw UnableToHydrateObject::dueToError('$className', \$exception, stack: \$this->hydrationStack);
+        }
+    }
 CODE;
     }
 
@@ -352,14 +397,14 @@ CODE;
 CODE;
     }
 
-    private function dumpClassDefinition(mixed $class, ClassSerializationDefinition $definition)
+    private function dumpClassDefinition(string $class, ClassSerializationDefinition $definition): string
     {
         $methodName = 'serializeObject' . str_replace('\\', '⚡️', $class);
         $properties = array_map([$this, 'dumpClassProperty'], $definition->properties);
         $propertiesCode = implode("\n        ", $properties);
 
         return <<<CODE
-    
+
     private function $methodName(mixed \$object): mixed
     {
         \\assert(\$object instanceof \\$class);
@@ -392,7 +437,9 @@ CODE;
 CODE;
         }
 
-        if ( ! $definition->isComplexType()) {
+        if ($definition->typeSpecifier) {
+            $code .= $this->dumpMappedSerializer($definition);
+        } elseif ( ! $definition->isComplexType()) {
             $code .= $this->dumpSimpleClassProperty($definition);
         } else {
             $code .= $this->dumpComplexClassProperty($definition);
@@ -404,6 +451,28 @@ CODE;
         $code .= $this->dumpResultHydrator($definition);
 
         return $code;
+    }
+
+    private function dumpMappedSerializer(PropertySerializationDefinition $definition): string
+    {
+        $matchCode = '';
+
+        foreach ($definition->typeMap as $payloadType => $valueType) {
+            $methodName = 'serializeObject' . str_replace('\\', '', $valueType);
+            $matchCode .= <<<CODE
+            is_a(\$$definition->accessorName, '$valueType') => ['$definition->typeSpecifier' => '$payloadType'] + \$this->$methodName(\$$definition->accessorName),
+
+CODE;
+
+        }
+
+        return <<<CODE
+        \$$definition->accessorName = match (true) {
+{$matchCode}            default => throw new \LogicException('No serializer specified for object of type ' . get_class(\$$definition->accessorName)),
+        };
+
+CODE;
+
     }
 
     /**

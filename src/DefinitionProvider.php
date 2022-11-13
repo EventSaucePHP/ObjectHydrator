@@ -97,6 +97,7 @@ final class DefinitionProvider
                 $casters = [$defaultCaster];
             }
 
+            $typeSpecifier = $this->typeSpecifier($attributes);
             $definitions[] = new PropertyHydrationDefinition(
                 $keys,
                 $accessorName,
@@ -107,6 +108,8 @@ final class DefinitionProvider
                 $parameterType->allowsNull(),
                 $parameter->isDefaultValueAvailable(),
                 $firstTypeName,
+                $typeSpecifier?->key,
+                $typeSpecifier?->map ?: [],
             );
         }
 
@@ -157,6 +160,7 @@ final class DefinitionProvider
             /** @var ReflectionNamedType|ReflectionUnionType $returnType */
             $returnType = $method->getReturnType();
             $attributes = $method->getAttributes();
+            $typeSpecifier = $this->typeSpecifier($attributes);
             $properties[] = new PropertySerializationDefinition(
                 PropertySerializationDefinition::TYPE_METHOD,
                 $methodName,
@@ -164,6 +168,8 @@ final class DefinitionProvider
                 PropertyType::fromReflectionType($returnType),
                 $returnType->allowsNull(),
                 $this->resolveKeys($key, $attributes),
+                $typeSpecifier?->key,
+                $typeSpecifier?->map ?: [],
             );
         }
 
@@ -185,6 +191,7 @@ final class DefinitionProvider
                 $serializers = array_reverse($serializers);
             }
 
+            $typeSpecifier = $this->typeSpecifier($attributes);
             $properties[] = new PropertySerializationDefinition(
                 PropertySerializationDefinition::TYPE_PROPERTY,
                 $property->getName(),
@@ -192,10 +199,26 @@ final class DefinitionProvider
                 PropertyType::fromReflectionType($propertyType),
                 $propertyType->allowsNull(),
                 $this->resolveKeys($key, $attributes),
+                $typeSpecifier?->key,
+                $typeSpecifier?->map ?: [],
             );
         }
 
         return new ClassSerializationDefinition($properties);
+    }
+
+    /**
+     * @param ReflectionAttribute[] $attributes
+     */
+    private function typeSpecifier(array $attributes): ?MapToType
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->getName() == MapToType::class) {
+                return $attribute->newInstance();
+            }
+        }
+
+        return null;
     }
 
     private function resolveSerializer(string $type, array $attributes): array
