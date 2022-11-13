@@ -11,6 +11,9 @@ class MapToType
 {
     public function __construct(
         public string $key = 'type',
+        /**
+         * @var array<string, class-string>
+         */
         public array $map = [],
     ) {
     }
