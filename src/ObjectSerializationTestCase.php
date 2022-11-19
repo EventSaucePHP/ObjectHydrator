@@ -6,6 +6,7 @@ namespace EventSauce\ObjectHydrator;
 
 use DateTime;
 use DateTimeImmutable;
+use EventSauce\ObjectHydrator\Fixtures\CastersOnClasses\ClassWithClassLevelMapFrom;
 use EventSauce\ObjectHydrator\Fixtures\ClassReferencedByUnionOne;
 use EventSauce\ObjectHydrator\Fixtures\ClassReferencedByUnionTwo;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatOmitsPublicMethods;
@@ -19,6 +20,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithListOfObjects;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMultipleProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUnionProperty;
+use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Animal;
 use EventSauce\ObjectHydrator\Fixtures\TypeMapping\ClassThatMapsTypes;
 use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Dog;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
@@ -29,16 +31,16 @@ use function PHPUnit\Framework\assertEquals;
 
 abstract class ObjectSerializationTestCase extends TestCase
 {
-    abstract public function objectHydrator(): ObjectMapper;
+    abstract public function objectMapper(): ObjectMapper;
 
-    abstract protected function objectHydratorFor81(): ObjectMapper;
+    abstract protected function objectMapperFor81(): ObjectMapper;
 
     /**
      * @test
      */
     public function serializing_a_class_with_polymorphism(): void
     {
-        $serializer = $this->objectHydrator();
+        $serializer = $this->objectMapper();
         $object = new ClassThatMapsTypes(new Dog('Rover'));
 
         /** @var array $payload */
@@ -51,9 +53,38 @@ abstract class ObjectSerializationTestCase extends TestCase
     /**
      * @test
      */
+    public function serializing_an_interface_with_polymorphism(): void
+    {
+        $serializer = $this->objectMapper();
+        $object = new Dog('Rover');
+
+        /** @var array $payload */
+        $payload = $serializer->serializeObjectOfType($object, Animal::class);
+        self::assertIsArray($payload);
+        self::assertEquals('rowlf', $payload['muppet'] ?? '');
+        self::assertEquals('Rover', $payload['name'] ?? '');
+    }
+
+    /**
+     * @test
+     */
+    public function serializing_a_class_with_class_level_map_from(): void
+    {
+        self::markTestSkipped('nope');
+        $serializer = $this->objectMapper();
+
+        $object = new ClassWithClassLevelMapFrom('Rover');
+        $payload = $serializer->serializeObject($object);
+
+        self::assertEquals(['nested' => ['name' => 'Rover']], $payload);
+    }
+
+    /**
+     * @test
+     */
     public function serializing_an_object_with_a_public_property(): void
     {
-        $serializer = $this->objectHydrator();
+        $serializer = $this->objectMapper();
         $object = new ClassWithCamelCaseProperty('some_property');
 
         $payload = $serializer->serializeObject($object);
@@ -108,7 +139,7 @@ abstract class ObjectSerializationTestCase extends TestCase
      */
     public function serializing_an_object_with_a_public_method(): void
     {
-        $serializer = $this->objectHydrator();
+        $serializer = $this->objectMapper();
         $object = new ClassWithCamelCasePublicMethod('some_property');
 
         $payload = $serializer->serializeObject($object);
@@ -121,7 +152,7 @@ abstract class ObjectSerializationTestCase extends TestCase
      */
     public function serializing_a_list_of_custom_objects(): void
     {
-        $serializer = $this->objectHydrator();
+        $serializer = $this->objectMapper();
         $object = new ClassWithListOfObjects([
             new ClassWithCamelCasePublicMethod('first_element'),
             new ClassWithCamelCasePublicMethod('second_element'),
@@ -140,7 +171,7 @@ abstract class ObjectSerializationTestCase extends TestCase
      */
     public function serializing_a_list_of_internal_objects(): void
     {
-        $serializer = $this->objectHydrator();
+        $serializer = $this->objectMapper();
         $now = new DateTimeImmutable();
         $nowFormatted = $now->format('Y-m-d H:i:s.uO');
         $object = new ClassWithListOfObjects([$now]);
@@ -155,7 +186,7 @@ abstract class ObjectSerializationTestCase extends TestCase
      */
     public function serializing_using_custom_date_time_formats(): void
     {
-        $serializer = $this->objectHydrator();
+        $serializer = $this->objectMapper();
         $object = new ClassWithCustomDateTimeSerialization(
             promotedPublicProperty: DateTimeImmutable::createFromFormat('!Y-m-d', '1987-11-24'),
             regularPublicProperty: DateTimeImmutable::createFromFormat('!Y-m-d', '1987-11-25'),
@@ -177,7 +208,7 @@ abstract class ObjectSerializationTestCase extends TestCase
      */
     public function serializing_a_class_with_an_enum(): void
     {
-        $serializer = $this->objectHydratorFor81();
+        $serializer = $this->objectMapperFor81();
         $object = new ClassWithEnumProperty(CustomEnum::VALUE_ONE);
 
         $payload = $serializer->serializeObject($object);
@@ -190,7 +221,7 @@ abstract class ObjectSerializationTestCase extends TestCase
      */
     public function serializing_a_class_with_a_union(): void
     {
-        $serializer = $this->objectHydrator();
+        $serializer = $this->objectMapper();
         $object1 = new ClassWithUnionProperty(
             new ClassReferencedByUnionOne(1234),
             'name',
@@ -230,7 +261,7 @@ abstract class ObjectSerializationTestCase extends TestCase
      */
     public function mapping_to_a_different_key(): void
     {
-        $serializer = $this->objectHydrator();
+        $serializer = $this->objectMapper();
         $object = new ClassWithMappedStringProperty(name: 'Frank');
 
         $payload = $serializer->serializeObject($object);
@@ -242,7 +273,7 @@ abstract class ObjectSerializationTestCase extends TestCase
      */
     public function mapping_to_multiple_keys(): void
     {
-        $serializer = $this->objectHydrator();
+        $serializer = $this->objectMapper();
         $object = new ClassThatRenamesInputForClassWithMultipleProperties(
             new ClassWithMultipleProperties(age: 34, name: 'Frank')
         );

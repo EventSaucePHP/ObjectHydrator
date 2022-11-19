@@ -44,10 +44,11 @@ class ObjectMapperCodeGeneratorSerializationTest extends ObjectSerializationTest
         }
 
         $classes = ConstructFinder::locatedIn($directory)->findClassNames();
+        $interfaces = ConstructFinder::locatedIn($directory)->findInterfaceNames();
         $dumper = new ObjectMapperCodeGenerator($definitionProvider);
 
         $dumpedDefinition = $dumper->dump(
-            $classes,
+            [...$classes, ...$interfaces],
             $className
         );
         $filename = __DIR__ . '/test' . (strpos($directory, '81') === false ? '80' : '81') . '.php';
@@ -71,12 +72,12 @@ class ObjectMapperCodeGeneratorSerializationTest extends ObjectSerializationTest
         return $this->createDumpedObjectHydrator(__DIR__ . '/Fixtures', $className, $definitionProvider);
     }
 
-    public function objectHydrator(): ObjectMapper
+    public function objectMapper(): ObjectMapper
     {
         return $this->createDumpedObjectHydrator(__DIR__ . '/Fixtures', 'AcmeCorp\\DumpedHydrator', $this->defaultDefinitionProvider);
     }
 
-    protected function objectHydratorFor81(): ObjectMapper
+    protected function objectMapperFor81(): ObjectMapper
     {
         return $this->createDumpedObjectHydrator(__DIR__ . '/FixturesFor81', 'AcmeCorp\\DumpedHydratorFor81', $this->defaultDefinitionProvider);
     }

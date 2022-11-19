@@ -36,6 +36,14 @@ interface ObjectMapper
     public function serializeObject(object $object): mixed;
 
     /**
+     * @template T
+     *
+     * @param T               $object
+     * @param class-string<T> $className
+     */
+    public function serializeObjectOfType(object $object, string $className): mixed;
+
+    /**
      * @param iterable<object> $payloads
      *
      * @return IterableList<array<mixed>>

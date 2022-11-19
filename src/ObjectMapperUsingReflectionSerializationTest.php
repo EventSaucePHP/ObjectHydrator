@@ -6,13 +6,13 @@ namespace EventSauce\ObjectHydrator;
 
 class ObjectMapperUsingReflectionSerializationTest extends ObjectSerializationTestCase
 {
-    public function objectHydrator(): ObjectMapper
+    public function objectMapper(): ObjectMapper
     {
         return new ObjectMapperUsingReflection();
     }
 
-    protected function objectHydratorFor81(): ObjectMapper
+    protected function objectMapperFor81(): ObjectMapper
     {
-        return $this->objectHydrator();
+        return $this->objectMapper();
     }
 }

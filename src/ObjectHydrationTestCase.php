@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use EventSauce\ObjectHydrator\Fixtures\CastersOnClasses\ClassWithClassLevelMapFrom;
+use EventSauce\ObjectHydrator\Fixtures\CastersOnClasses\ClassWithClassLevelMapFromMultiple;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToDifferentTypes;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatContainsAnotherClass;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatHasMultipleCastersOnSingleProperty;
@@ -52,6 +54,35 @@ abstract class ObjectHydrationTestCase extends TestCase
 
         self::assertInstanceOf(ClassThatMapsTypes::class, $object);
         self::assertInstanceOf(Frog::class, $object->child);
+    }
+
+    /**
+     * @test
+     */
+    public function hydrating_with_class_level_map_from(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $payload = ['nested' => ['name' => 'Frank']];
+        $object = $hydrator->hydrateObject(ClassWithClassLevelMapFrom::class, $payload);
+
+        self::assertInstanceOf(ClassWithClassLevelMapFrom::class, $object);
+        self::assertEquals('Frank', $object->name);
+    }
+
+    /**
+     * @test
+     */
+    public function hydrating_with_class_level_map_from_with_multiple_sources(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $payload = ['first' => 1, 'second' => 2];
+        $object = $hydrator->hydrateObject(ClassWithClassLevelMapFromMultiple::class, $payload);
+
+        self::assertInstanceOf(ClassWithClassLevelMapFromMultiple::class, $object);
+        self::assertEquals(1, $object->one);
+        self::assertEquals(2, $object->two);
     }
 
     /**

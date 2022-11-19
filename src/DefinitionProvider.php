@@ -60,6 +60,7 @@ final class DefinitionProvider
 
         $reflectionClass = new ReflectionClass($className);
         $constructor = $this->resolveConstructor($reflectionClass);
+        $classAttributes = $reflectionClass->getAttributes();
 
         /** @var PropertyHydrationDefinition[] $definitions */
         $definitions = [];
@@ -113,10 +114,16 @@ final class DefinitionProvider
             );
         }
 
+        $typeSpecifier = $this->typeSpecifier($classAttributes);
+        $mapFrom = $this->resolveMapFrom($classAttributes);
+
         return $this->definitionCache[$className] = new ClassHydrationDefinition(
             $constructorName,
             $constructionStyle,
-            ...$definitions
+            $typeSpecifier?->key,
+            $typeSpecifier?->map ?: [],
+            $mapFrom,
+            ...$definitions,
         );
     }
 
@@ -145,6 +152,7 @@ final class DefinitionProvider
         $reflection = new ReflectionClass($className);
         $objectSettings = $this->resolveObjectSettings($reflection);
         $publicMethods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
+        $classAttributes = $reflection->getAttributes();
         $properties = [];
 
         foreach ($publicMethods as $method) {
@@ -204,7 +212,14 @@ final class DefinitionProvider
             );
         }
 
-        return new ClassSerializationDefinition($properties);
+        $typeSpecifier = $this->typeSpecifier($reflection->getAttributes());
+
+        return new ClassSerializationDefinition(
+            $properties,
+            $typeSpecifier?->key,
+            $typeSpecifier?->map ?: [],
+            $this->resolveMapFrom($classAttributes),
+        );
     }
 
     /**
@@ -299,6 +314,14 @@ final class DefinitionProvider
      */
     private function resolveKeys(string $defaultKey, array $attributes): array
     {
+        return $this->resolveMapFrom($attributes) ?: [$defaultKey => [$defaultKey]];
+    }
+
+    /**
+     * @param ReflectionAttribute[] $attributes
+     */
+    private function resolveMapFrom(array $attributes): array|false
+    {
         foreach ($attributes as $attribute) {
             if ($attribute->getName() === MapFrom::class) {
                 /** @var MapFrom $mapFrom */
@@ -308,7 +331,7 @@ final class DefinitionProvider
             }
         }
 
-        return [$defaultKey => [$defaultKey]];
+        return false;
     }
 
     private function resolveObjectSettings(ReflectionClass $reflection): MapperSettings

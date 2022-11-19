@@ -11,9 +11,7 @@ use function array_pop;
 use function array_values;
 use function count;
 use function explode;
-use function gettype;
 use function implode;
-use function is_a;
 use function str_replace;
 use function var_export;
 
@@ -104,11 +102,9 @@ class $shortName implements ObjectMapper
     
     private function serializeViaTypeMap(string \$accessor, object \$object, array \$payloadToTypeMap): array
     {
-        \$className = null;
-
-        foreach (\$payloadToTypeMap as \$payloadType => \$valueType) {
+        foreach (\$payloadToTypeMap as \$payloadType => [\$valueType, \$method]) {
             if (is_a(\$object, \$valueType)) {
-                return [\$accessor => \$payloadType] + \$this->{'serializeObject' . str_replace('\\\\', '', \$payloadType)}(\$object);
+                return [\$accessor => \$payloadType] + \$this->{\$method}(\$object);
             }
         }
 
@@ -117,9 +113,18 @@ class $shortName implements ObjectMapper
 
     public function serializeObject(object \$object): mixed
     {
-        try {
-            \$className = get_class(\$object);
+        return \$this->serializeObjectOfType(\$object, get_class(\$object));
+    }
 
+    /**
+     * @template T
+     *
+     * @param T               \$object
+     * @param class-string<T> \$className
+     */
+    public function serializeObjectOfType(object \$object, string \$className): mixed
+    {
+        try {
             return match(\$className) {
                 $serializationMapCode
                 default => throw new \\LogicException('No serialization defined for \$className'),
@@ -183,6 +188,35 @@ CODE;
     private function dumpClassHydrator(string $className, ClassHydrationDefinition $classDefinition)
     {
         $body = '';
+
+        if ($mapFrom = $classDefinition->mapFrom) {
+            if (count($mapFrom) === 1) {
+                $from = array_values($mapFrom)[0];
+                $from = implode('\'][\'', $from);
+                $body .= <<<CODE
+            \$payload = \$payload['$from'] ?? null;
+CODE;
+
+            } else {
+                $body .= <<<CODE
+            \$payload = [
+
+CODE;
+                foreach ($mapFrom as $to => $from) {
+                    $from = implode('\'][\'', $from);
+                    $body .= <<<CODE
+                '$to' => \$payload['$from'] ?? null,
+CODE;
+
+                }
+                $body .= <<<CODE
+            ];
+
+
+CODE;
+
+            }
+        }
 
         foreach ($classDefinition->propertyDefinitions as $definition) {
             $keys = $definition->keys;
@@ -399,17 +433,38 @@ CODE;
 
     private function dumpClassDefinition(string $class, ClassSerializationDefinition $definition): string
     {
-        $methodName = 'serializeObject' . str_replace('\\', '⚡️', $class);
-        $properties = array_map([$this, 'dumpClassProperty'], $definition->properties);
-        $propertiesCode = implode("\n        ", $properties);
+        $methodName = 'serializeObject' . str_replace('\\', '⚡', $class);
+        $typeMapCode = '';
+        $propertiesCode = '';
+
+        if ($definition->typeKey) {
+            $map = [];
+            foreach ($definition->typeMap as $p => $v) {
+                $map[$p] = [$v, 'serializeObject' . str_replace('\\', '', $v)];
+            }
+            $typeMapExported = var_export($map, true);
+            $typeMapCode = <<<CODE
+        
+        \$result = \$this->serializeViaTypeMap('$definition->typeKey', \$object, $typeMapExported);
+
+CODE;
+
+        } else {
+            $propertiesCode .= <<<CODE
+        \$result = [];
+
+CODE;
+
+            $properties = array_map([$this, 'dumpClassProperty'], $definition->properties);
+            $propertiesCode .= implode("\n        ", $properties);
+        }
 
         return <<<CODE
 
     private function $methodName(mixed \$object): mixed
     {
         \\assert(\$object instanceof \\$class);
-        \$result = [];
-        $propertiesCode
+$typeMapCode$propertiesCode
 
         return \$result;
     }
