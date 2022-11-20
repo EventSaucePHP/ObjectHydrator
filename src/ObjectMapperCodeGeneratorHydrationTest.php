@@ -11,7 +11,6 @@ use function class_exists;
 use function spl_object_hash;
 use function strpos;
 use function unlink;
-use function var_dump;
 
 class ObjectMapperCodeGeneratorHydrationTest extends ObjectHydrationTestCase
 {
@@ -57,7 +56,7 @@ class ObjectMapperCodeGeneratorHydrationTest extends ObjectHydrationTestCase
 
         file_put_contents($filename, $dumpedDefinition);
         include $filename;
-//        unlink($filename);
+        unlink($filename);
 
         create_object_hydrator:
         /** @var ObjectMapper $objectHydrator */

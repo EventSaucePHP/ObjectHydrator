@@ -4,18 +4,12 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
-use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Animal;
-use ReflectionClass;
-use Throwable;
 use function array_key_exists;
 use function array_unique;
 use function array_values;
 use function class_exists;
-use function enum_exists;
-use function function_exists;
 use function in_array;
 use function interface_exists;
-use function var_dump;
 
 /**
  * @internal

@@ -23,7 +23,6 @@ use function is_a;
 use function is_array;
 use function is_object;
 use function json_encode;
-use function var_dump;
 
 class ObjectMapperUsingReflection implements ObjectMapper
 {
