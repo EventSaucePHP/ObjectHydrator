@@ -117,7 +117,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
                     $value = $propertyCaster->cast($value, $this);
                 }
 
-                if ($definition->typeAccessor && is_array($value)) {
+                if ($definition->typeKey && is_array($value)) {
                     $value = $this->hydrateViaTypeMap($definition, $value);
                 }
 
@@ -339,7 +339,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
 
     private function hydrateViaTypeMap(PropertyHydrationDefinition|ClassHydrationDefinition $definition, array $payload): object
     {
-        $type = $payload[$definition->typeAccessor ?? ''] ?? '';
+        $type = $payload[$definition->typeKey ?? ''] ?? '';
         $valueType = $definition->typeMap[$type] ?? null;
 
         if ($valueType === null) {

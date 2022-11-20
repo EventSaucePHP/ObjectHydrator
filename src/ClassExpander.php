@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Animal;
 use ReflectionClass;
 use Throwable;
 use function array_key_exists;
+use function array_unique;
 use function array_values;
+use function class_exists;
 use function enum_exists;
 use function function_exists;
 use function in_array;
+use function interface_exists;
+use function var_dump;
 
 /**
  * @internal
@@ -28,7 +33,7 @@ final class ClassExpander
      */
     public static function expandClassesForHydration(array $classes, DefinitionProvider $definitionProvider): array
     {
-        $classes = array_values($classes);
+        $classes = array_unique(array_values($classes));
 
         for ($i = 0; array_key_exists($i, $classes); ++$i) {
             $class = $classes[$i];
@@ -52,17 +57,7 @@ final class ClassExpander
 
     private static function isClass(string $className): bool
     {
-        if (function_exists('enum_exists') && enum_exists($className)) {
-            return false;
-        }
-
-        try {
-            $reflection = new ReflectionClass($className);
-
-            return $reflection->isInstantiable();
-        } catch (Throwable) {
-            return false;
-        }
+        return class_exists($className) || interface_exists($className);
     }
 
     /**

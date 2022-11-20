@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use function in_array;
+
 /**
  * @internal
  */
@@ -21,5 +23,10 @@ final class ClassHydrationDefinition
         PropertyHydrationDefinition ...$propertyDefinitions,
     ) {
         $this->propertyDefinitions = $propertyDefinitions;
+    }
+
+    public function canBeConstructed(): bool
+    {
+        return in_array($this->constructionStyle, ['new', 'static']);
     }
 }

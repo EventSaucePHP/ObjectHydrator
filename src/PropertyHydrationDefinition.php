@@ -20,7 +20,7 @@ final class PropertyHydrationDefinition
         public bool $nullable,
         public bool $hasDefaultValue,
         public ?string $firstTypeName,
-        public ?string $typeAccessor,
+        public ?string $typeKey,
         public array $typeMap = [],
     ) {
     }

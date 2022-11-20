@@ -65,8 +65,17 @@ final class DefinitionProvider
         /** @var PropertyHydrationDefinition[] $definitions */
         $definitions = [];
 
-        $constructionStyle = $constructor instanceof ReflectionMethod ? $constructor->isConstructor() ? 'new' : 'static' : 'new';
-        $constructorName = $constructionStyle === 'new' ? $className : $this->stringifyConstructor($constructor);
+        $constructionStyle = match (true) {
+            $constructor instanceof ReflectionMethod => $constructor->isConstructor() ? 'new' : 'static',
+            ! $reflectionClass->isInstantiable() => 'none',
+            default => 'new',
+        };
+
+        if ($constructionStyle !== 'none') {
+            $constructorName = $constructionStyle === 'new' ? $className : $this->stringifyConstructor($constructor);
+        } else {
+            $constructorName = '';
+        }
 
         /** @var ReflectionParameter[] $parameters */
         $parameters = $constructor instanceof ReflectionMethod ? $constructor->getParameters() : [];

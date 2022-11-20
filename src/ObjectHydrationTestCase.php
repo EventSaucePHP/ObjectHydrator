@@ -29,6 +29,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyThatUsesListCastingToCla
 use EventSauce\ObjectHydrator\Fixtures\ClassWithStaticConstructor;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUnmappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUuidProperty;
+use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Animal;
 use EventSauce\ObjectHydrator\Fixtures\TypeMapping\ClassThatMapsTypes;
 use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Frog;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
@@ -54,6 +55,20 @@ abstract class ObjectHydrationTestCase extends TestCase
 
         self::assertInstanceOf(ClassThatMapsTypes::class, $object);
         self::assertInstanceOf(Frog::class, $object->child);
+    }
+    /**
+     * @test
+     */
+    public function hydrating_a_polymorphic_interface(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $payload = ['muppet' => 'kermit', 'color' => 'blue'];
+        $object = $hydrator->hydrateObject(Animal::class, $payload);
+
+        self::assertInstanceOf(Animal::class, $object);
+        self::assertInstanceOf(Frog::class, $object);
+        self::assertEquals('blue', $object->color);
     }
 
     /**
