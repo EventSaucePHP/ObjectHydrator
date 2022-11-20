@@ -62,8 +62,8 @@ abstract class ObjectSerializationTestCase extends TestCase
         /** @var array $payload */
         $payload = $serializer->serializeObjectOfType($object, Animal::class);
         self::assertIsArray($payload);
-        self::assertEquals('rowlf', $payload['muppet'] ?? '');
-        self::assertEquals('Rover', $payload['name'] ?? '');
+        self::assertEquals('rowlf', $payload['nested']['muppet'] ?? '');
+        self::assertEquals('Rover', $payload['nested']['name'] ?? '');
     }
 
     /**

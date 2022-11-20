@@ -63,7 +63,7 @@ abstract class ObjectHydrationTestCase extends TestCase
     {
         $hydrator = $this->createObjectHydrator();
 
-        $payload = ['muppet' => 'kermit', 'color' => 'blue'];
+        $payload = ['nested' => ['muppet' => 'kermit', 'color' => 'blue']];
         $object = $hydrator->hydrateObject(Animal::class, $payload);
 
         self::assertInstanceOf(Animal::class, $object);
