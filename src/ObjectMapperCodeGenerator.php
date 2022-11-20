@@ -61,7 +61,7 @@ final class ObjectMapperCodeGenerator
             $definition = $this->definitionProvider->provideSerializationDefinition($class);
             $methodName = 'serializeObject' . str_replace('\\', '⚡️', $class);
             $serializationMap[] = "'$class' => \$this->$methodName(\$object),";
-            $serializers[] = $this->dumpClassDefinition($class, $definition);
+            $serializers[] = $this->dumpClassSerializer($class, $definition);
         }
 
         $serializationMapCode = implode("\n            ", $serializationMap);
@@ -431,7 +431,7 @@ CODE;
 CODE;
     }
 
-    private function dumpClassDefinition(string $class, ClassSerializationDefinition $definition): string
+    private function dumpClassSerializer(string $class, ClassSerializationDefinition $definition): string
     {
         $methodName = 'serializeObject' . str_replace('\\', '⚡', $class);
         $typeMapCode = '';
@@ -459,12 +459,14 @@ CODE;
             $propertiesCode .= implode("\n        ", $properties);
         }
 
+        $mapFrom = $this->dumpObjectMapFromSerializer($definition);
+
         return <<<CODE
 
     private function $methodName(mixed \$object): mixed
     {
         \\assert(\$object instanceof \\$class);
-$typeMapCode$propertiesCode
+$typeMapCode$propertiesCode$mapFrom
 
         return \$result;
     }
@@ -725,6 +727,41 @@ CODE;
         $code = '';
 
         foreach ($keys as $tempKey => $resultKey) {
+            $key = '[\'' . implode('\'][\'', $resultKey) . '\']';
+            $code .= <<<CODE
+        \$result$key = {$tempVariable}['$tempKey'];
+CODE;
+        }
+
+        return $code;
+    }
+
+    private function dumpObjectMapFromSerializer(ClassSerializationDefinition $definition): string
+    {
+        $mapFrom = $definition->mapFrom;
+
+        if ( ! $mapFrom) {
+            return '';
+        }
+
+        $tempVariable = '$tmpResult';
+
+        $code = <<<CODE
+        $tempVariable = \$result;
+        \$result = [];
+
+CODE;
+
+        if (count($mapFrom) === 1) {
+            $key = '[\'' . implode('\'][\'', array_pop($mapFrom)) . '\']';
+
+            return $code . <<<CODE
+        \$result$key = $tempVariable;
+
+CODE;
+        }
+
+        foreach ($mapFrom as $tempKey => $resultKey) {
             $key = '[\'' . implode('\'][\'', $resultKey) . '\']';
             $code .= <<<CODE
         \$result$key = {$tempVariable}['$tempKey'];

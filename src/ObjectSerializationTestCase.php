@@ -7,6 +7,7 @@ namespace EventSauce\ObjectHydrator;
 use DateTime;
 use DateTimeImmutable;
 use EventSauce\ObjectHydrator\Fixtures\CastersOnClasses\ClassWithClassLevelMapFrom;
+use EventSauce\ObjectHydrator\Fixtures\CastersOnClasses\ClassWithClassLevelMapFromMultiple;
 use EventSauce\ObjectHydrator\Fixtures\ClassReferencedByUnionOne;
 use EventSauce\ObjectHydrator\Fixtures\ClassReferencedByUnionTwo;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatOmitsPublicMethods;
@@ -70,13 +71,25 @@ abstract class ObjectSerializationTestCase extends TestCase
      */
     public function serializing_a_class_with_class_level_map_from(): void
     {
-        self::markTestSkipped('nope');
         $serializer = $this->objectMapper();
 
         $object = new ClassWithClassLevelMapFrom('Rover');
         $payload = $serializer->serializeObject($object);
 
         self::assertEquals(['nested' => ['name' => 'Rover']], $payload);
+    }
+
+    /**
+     * @test
+     */
+    public function serializing_a_class_with_multiple_class_level_map_from(): void
+    {
+        $serializer = $this->objectMapper();
+
+        $object = new ClassWithClassLevelMapFromMultiple(2, 4);
+        $payload = $serializer->serializeObject($object);
+
+        self::assertEquals(['first' => 2, 'second' => 4], $payload);
     }
 
     /**

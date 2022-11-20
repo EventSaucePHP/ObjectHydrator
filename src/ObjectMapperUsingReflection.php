@@ -220,7 +220,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
                         $result = $this->serializeObjectOfType($object, $valueType);
                         $result[$definition->typeKey] = $payloadType;
 
-                        return $result;
+                        goto process_map_from;
                     }
                 }
 
@@ -285,6 +285,14 @@ class ObjectMapperUsingReflection implements ObjectMapper
                 }
 
                 $this->assignToResult($keys, $result, $value);
+            }
+
+            process_map_from:
+            if ($mapFrom = $definition->mapFrom) {
+                $r = [];
+                $this->assignToResult($mapFrom, $r, $result);
+
+                return $r;
             }
 
             return $result;
