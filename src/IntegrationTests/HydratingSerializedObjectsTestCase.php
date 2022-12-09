@@ -38,6 +38,7 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
         yield 'class with list type resolve from doc comment' => [
             ClassThatCastsListsToBasedOnDocComments::class,
             [
+                'number' => 1,
                 'list' => [
                     ['snake_case' => 'Frank'],
                     ['snake_case' => 'Renske'],
