@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator\Fixtures;
 
-use EventSauce\ObjectHydrator\ObjectSettings;
+use EventSauce\ObjectHydrator\MapperSettings;
 
-#[ObjectSettings(serializePublicMethods: false)]
+#[MapperSettings(serializePublicMethods: false)]
 class ClassThatOmitsPublicMethods
 {
     public function __construct(

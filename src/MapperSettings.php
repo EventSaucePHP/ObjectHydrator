@@ -6,7 +6,7 @@ namespace EventSauce\ObjectHydrator;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS)]
-class ObjectSettings
+class MapperSettings
 {
     public function __construct(
         public bool $serializePublicMethods = true,

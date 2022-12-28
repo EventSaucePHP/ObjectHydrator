@@ -283,13 +283,13 @@ final class DefinitionProvider
         return [$defaultKey => [$defaultKey]];
     }
 
-    private function resolveObjectSettings(ReflectionClass $reflection): ObjectSettings
+    private function resolveObjectSettings(ReflectionClass $reflection): MapperSettings
     {
         /** @var ReflectionAttribute[] $attributes */
-        $attributes = $reflection->getAttributes(ObjectSettings::class);
+        $attributes = $reflection->getAttributes(MapperSettings::class);
 
         if (count($attributes) === 0) {
-            return new ObjectSettings();
+            return new MapperSettings();
         }
 
         return $attributes[0]->newInstance();
