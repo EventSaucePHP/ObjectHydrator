@@ -140,10 +140,10 @@ final class DefinitionProvider
     public function provideSerializationDefinition(string $className): ClassSerializationDefinition
     {
         $reflection = new ReflectionClass($className);
-        $publicMethod = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
+        $publicMethods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
         $properties = [];
 
-        foreach ($publicMethod as $method) {
+        foreach ($publicMethods as $method) {
             if ($method->isStatic() || $method->getNumberOfParameters() !== 0) {
                 continue;
             }
