@@ -145,7 +145,10 @@ final class DefinitionProvider
         $properties = [];
 
         foreach ($publicMethods as $method) {
-            if ($objectSettings->serializePublicMethods === false || $method->isStatic() || $method->getNumberOfParameters() !== 0) {
+            if ($objectSettings->serializePublicMethods === false
+                || $method->isStatic()
+                || $method->getNumberOfParameters() !== 0
+                || count($method->getAttributes(DoNotSerialize::class)) === 1) {
                 continue;
             }
 
@@ -167,7 +170,9 @@ final class DefinitionProvider
         $publicProperties = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
 
         foreach ($publicProperties as $property) {
-            if ($property->isStatic() || $objectSettings->serializePublicProperties === false) {
+            if ($property->isStatic()
+                || $objectSettings->serializePublicProperties === false
+                || count($property->getAttributes(DoNotSerialize::class)) === 1) {
                 continue;
             }
 

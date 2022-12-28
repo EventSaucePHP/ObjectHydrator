@@ -10,6 +10,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassReferencedByUnionOne;
 use EventSauce\ObjectHydrator\Fixtures\ClassReferencedByUnionTwo;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatOmitsPublicMethods;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatOmitsPublicProperties;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatOmitsSpecificMethodsAndProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatRenamesInputForClassWithMultipleProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCaseProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCasePublicMethod;
@@ -67,6 +68,22 @@ abstract class ObjectSerializationTestCase extends TestCase
 
         assertEquals(1, count(array_keys($payload)));
         assertEquals(['included' => 'included!'], $payload);
+    }
+
+    /**
+     * @test
+     */
+    public function excluding_public_properties_through_annotations(): void
+    {
+        $object = new ClassThatOmitsSpecificMethodsAndProperties();
+
+        $payload = $this->objectHydrator()->serializeObject($object);
+
+        assertEquals(2, count(array_keys($payload)));
+        assertEquals([
+            'included_property' => 'included property',
+            'included_method_field' => 'included method value',
+        ], $payload);
     }
 
     /**
