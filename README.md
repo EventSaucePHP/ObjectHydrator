@@ -617,6 +617,57 @@ data/objects.
 In order to make hydration and serialization symmetrical (allowing back and forth conversion), the order
 of serializers called is reversed for _promoted_ properties.
 
+### Omitting data for serialization
+
+Data can be omitted from serialization. By default, all public methods and properties are included for
+serialization. There are two ways to exclude data, both methods use attributes.
+
+The `MapperSettings` attribute can be specified at class-level to exclude either all
+public properties, public methods, or both (the last being rather useless, of course).
+
+```php
+use EventSauce\ObjectHydrator\MapperSettings;
+
+#[MapperSettings(serializePublicMethods: false)]
+class ClassThatDoesNotSerializePublicMethods
+{
+    // class body
+}
+
+#[MapperSettings(serializePublicProperties: false)]
+class ClassThatDoesNotSerializePublicProperties
+{
+    // class body
+}
+```
+
+Alternatively, specific methods and properties can be excluded from serialization by
+using the `DoNotSerialize` attribute.
+
+```php
+use EventSauce\ObjectHydrator\DoNotSerialize;
+
+class ClassThatExcludesCertainDataPoints
+{
+    public function __construct(
+        public string $includedProperty,
+        #[DoNotSerialize]
+        public string $excludedProperty,
+    ) {}
+    
+    public function includedMethod(): string
+    {
+        return 'included';
+    }
+    
+    #[DoNotSerialize]
+    public function excludedMethod(): string
+    {
+        return 'excluded';
+    }
+}
+```
+
 ## Maximizing performance
 
 Reflection and dynamic code paths can be a performance issue in the hot-path. To remove the expense,
