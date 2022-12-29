@@ -30,11 +30,12 @@ final class DefinitionProvider
     private PropertyTypeResolver $propertyTypeResolver;
 
     public function __construct(
-        DefaultCasterRepository $defaultCasterRepository = null,
-        KeyFormatter $keyFormatter = null,
+        DefaultCasterRepository     $defaultCasterRepository = null,
+        KeyFormatter                $keyFormatter = null,
         DefaultSerializerRepository $defaultSerializerRepository = null,
-        PropertyTypeResolver $propertyTypeResolver = null,
-    ) {
+        PropertyTypeResolver        $propertyTypeResolver = null,
+    )
+    {
         $this->defaultCasters = $defaultCasterRepository ?? DefaultCasterRepository::builtIn();
         $this->keyFormatter = $keyFormatter ?? new KeyFormatterForSnakeCasing();
         $this->defaultSerializers = $defaultSerializerRepository ?? DefaultSerializerRepository::builtIn();
@@ -63,8 +64,7 @@ final class DefinitionProvider
         /** @var PropertyHydrationDefinition[] $definitions */
         $definitions = [];
 
-        $constructionStyle = $constructor instanceof ReflectionMethod ? $constructor->isConstructor(
-        ) ? 'new' : 'static' : 'new';
+        $constructionStyle = $constructor instanceof ReflectionMethod ? $constructor->isConstructor() ? 'new' : 'static' : 'new';
         $constructorName = $constructionStyle === 'new' ? $className : $this->stringifyConstructor($constructor);
 
         /** @var ReflectionParameter[] $parameters */
@@ -140,11 +140,15 @@ final class DefinitionProvider
     public function provideSerializationDefinition(string $className): ClassSerializationDefinition
     {
         $reflection = new ReflectionClass($className);
+        $objectSettings = $this->resolveObjectSettings($reflection);
         $publicMethods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
         $properties = [];
 
         foreach ($publicMethods as $method) {
-            if ($method->isStatic() || $method->getNumberOfParameters() !== 0) {
+            if ($objectSettings->serializePublicMethods === false
+                || $method->isStatic()
+                || $method->getNumberOfParameters() !== 0
+                || count($method->getAttributes(DoNotSerialize::class)) === 1) {
                 continue;
             }
 
@@ -166,7 +170,9 @@ final class DefinitionProvider
         $publicProperties = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
 
         foreach ($publicProperties as $property) {
-            if ($property->isStatic()) {
+            if ($property->isStatic()
+                || $objectSettings->serializePublicProperties === false
+                || count($property->getAttributes(DoNotSerialize::class)) === 1) {
                 continue;
             }
 
@@ -280,5 +286,17 @@ final class DefinitionProvider
         }
 
         return [$defaultKey => [$defaultKey]];
+    }
+
+    private function resolveObjectSettings(ReflectionClass $reflection): MapperSettings
+    {
+        /** @var ReflectionAttribute[] $attributes */
+        $attributes = $reflection->getAttributes(MapperSettings::class);
+
+        if (count($attributes) === 0) {
+            return new MapperSettings();
+        }
+
+        return $attributes[0]->newInstance();
     }
 }

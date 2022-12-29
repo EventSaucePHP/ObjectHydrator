@@ -8,6 +8,9 @@ use DateTime;
 use DateTimeImmutable;
 use EventSauce\ObjectHydrator\Fixtures\ClassReferencedByUnionOne;
 use EventSauce\ObjectHydrator\Fixtures\ClassReferencedByUnionTwo;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatOmitsPublicMethods;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatOmitsPublicProperties;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatOmitsSpecificMethodsAndProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatRenamesInputForClassWithMultipleProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCaseProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCasePublicMethod;
@@ -19,6 +22,8 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithUnionProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\CustomEnum;
 use PHPUnit\Framework\TestCase;
+use function array_keys;
+use function PHPUnit\Framework\assertEquals;
 
 abstract class ObjectSerializationTestCase extends TestCase
 {
@@ -37,6 +42,48 @@ abstract class ObjectSerializationTestCase extends TestCase
         $payload = $serializer->serializeObject($object);
 
         self::assertEquals(['snake_case' => 'some_property'], $payload);
+    }
+
+    /**
+     * @test
+     */
+    public function excluding_public_methods_through_object_settings(): void
+    {
+        $object = new ClassThatOmitsPublicMethods();
+
+        $payload = $this->objectHydrator()->serializeObject($object);
+
+        assertEquals(1, count(array_keys($payload)));
+        assertEquals(['included' => 'included!'], $payload);
+    }
+
+    /**
+     * @test
+     */
+    public function excluding_public_properties_through_object_settings(): void
+    {
+        $object = new ClassThatOmitsPublicProperties();
+
+        $payload = $this->objectHydrator()->serializeObject($object);
+
+        assertEquals(1, count(array_keys($payload)));
+        assertEquals(['included' => 'included!'], $payload);
+    }
+
+    /**
+     * @test
+     */
+    public function excluding_public_properties_through_annotations(): void
+    {
+        $object = new ClassThatOmitsSpecificMethodsAndProperties();
+
+        $payload = $this->objectHydrator()->serializeObject($object);
+
+        assertEquals(2, count(array_keys($payload)));
+        assertEquals([
+            'included_property' => 'included property',
+            'included_method_field' => 'included method value',
+        ], $payload);
     }
 
     /**
