@@ -112,7 +112,7 @@ abstract class ObjectSerializationTestCase extends TestCase
     {
         $object = new ClassThatOmitsPublicMethods();
 
-        $payload = $this->objectHydrator()->serializeObject($object);
+        $payload = $this->objectMapper()->serializeObject($object);
 
         assertEquals(1, count(array_keys($payload)));
         assertEquals(['included' => 'included!'], $payload);
@@ -125,7 +125,7 @@ abstract class ObjectSerializationTestCase extends TestCase
     {
         $object = new ClassThatOmitsPublicProperties();
 
-        $payload = $this->objectHydrator()->serializeObject($object);
+        $payload = $this->objectMapper()->serializeObject($object);
 
         assertEquals(1, count(array_keys($payload)));
         assertEquals(['included' => 'included!'], $payload);
@@ -138,7 +138,7 @@ abstract class ObjectSerializationTestCase extends TestCase
     {
         $object = new ClassThatOmitsSpecificMethodsAndProperties();
 
-        $payload = $this->objectHydrator()->serializeObject($object);
+        $payload = $this->objectMapper()->serializeObject($object);
 
         assertEquals(2, count(array_keys($payload)));
         assertEquals([
