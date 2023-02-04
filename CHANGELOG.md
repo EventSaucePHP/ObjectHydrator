@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Corrected @template generic usage for generated hydrator
+- Prevented exception when scalar type is resolved from a docblock
 
 ## [1.1.0] - 2022-12-29
 
