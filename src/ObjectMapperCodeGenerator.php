@@ -80,15 +80,13 @@ use EventSauce\ObjectHydrator\UnableToHydrateObject;
 use EventSauce\ObjectHydrator\UnableToSerializeObject;
 use Generator;
 
-/**
- * @template T
- */
 class $shortName implements ObjectMapper
 {
     private array \$hydrationStack = [];
     public function __construct() {}
 
     /**
+     * @template T
      * @param class-string<T> \$className
      * @return T
      */
