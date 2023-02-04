@@ -148,8 +148,7 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
         foreach ($matches as [, $type, $paramName]) {
             $type = $this->extractItemType(trim($type));
 
-            if (str_starts_with($type, '\\')) {
-                $commentTypeMap[$paramName] = $type;
+            if (str_starts_with($type, '\\') || in_array($type, ['bool', 'boolean', 'int', 'integer', 'float', 'double', 'string', 'array', 'object', 'null'])) {
                 continue;
             }
 

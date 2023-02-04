@@ -6,6 +6,7 @@ namespace EventSauce\ObjectHydrator\IntegrationTests;
 
 use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToBasedOnDocComments;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToDifferentTypes;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListToScalarType;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatHasMultipleCastersOnSingleProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyCasting;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
@@ -35,6 +36,11 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
 
     public function dataProvider(): iterable
     {
+        yield 'class that casts a list to a scalar type' => [
+            ClassThatCastsListToScalarType::class,
+            ['test' => ['Frank']],
+        ];
+
         yield 'class with list type resolve from doc comment' => [
             ClassThatCastsListsToBasedOnDocComments::class,
             [

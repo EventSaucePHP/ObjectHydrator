@@ -13,7 +13,7 @@ use function in_array;
 use function is_array;
 use function settype;
 
-#[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
+#[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 final class CastListToType implements PropertyCaster, PropertySerializer
 {
     public const NATIVE_TYPES = ['bool', 'boolean', 'int', 'integer', 'float', 'double', 'string', 'array', 'object', 'null'];
