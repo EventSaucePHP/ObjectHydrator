@@ -35,7 +35,7 @@ final class ObjectMapperCodeGenerator
 
         foreach ($hydrationClasses as $className) {
             $classDefinition = $this->definitionProvider->provideHydrationDefinition($className);
-            $methodName = 'hydrate' . str_replace('\\', '', $className);
+            $methodName = 'hydrate' . str_replace('\\', '⚡️', $className);
             $hydratorMap[] = "'$className' => \$this->$methodName(\$payload),";
             $hydrators[] = $this->dumpClassHydrator($className, $classDefinition);
         }
@@ -50,7 +50,7 @@ final class ObjectMapperCodeGenerator
 
         foreach ($valueSerializers as $valueType => [$valueSerializerClass, $valueSerializerArgs]) {
             $serializers[] = $this->dumpValueTypeSerializer($valueType, $valueSerializerClass, $valueSerializerArgs);
-            $methodName = 'serializeValue' . str_replace('\\', '', $valueType);
+            $methodName = 'serializeValue' . str_replace('\\', '⚡️', $valueType);
             $serializationMap[] = "'$valueType' => \$this->$methodName(\$object),";
         }
 
@@ -59,7 +59,7 @@ final class ObjectMapperCodeGenerator
                 continue;
             }
             $definition = $this->definitionProvider->provideSerializationDefinition($class);
-            $methodName = 'serializeObject' . str_replace('\\', '', $class);
+            $methodName = 'serializeObject' . str_replace('\\', '⚡️', $class);
             $serializationMap[] = "'$class' => \$this->$methodName(\$object),";
             $serializers[] = $this->dumpClassDefinition($class, $definition);
         }
@@ -276,7 +276,7 @@ CODE;
 
 CODE;
                 } else {
-                    $methodName = 'hydrate' . str_replace('\\', '', $definition->firstTypeName);
+                    $methodName = 'hydrate' . str_replace('\\', '⚡️', $definition->firstTypeName);
                     $body .= <<<CODE
 
                 if (is_array(\$value)) {
@@ -301,7 +301,7 @@ CODE;
 CODE;
         }
 
-        $methodName = 'hydrate' . str_replace('\\', '', $className);
+        $methodName = 'hydrate' . str_replace('\\', '⚡️', $className);
         $constructionCode = $classDefinition->constructionStyle === 'new' ? "new \\$className(...\$properties)" : "\\$classDefinition->constructor(...\$properties)";
 
         return <<<CODE
@@ -334,7 +334,7 @@ CODE;
         string $valueSerializerClass,
         array $valueSerializerArgs
     ): string {
-        $methodName = 'serializeValue' . str_replace('\\', '', $valueType);
+        $methodName = 'serializeValue' . str_replace('\\', '⚡️', $valueType);
         $serializerArgs = var_export($valueSerializerArgs, true);
 
         return <<<CODE
@@ -354,7 +354,7 @@ CODE;
 
     private function dumpClassDefinition(mixed $class, ClassSerializationDefinition $definition)
     {
-        $methodName = 'serializeObject' . str_replace('\\', '', $class);
+        $methodName = 'serializeObject' . str_replace('\\', '⚡️', $class);
         $properties = array_map([$this, 'dumpClassProperty'], $definition->properties);
         $propertiesCode = implode("\n        ", $properties);
 
@@ -443,7 +443,7 @@ CODE;
                 $prefix = 'serializeValue';
             }
 
-            $method = $prefix . str_replace('\\', '', $firstType->name);
+            $method = $prefix . str_replace('\\', '⚡️', $firstType->name);
 
             return <<<CODE
         \$$definition->accessorName = \$this->$method(\$$definition->accessorName);
@@ -497,8 +497,8 @@ CODE;
 
             foreach ($propertyType->concreteTypes() as $concreteType) {
                 $serializerName = $this->definitionProvider->hasSerializerFor($concreteType->name)
-                    ? 'serializeValue' . str_replace('\\', '', $concreteType->name)
-                    : 'serializeObject' . str_replace('\\', '', $concreteType->name);
+                    ? 'serializeValue' . str_replace('\\', '⚡️', $concreteType->name)
+                    : 'serializeObject' . str_replace('\\', '⚡️', $concreteType->name);
                 $matchStatement .= <<<CODE
             '$concreteType->name' => \$this->$serializerName(\$$definition->accessorName),
 
