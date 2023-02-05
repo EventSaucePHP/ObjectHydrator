@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Ensure generic template is of object type (#36)
+- Prevent method name collisions in case SomeThing and Some\Thing both exist 
 
 ## [1.1.1] 2023-02-04
 
