@@ -17,6 +17,11 @@ use function var_export;
 
 final class ObjectMapperCodeGenerator
 {
+    /**
+     * @var array<class-string, string>
+     */
+    private array $classMethodSuffixMapping = [];
+
     private DefinitionProvider $definitionProvider;
 
     public function __construct(DefinitionProvider $definitionProvider = null)
@@ -32,10 +37,27 @@ final class ObjectMapperCodeGenerator
         $hydrationClasses = ClassExpander::expandClassesForHydration($classes, $this->definitionProvider);
         $hydrators = [];
         $hydratorMap = [];
+        $methodSuffixes = [];
+
+        foreach ($hydrationClasses as $className) {
+            $methodName = str_replace('\\', '', $className);
+            if (!array_key_exists($methodName, $methodSuffixes)) {
+                $this->classMethodSuffixMapping[$className] = $methodSuffixes[$methodName] = '';
+                continue;
+            }
+
+            $suffix = 0;
+            do {
+                $suffix++;
+                $methodName = $methodName . (string)$suffix;
+            } while (array_key_exists($methodName, $methodSuffixes));
+            $this->classMethodSuffixMapping[$className] = $methodSuffixes[$methodName] = (string)$suffix;
+        }
+        unset($methodSuffixes);
 
         foreach ($hydrationClasses as $className) {
             $classDefinition = $this->definitionProvider->provideHydrationDefinition($className);
-            $methodName = 'hydrate' . str_replace('\\', '', $className);
+            $methodName = 'hydrate' . str_replace('\\', '', $className) . $this->classMethodSuffixMapping[$className];
             $hydratorMap[] = "'$className' => \$this->$methodName(\$payload),";
             $hydrators[] = $this->dumpClassHydrator($className, $classDefinition);
         }
@@ -59,7 +81,7 @@ final class ObjectMapperCodeGenerator
                 continue;
             }
             $definition = $this->definitionProvider->provideSerializationDefinition($class);
-            $methodName = 'serializeObject' . str_replace('\\', '', $class);
+            $methodName = 'serializeObject' . str_replace('\\', '', $class) . $this->classMethodSuffixMapping[$class];
             $serializationMap[] = "'$class' => \$this->$methodName(\$object),";
             $serializers[] = $this->dumpClassDefinition($class, $definition);
         }
@@ -301,7 +323,7 @@ CODE;
 CODE;
         }
 
-        $methodName = 'hydrate' . str_replace('\\', '', $className);
+        $methodName = 'hydrate' . str_replace('\\', '', $className) . $this->classMethodSuffixMapping[$className];;
         $constructionCode = $classDefinition->constructionStyle === 'new' ? "new \\$className(...\$properties)" : "\\$classDefinition->constructor(...\$properties)";
 
         return <<<CODE
@@ -354,7 +376,7 @@ CODE;
 
     private function dumpClassDefinition(mixed $class, ClassSerializationDefinition $definition)
     {
-        $methodName = 'serializeObject' . str_replace('\\', '', $class);
+        $methodName = 'serializeObject' . str_replace('\\', '', $class) . $this->classMethodSuffixMapping[$class];;
         $properties = array_map([$this, 'dumpClassProperty'], $definition->properties);
         $propertiesCode = implode("\n        ", $properties);
 
