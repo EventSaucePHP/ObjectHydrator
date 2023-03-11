@@ -60,12 +60,22 @@ final class DefinitionProvider
 
         $reflectionClass = new ReflectionClass($className);
         $constructor = $this->resolveConstructor($reflectionClass);
+        $classAttributes = $reflectionClass->getAttributes();
 
         /** @var PropertyHydrationDefinition[] $definitions */
         $definitions = [];
 
-        $constructionStyle = $constructor instanceof ReflectionMethod ? $constructor->isConstructor() ? 'new' : 'static' : 'new';
-        $constructorName = $constructionStyle === 'new' ? $className : $this->stringifyConstructor($constructor);
+        $constructionStyle = match (true) {
+            $constructor instanceof ReflectionMethod => $constructor->isConstructor() ? 'new' : 'static',
+            ! $reflectionClass->isInstantiable() => 'none',
+            default => 'new',
+        };
+
+        if ($constructionStyle !== 'none') {
+            $constructorName = $constructionStyle === 'new' ? $className : $this->stringifyConstructor($constructor);
+        } else {
+            $constructorName = '';
+        }
 
         /** @var ReflectionParameter[] $parameters */
         $parameters = $constructor instanceof ReflectionMethod ? $constructor->getParameters() : [];
@@ -97,6 +107,7 @@ final class DefinitionProvider
                 $casters = [$defaultCaster];
             }
 
+            $typeSpecifier = $this->typeSpecifier($attributes);
             $definitions[] = new PropertyHydrationDefinition(
                 $keys,
                 $accessorName,
@@ -107,13 +118,21 @@ final class DefinitionProvider
                 $parameterType->allowsNull(),
                 $parameter->isDefaultValueAvailable(),
                 $firstTypeName,
+                $typeSpecifier?->key,
+                $typeSpecifier?->map ?: [],
             );
         }
+
+        $typeSpecifier = $this->typeSpecifier($classAttributes);
+        $mapFrom = $this->resolveMapFrom($classAttributes);
 
         return $this->definitionCache[$className] = new ClassHydrationDefinition(
             $constructorName,
             $constructionStyle,
-            ...$definitions
+            $typeSpecifier?->key,
+            $typeSpecifier?->map ?: [],
+            $mapFrom,
+            ...$definitions,
         );
     }
 
@@ -142,6 +161,7 @@ final class DefinitionProvider
         $reflection = new ReflectionClass($className);
         $objectSettings = $this->resolveObjectSettings($reflection);
         $publicMethods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
+        $classAttributes = $reflection->getAttributes();
         $properties = [];
 
         foreach ($publicMethods as $method) {
@@ -157,6 +177,7 @@ final class DefinitionProvider
             /** @var ReflectionNamedType|ReflectionUnionType $returnType */
             $returnType = $method->getReturnType();
             $attributes = $method->getAttributes();
+            $typeSpecifier = $this->typeSpecifier($attributes);
             $properties[] = new PropertySerializationDefinition(
                 PropertySerializationDefinition::TYPE_METHOD,
                 $methodName,
@@ -164,6 +185,8 @@ final class DefinitionProvider
                 PropertyType::fromReflectionType($returnType),
                 $returnType->allowsNull(),
                 $this->resolveKeys($key, $attributes),
+                $typeSpecifier?->key,
+                $typeSpecifier?->map ?: [],
             );
         }
 
@@ -185,6 +208,7 @@ final class DefinitionProvider
                 $serializers = array_reverse($serializers);
             }
 
+            $typeSpecifier = $this->typeSpecifier($attributes);
             $properties[] = new PropertySerializationDefinition(
                 PropertySerializationDefinition::TYPE_PROPERTY,
                 $property->getName(),
@@ -192,10 +216,33 @@ final class DefinitionProvider
                 PropertyType::fromReflectionType($propertyType),
                 $propertyType->allowsNull(),
                 $this->resolveKeys($key, $attributes),
+                $typeSpecifier?->key,
+                $typeSpecifier?->map ?: [],
             );
         }
 
-        return new ClassSerializationDefinition($properties);
+        $typeSpecifier = $this->typeSpecifier($reflection->getAttributes());
+
+        return new ClassSerializationDefinition(
+            $properties,
+            $typeSpecifier?->key,
+            $typeSpecifier?->map ?: [],
+            $this->resolveMapFrom($classAttributes),
+        );
+    }
+
+    /**
+     * @param ReflectionAttribute[] $attributes
+     */
+    private function typeSpecifier(array $attributes): ?MapToType
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->getName() == MapToType::class) {
+                return $attribute->newInstance();
+            }
+        }
+
+        return null;
     }
 
     private function resolveSerializer(string $type, array $attributes): array
@@ -276,6 +323,14 @@ final class DefinitionProvider
      */
     private function resolveKeys(string $defaultKey, array $attributes): array
     {
+        return $this->resolveMapFrom($attributes) ?: [$defaultKey => [$defaultKey]];
+    }
+
+    /**
+     * @param ReflectionAttribute[] $attributes
+     */
+    private function resolveMapFrom(array $attributes): array|false
+    {
         foreach ($attributes as $attribute) {
             if ($attribute->getName() === MapFrom::class) {
                 /** @var MapFrom $mapFrom */
@@ -285,7 +340,7 @@ final class DefinitionProvider
             }
         }
 
-        return [$defaultKey => [$defaultKey]];
+        return false;
     }
 
     private function resolveObjectSettings(ReflectionClass $reflection): MapperSettings

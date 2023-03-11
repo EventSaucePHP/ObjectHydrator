@@ -53,4 +53,9 @@ final class UnableToHydrateObject extends RuntimeException
     {
         return new static("Unable to hydrate object: $className, no hydrator defined", stack: $stack);
     }
+
+    public static function classIsNotInstantiable(string $className, array $stack = []): static
+    {
+        return new static("Unable to hydrate object: $className, is not instantiable", stack: $stack);
+    }
 }

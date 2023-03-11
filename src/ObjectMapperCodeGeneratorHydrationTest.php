@@ -6,6 +6,7 @@ namespace EventSauce\ObjectHydrator;
 
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use League\ConstructFinder\ConstructFinder;
+use function array_unique;
 use function class_exists;
 use function spl_object_hash;
 use function strpos;
@@ -44,10 +45,11 @@ class ObjectMapperCodeGeneratorHydrationTest extends ObjectHydrationTestCase
         }
 
         $classes = ConstructFinder::locatedIn($directory)->findClassNames();
+        $interfaces = ConstructFinder::locatedIn($directory)->findInterfaceNames();
         $dumper = new ObjectMapperCodeGenerator($definitionProvider);
 
         $dumpedDefinition = $dumper->dump(
-            $classes,
+            array_unique([...$interfaces, ...$classes]),
             $className
         );
         $filename = __DIR__ . '/test' . (strpos($directory, '81') === false ? '80' : '81') . '.php';

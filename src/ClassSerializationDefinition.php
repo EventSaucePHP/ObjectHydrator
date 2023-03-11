@@ -13,7 +13,10 @@ class ClassSerializationDefinition
         /**
          * @var PropertySerializationDefinition[]
          */
-        public array $properties
+        public array $properties,
+        public ?string $typeKey,
+        public array $typeMap,
+        public false|array $mapFrom,
     ) {
     }
 }

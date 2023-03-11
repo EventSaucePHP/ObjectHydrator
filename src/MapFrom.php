@@ -8,7 +8,7 @@ use Attribute;
 use function explode;
 use function is_string;
 
-#[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_PROPERTY | Attribute::TARGET_CLASS)]
 final class MapFrom
 {
     /** @var array<string, array<string>> */

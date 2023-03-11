@@ -6,6 +6,7 @@ namespace EventSauce\ObjectHydrator;
 
 use BackedEnum;
 use Generator;
+use LogicException;
 use Throwable;
 use UnitEnum;
 use function array_key_exists;
@@ -14,6 +15,7 @@ use function array_pop;
 use function constant;
 use function count;
 use function current;
+use function end;
 use function get_class;
 use function gettype;
 use function implode;
@@ -41,6 +43,31 @@ class ObjectMapperUsingReflection implements ObjectMapper
         $this->definitionProvider = $definitionProvider ?? new DefinitionProvider();
     }
 
+    private function extractPayloadViaMap(array $payload, array $inputMap): mixed
+    {
+        $newPayload = [];
+
+        foreach ($inputMap as $to => $from) {
+            $p = $payload;
+            $newPayload[$to] = null;
+
+            foreach ($from as $fromSegment) {
+                if ( ! is_array($p) || ! array_key_exists($fromSegment, $p)) {
+                    goto next_property;
+                }
+                $p = $p[$fromSegment];
+            }
+
+            $newPayload[$to] = $p;
+
+            next_property:
+        }
+
+        return count($inputMap) === 1
+            ? current($newPayload)
+            : $newPayload;
+    }
+
     /**
      * @template T of object
      *
@@ -55,58 +82,45 @@ class ObjectMapperUsingReflection implements ObjectMapper
         try {
             $classDefinition = $this->definitionProvider->provideHydrationDefinition($className);
 
+            if ($classDefinition->mapFrom) {
+                $payload = $this->extractPayloadViaMap($payload, $classDefinition->mapFrom);
+            }
+
+            if ($classDefinition->typeKey) {
+                return $this->hydrateViaTypeMap($classDefinition, $payload);
+            }
+
             $properties = [];
             $missingFields = [];
 
             foreach ($classDefinition->propertyDefinitions as $definition) {
-                $value = [];
-
-                foreach ($definition->keys as $to => $from) {
-                    $p = $payload;
-
-                    foreach ($from as $fromSegment) {
-                        if ( ! is_array($p) || ! array_key_exists($fromSegment, $p)) {
-                            goto next_property;
-                        }
-                        $p = $p[$fromSegment];
-                    }
-
-                    $value[$to] = $p;
-
-                    next_property:
-                }
-
-                if ($value === []) {
-                    if ($definition->nullable && ! $definition->hasDefaultValue) {
-                        $value = null;
-                    } else {
-                        if ( ! $definition->hasDefaultValue) {
-                            $missingFields[] = implode('.', $from);
-                        }
-                        continue;
-                    }
-                }
-
-                if ($value !== null && count($definition->keys) === 1) {
-                    $value = current($value);
-                }
-
+                $keys = $definition->keys;
                 $property = $definition->accessorName;
+                $value = $this->extractPayloadViaMap($payload, $keys);
 
-                if ($value !== null) {
-                    foreach ($definition->casters as [$caster, $options]) {
-                        $key = $className . '-' . $caster . '-' . json_encode($options);
-                        /** @var PropertyCaster $propertyCaster */
-                        $propertyCaster = $this->casterInstances[$key] ??= new $caster(...$options);
-                        $value = $propertyCaster->cast($value, $this);
+                if ($value === null) {
+                    if ($definition->hasDefaultValue) {
+                        continue;
+                    } elseif ($definition->nullable) {
+                        $properties[$property] = null;
+                    } else {
+                        $missingFields[] = implode('.', end($keys));
                     }
+                    continue;
+                }
+
+                foreach ($definition->casters as [$caster, $options]) {
+                    $key = $className . '-' . $caster . '-' . json_encode($options);
+                    /** @var PropertyCaster $propertyCaster */
+                    $propertyCaster = $this->casterInstances[$key] ??= new $caster(...$options);
+                    $value = $propertyCaster->cast($value, $this);
+                }
+
+                if ($definition->typeKey && is_array($value)) {
+                    $value = $this->hydrateViaTypeMap($definition, $value);
                 }
 
                 $typeName = $definition->firstTypeName;
-
-                if ($value === null) {
-                    goto set_value;
-                }
 
                 if ($definition->isBackedEnum()) {
                     $value = $typeName::from($value);
@@ -175,8 +189,17 @@ class ObjectMapperUsingReflection implements ObjectMapper
 
     public function serializeObject(object $object): mixed
     {
-        $className = get_class($object);
+        return $this->serializeObjectOfType($object, get_class($object));
+    }
 
+    /**
+     * @template T
+     *
+     * @param T               $object
+     * @param class-string<T> $className
+     */
+    public function serializeObjectOfType(object $object, string $className): mixed
+    {
         try {
             if ($serializer = $this->definitionProvider->provideSerializer($className)) {
                 /** @var class-string<PropertySerializer> $serializerClass */
@@ -190,14 +213,36 @@ class ObjectMapperUsingReflection implements ObjectMapper
             $result = [];
             $definition = $this->definitionProvider->provideSerializationDefinition($className);
 
+            if ($definition->typeKey) {
+                foreach ($definition->typeMap as $payloadType => $valueType) {
+                    if (is_a($object, $valueType)) {
+                        $result = $this->serializeObjectOfType($object, $valueType);
+                        $result[$definition->typeKey] = $payloadType;
+
+                        goto process_map_from;
+                    }
+                }
+
+                throw new LogicException('Unable to map object to type for value type: ' . get_class($object));
+            }
+
             /** @var PropertySerializationDefinition $property */
             foreach ($definition->properties as $property) {
+                $defaults = [];
                 $keys = $property->keys;
                 $accessorName = $property->accessorName;
 
                 $value = $property->type === PropertySerializationDefinition::TYPE_METHOD
                     ? $object->{$accessorName}()
                     : $object->{$accessorName};
+
+                if ($value !== null && $property->typeSpecifier) {
+                    foreach ($property->typeMap as $payloadType => $valueType) {
+                        if (is_a($value, $valueType)) {
+                            $defaults[$property->typeSpecifier] = $payloadType;
+                        }
+                    }
+                }
 
                 if ($value === null || count($property->serializers) === 0) {
                     goto assign_result;
@@ -216,7 +261,7 @@ class ObjectMapperUsingReflection implements ObjectMapper
                     }
                 } else {
                     foreach ($serializers as $valueType => $serializer) {
-                        if (is_a($value, $valueType, false) === false && $valueType !== gettype($valueType)) {
+                        if (is_a($value, $valueType) === false && $valueType !== gettype($valueType)) {
                             continue;
                         }
 
@@ -235,10 +280,18 @@ class ObjectMapperUsingReflection implements ObjectMapper
                 } elseif ($value instanceof UnitEnum) {
                     $value = $value->name;
                 } elseif (is_object($value)) {
-                    $value = $this->serializeObject($value);
+                    $value = $defaults + $this->serializeObject($value);
                 }
 
                 $this->assignToResult($keys, $result, $value);
+            }
+
+            process_map_from:
+            if ($mapFrom = $definition->mapFrom) {
+                $r = [];
+                $this->assignToResult($mapFrom, $r, $result);
+
+                return $r;
             }
 
             return $result;
@@ -281,5 +334,17 @@ class ObjectMapperUsingReflection implements ObjectMapper
         foreach ($objects as $index => $object) {
             yield $index => $this->serializeObject($object);
         }
+    }
+
+    private function hydrateViaTypeMap(PropertyHydrationDefinition|ClassHydrationDefinition $definition, array $payload): object
+    {
+        $type = $payload[$definition->typeKey ?? ''] ?? '';
+        $valueType = $definition->typeMap[$type] ?? null;
+
+        if ($valueType === null) {
+            throw new LogicException("No type mapped for serialized type \"$type\"");
+        }
+
+        return $this->hydrateObject($valueType, $payload);
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
+use EventSauce\ObjectHydrator\Fixtures\CastersOnClasses\ClassWithClassLevelMapFrom;
+use EventSauce\ObjectHydrator\Fixtures\CastersOnClasses\ClassWithClassLevelMapFromMultiple;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToDifferentTypes;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatContainsAnotherClass;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatHasMultipleCastersOnSingleProperty;
@@ -27,6 +29,9 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyThatUsesListCastingToCla
 use EventSauce\ObjectHydrator\Fixtures\ClassWithStaticConstructor;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUnmappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUuidProperty;
+use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Animal;
+use EventSauce\ObjectHydrator\Fixtures\TypeMapping\ClassThatMapsTypes;
+use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Frog;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumPropertyWithDefault;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithNullableEnumProperty;
@@ -38,6 +43,63 @@ use Ramsey\Uuid\UuidInterface;
 
 abstract class ObjectHydrationTestCase extends TestCase
 {
+    /**
+     * @test
+     */
+    public function hydrating_a_polymorphic_property(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $payload = ['child' => ['animal' => 'frog', 'color' => 'blue']];
+        $object = $hydrator->hydrateObject(ClassThatMapsTypes::class, $payload);
+
+        self::assertInstanceOf(ClassThatMapsTypes::class, $object);
+        self::assertInstanceOf(Frog::class, $object->child);
+    }
+    /**
+     * @test
+     */
+    public function hydrating_a_polymorphic_interface(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $payload = ['nested' => ['muppet' => 'kermit', 'color' => 'blue']];
+        $object = $hydrator->hydrateObject(Animal::class, $payload);
+
+        self::assertInstanceOf(Animal::class, $object);
+        self::assertInstanceOf(Frog::class, $object);
+        self::assertEquals('blue', $object->color);
+    }
+
+    /**
+     * @test
+     */
+    public function hydrating_with_class_level_map_from(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $payload = ['nested' => ['name' => 'Frank']];
+        $object = $hydrator->hydrateObject(ClassWithClassLevelMapFrom::class, $payload);
+
+        self::assertInstanceOf(ClassWithClassLevelMapFrom::class, $object);
+        self::assertEquals('Frank', $object->name);
+    }
+
+    /**
+     * @test
+     */
+    public function hydrating_with_class_level_map_from_with_multiple_sources(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $payload = ['first' => 1, 'second' => 2];
+        $object = $hydrator->hydrateObject(ClassWithClassLevelMapFromMultiple::class, $payload);
+
+        self::assertInstanceOf(ClassWithClassLevelMapFromMultiple::class, $object);
+        self::assertEquals(1, $object->one);
+        self::assertEquals(2, $object->two);
+    }
+
     /**
      * @test
      */
