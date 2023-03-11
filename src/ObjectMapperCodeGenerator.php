@@ -35,7 +35,7 @@ final class ObjectMapperCodeGenerator
 
         foreach ($hydrationClasses as $className) {
             $classDefinition = $this->definitionProvider->provideHydrationDefinition($className);
-            $methodName = 'hydrate' . str_replace('\\', '⚡', $className);
+            $methodName = 'hydrate' . str_replace('\\', '⚡️', $className);
             $hydratorMap[] = "'$className' => \$this->$methodName(\$payload),";
             $hydrators[] = $this->dumpClassHydrator($className, $classDefinition);
         }
@@ -328,7 +328,7 @@ CODE;
                     $typeMatchMapCode = '';
 
                     foreach ($definition->typeMap as $payloadType => $valueType) {
-                        $methodName = 'hydrate' . str_replace('\\', '', $valueType);
+                        $methodName = 'hydrate' . str_replace('\\', '⚡️', $valueType);
                         $typeMatchMapCode .= <<<CODE
                     '$payloadType' => \$this->$methodName(\$value),
 
@@ -381,7 +381,7 @@ CODE;
 CODE;
         }
 
-        $methodName = 'hydrate' . str_replace('\\', '⚡', $className);
+        $methodName = 'hydrate' . str_replace('\\', '⚡️', $className);
 
         if ($classDefinition->canBeConstructed() === false) {
             if ($classDefinition->typeKey === null) {
@@ -399,7 +399,7 @@ CODE;
             $typeMatchMapCode = '';
 
             foreach ($classDefinition->typeMap as $payloadType => $valueType) {
-                $method = 'hydrate' . str_replace('\\', '', $valueType);
+                $method = 'hydrate' . str_replace('\\', '⚡️', $valueType);
                 $typeMatchMapCode .= <<<CODE
                  '$payloadType' => \$this->$method(\$payload),
 
@@ -478,14 +478,14 @@ CODE;
 
     private function dumpClassSerializer(string $class, ClassSerializationDefinition $definition): string
     {
-        $methodName = 'serializeObject' . str_replace('\\', '⚡', $class);
+        $methodName = 'serializeObject' . str_replace('\\', '⚡️', $class);
         $typeMapCode = '';
         $propertiesCode = '';
 
         if ($definition->typeKey) {
             $map = [];
             foreach ($definition->typeMap as $p => $v) {
-                $map[$p] = [$v, 'serializeObject' . str_replace('\\', '', $v)];
+                $map[$p] = [$v, 'serializeObject' . str_replace('\\', '⚡️', $v)];
             }
             $typeMapExported = var_export($map, true);
             $typeMapCode = <<<CODE
@@ -560,7 +560,7 @@ CODE;
         $matchCode = '';
 
         foreach ($definition->typeMap as $payloadType => $valueType) {
-            $methodName = 'serializeObject' . str_replace('\\', '', $valueType);
+            $methodName = 'serializeObject' . str_replace('\\', '⚡️', $valueType);
             $matchCode .= <<<CODE
             is_a(\$$definition->accessorName, '$valueType') => ['$definition->typeSpecifier' => '$payloadType'] + \$this->$methodName(\$$definition->accessorName),
 
