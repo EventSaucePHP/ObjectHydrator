@@ -29,17 +29,21 @@ final class DefinitionProvider
 
     private PropertyTypeResolver $propertyTypeResolver;
 
+    private SkippableTypesRepository $skippableTypesRepository;
+
     public function __construct(
         DefaultCasterRepository     $defaultCasterRepository = null,
         KeyFormatter                $keyFormatter = null,
         DefaultSerializerRepository $defaultSerializerRepository = null,
         PropertyTypeResolver        $propertyTypeResolver = null,
+        SkippableTypesRepository    $skippableTypesRepository = null,
     )
     {
         $this->defaultCasters = $defaultCasterRepository ?? DefaultCasterRepository::builtIn();
         $this->keyFormatter = $keyFormatter ?? new KeyFormatterForSnakeCasing();
         $this->defaultSerializers = $defaultSerializerRepository ?? DefaultSerializerRepository::builtIn();
         $this->propertyTypeResolver = $propertyTypeResolver ?? new NaivePropertyTypeResolver();
+        $this->skippableTypesRepository = $skippableTypesRepository ?? SkippableTypesRepository::createDefault();
     }
 
     /**
@@ -149,6 +153,11 @@ final class DefinitionProvider
         }
 
         return $reflectionClass->getConstructor();
+    }
+
+    public function isValueTypeSkippable(object $value): bool
+    {
+        return $this->skippableTypesRepository->hasType($value::class);
     }
 
     private function stringifyConstructor(ReflectionMethod $constructor): string

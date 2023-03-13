@@ -275,9 +275,9 @@ class ObjectMapperUsingReflection implements ObjectMapper
 
                 assign_result:
 
-                if ($value instanceof Skippable) {
+                if (is_object($value) && $this->definitionProvider->isValueTypeSkippable($value)) {
                     continue;
-                } else if ($value instanceof BackedEnum) {
+                } elseif ($value instanceof BackedEnum) {
                     $value = $value->value;
                 } elseif ($value instanceof UnitEnum) {
                     $value = $value->name;
