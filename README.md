@@ -59,6 +59,7 @@ resolving steps using [code generation](#maximizing-performance).
     - [**Using multiple casters per property**](#creating-your-own-property-casters)
     - [**Creating your own property casters**](#creating-your-own-property-casters)
     - [**Static constructors**](#static-constructors)
+    - [**Key formatters**](#key-formatters)
 - [**Maximizing performance**](#maximizing-performance)
 
 ## Design goals
@@ -81,7 +82,7 @@ This library supports hydration and serialization of objects.
 ## Hydration usage
 
 By default, input is mapped by property name, and types need to match. By default, keys are mapped from snake_case input
-to camelCase properties.
+to camelCase properties. If you want to keep the key names you can [use the `KeyFormatterWithoutConversion`](#key-formatters). 
 
 ```php
 use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
@@ -471,6 +472,29 @@ class ExampleCommand
     }
 }
 ```
+
+### Key formatters
+
+By default, keys are converted from snake_case input to camelCase properties. However, you can 
+control how keys are mapped by passing a key formatter to the `DefinitionProvider` that is handed to
+the object mapper constructor:
+
+```php
+use EventSauce\ObjectHydrator\DefinitionProvider;
+use EventSauce\ObjectHydrator\KeyFormatterWithoutConversion;
+use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
+
+$mapper = new ObjectMapperUsingReflection(
+    new DefinitionProvider(
+        keyFormatter: new KeyFormatterWithoutConversion(),
+    ),
+);
+```
+
+This library ships with a `KeyFormatterWithoutConversion` that can be used if no conversion is 
+desired. You can implement the 
+[`KeyFormatter`](https://github.com/EventSaucePHP/ObjectHydrator/blob/main/src/KeyFormatter.php)
+interface if you need custom conversion logic.
 
 ## Serialization usage
 
