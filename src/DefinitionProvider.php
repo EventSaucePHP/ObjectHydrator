@@ -345,13 +345,34 @@ final class DefinitionProvider
 
     private function resolveObjectSettings(ReflectionClass $reflection): MapperSettings
     {
-        /** @var ReflectionAttribute[] $attributes */
-        $attributes = $reflection->getAttributes(MapperSettings::class);
+        $attributes = $this->getMapperAttributes($reflection);
 
-        if (count($attributes) === 0) {
-            return new MapperSettings();
+        if ($attributes) {
+            return $attributes[0]->newInstance();
         }
 
-        return $attributes[0]->newInstance();
+        return new MapperSettings();
+    }
+
+    /**
+     * @return ReflectionAttribute[]
+     */
+    private function getMapperAttributes(ReflectionClass $reflection): array
+    {
+        $attributes = $reflection->getAttributes(MapperSettings::class);
+
+        if ($attributes) {
+            return $attributes;
+        }
+
+        foreach ($reflection->getInterfaces() as $reflection) {
+            $attributes = $reflection->getAttributes(MapperSettings::class);
+
+            if ($attributes) {
+                return $attributes;
+            }
+        }
+
+        return [];
     }
 }
