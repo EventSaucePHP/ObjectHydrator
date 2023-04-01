@@ -133,7 +133,7 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
         }
 
         $result = (int) preg_match_all(
-            '/\\*\\s+@param\\s+([A-Za-z0-9\\\\\\[\\]<>,]+)\\s\\$([A-Za-z_0-9]+)/m',
+            '/\\*\\s+@param\\s+([A-Za-z0-9\\\\\\[\\]<>\s,]+)\\s+\\$([A-Za-z_0-9]+)/m',
             $docBlock,
             $matches,
             PREG_SET_ORDER

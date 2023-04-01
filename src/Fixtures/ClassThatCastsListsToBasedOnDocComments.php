@@ -11,7 +11,7 @@ class ClassThatCastsListsToBasedOnDocComments
     /**
      * @param CamelClass[]              $list
      * @param array<string, CamelClass> $map
-     * @param array<CamelClass>         $map
+     * @param array<CamelClass>         $array
      */
     public function __construct(
         public array $list,
