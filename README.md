@@ -665,6 +665,30 @@ class ClassThatDoesNotSerializePublicProperties
 }
 ```
 
+The `MapperSettings` attribute can also be specified on interfaces that are implemented
+by classes. In this case, the first available `MapperSettings` will be used.
+
+```php
+use EventSauce\ObjectHydrator\MapperSettings;
+
+#[MapperSettings(serializePublicMethods: false)]
+interface InterfaceThatDoesNotSerializePublicMethods
+{
+    public function resource(): string;
+}
+
+class ClassThatInheritsMapperSettingsFromInterface implements InterfaceThatDoesNotSerializePublicMethods
+{
+    public function resource(): string
+    {
+        return 'foo';
+    }
+}
+```
+
+⚠️ Note that `MapperSettings` defined on parent classes _will not_ be used,
+to prevent confusion and ensure consistent performance with class inheritance.
+
 Alternatively, specific methods and properties can be excluded from serialization by
 using the `DoNotSerialize` attribute.
 
