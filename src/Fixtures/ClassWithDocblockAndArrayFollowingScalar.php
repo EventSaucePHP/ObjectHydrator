@@ -14,7 +14,7 @@ class ClassWithDocblockAndArrayFollowingScalar
      *   Param 2 name.
      */
     public function __construct(
-        public readonly string $test,
+        public string $test,
         protected array $test2,
     ) {
     }
