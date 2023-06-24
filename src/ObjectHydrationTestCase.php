@@ -15,6 +15,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassThatUsesClassWithMultipleProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatUsesMutipleCastersWithoutOptions;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCaseProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithDocblockAndArrayFollowingScalar;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithDefaultValue;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
@@ -586,6 +587,21 @@ abstract class ObjectHydrationTestCase extends TestCase
         $object = $hydrator->hydrateObject(ClassThatTriggersUseStatementLookup::class, $payload);
 
         self::assertInstanceOf(ClassThatTriggersUseStatementLookup::class, $object);
+    }
+
+    /**
+     * @test
+     */
+    public function hydrating_a_class_with_valid_docblock_array_following_scalar(): void {
+        $hydrator = $this->createObjectHydrator();
+        $payload = [
+            'test' => 'Brad',
+            'test2' => ['Gianna', 'Kate'],
+        ];
+
+        $object = $hydrator->hydrateObject(ClassWithDocblockAndArrayFollowingScalar::class, $payload);
+
+        self::assertInstanceOf(ClassWithDocblockAndArrayFollowingScalar::class, $object);
     }
 
     protected function createObjectHydratorFor81(): ObjectMapper
