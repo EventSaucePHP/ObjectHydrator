@@ -144,8 +144,12 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
         }
 
         $commentTypeMap = [];
+        $parameterType = NULL;
 
         foreach ($matches as [, $type, $paramName]) {
+            if ($paramName !== $parameter->name) {
+                continue;
+            }
             $type = $this->extractItemType(trim($type));
 
             if (str_starts_with($type, '\\') || in_array($type, ['bool', 'boolean', 'int', 'integer', 'float', 'double', 'string', 'array', 'object', 'null', 'mixed'])) {
@@ -160,17 +164,16 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
             }
 
             if (array_key_exists($base, $useMap)) {
-                $commentTypeMap[$paramName] = $useMap[$base];
+                $parameterType = $useMap[$base];
             } else {
-                $commentTypeMap[$paramName] = ltrim($namespace . '\\' . $base, '\\');
+                $parameterType = ltrim($namespace . '\\' . $base, '\\');
             }
         }
 
-        if ( ! array_key_exists($parameter->name, $commentTypeMap)) {
+        if ( ! $parameterType) {
             return false;
         }
 
-        $parameterType = $commentTypeMap[$parameter->name];
         $reflectionClass = new ReflectionClass($parameterType);
 
         return PropertyType::collectionContaining($reflectionClass);
