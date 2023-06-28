@@ -431,9 +431,13 @@ abstract class ObjectHydrationTestCase extends TestCase
     {
         $hydrator = $this->createObjectHydratorFor81();
 
-        $object = $hydrator->hydrateObject(ClassWithNullableEnumProperty::class, ['enum' => null]);
+        $object = $hydrator->hydrateObject(ClassWithNullableEnumProperty::class, [
+            'enum' => null,
+            'enumFromEmptyString' => '',
+        ]);
 
         self::assertNull($object->enum);
+        self::assertNull($object->enumFromEmptyString);
     }
 
     /**
