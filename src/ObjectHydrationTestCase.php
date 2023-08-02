@@ -611,6 +611,7 @@ abstract class ObjectHydrationTestCase extends TestCase
 
     /**
      * @test
+     * @see https://github.com/EventSaucePHP/ObjectHydrator/issues/56
      */
     public function hydrating_a_class_with_valid_docblock_array_different_formats(): void {
         $hydrator = $this->createObjectHydrator();
