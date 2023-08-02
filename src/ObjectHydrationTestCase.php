@@ -17,6 +17,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCaseProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithDocblockAndArrayFollowingScalar;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithDefaultValue;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithDocblockArrayVariants;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithNotCastedDateTimeInput;
@@ -602,6 +603,32 @@ abstract class ObjectHydrationTestCase extends TestCase
         $object = $hydrator->hydrateObject(ClassWithDocblockAndArrayFollowingScalar::class, $payload);
 
         self::assertInstanceOf(ClassWithDocblockAndArrayFollowingScalar::class, $object);
+    }
+
+    /**
+     * @test
+     */
+    public function hydrating_a_class_with_valid_docblock_array_different_formats(): void {
+        $hydrator = $this->createObjectHydrator();
+        $payload = [
+            'test' => ['Brad', 'Jones'],
+            'test2' => ['Buffy', 'Witt'],
+            'test3' => ['Flying', 'Spaghetti', 'Monster'],
+            'test4' => ['One' => 1, 'Two' => 2],
+            'test5' => [0 => 'Zero', 'One' => 'One'],
+            'test6' => [['defaultsToNull' => 'Array member that is cast to an object.']],
+            'test7' => [[]],
+            'test8' => [[]],
+            'test9' => [[]],
+            'test10' => [[]],
+        ];
+
+        $object = $hydrator->hydrateObject(ClassWithDocblockArrayVariants::class, $payload);
+
+        foreach (['test6', 'test7', 'test8', 'test9', 'test10'] as $property) {
+            self::assertContainsOnlyInstancesOf(ClassWithNullableProperty::class, $object->{$property});
+        }
+        self::assertInstanceOf(ClassWithDocblockArrayVariants::class, $object);
     }
 
     protected function createObjectHydratorFor81(): ObjectMapper
