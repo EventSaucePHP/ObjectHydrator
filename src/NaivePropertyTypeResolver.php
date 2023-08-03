@@ -187,7 +187,7 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
     private function extractItemType(string $type): string
     {
         if ($type === 'array') {
-            return 'mixed';
+            return $type;
         }
 
         if (str_ends_with($type, '[]')) {
