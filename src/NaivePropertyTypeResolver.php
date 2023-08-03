@@ -149,6 +149,7 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
             if ($paramName !== $parameter->name) {
                 continue;
             }
+
             $type = $this->extractItemType(trim($type));
 
             if (in_array(ltrim($type, '\\'), ['bool', 'boolean', 'int', 'integer', 'float', 'double', 'string', 'array', 'object', 'null', 'mixed'])) {

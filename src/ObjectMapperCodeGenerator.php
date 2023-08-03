@@ -296,6 +296,10 @@ CODE;
 
             \$value = \${$casterName}->cast(\$value, \$this);
 
+            if (\$value === null) {
+                $isNullBody
+            }
+
 CODE;
                 }
             }
