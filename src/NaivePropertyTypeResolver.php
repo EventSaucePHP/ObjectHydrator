@@ -133,7 +133,7 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
         }
 
         $result = (int) preg_match_all(
-            '/\\*\\s+@param\\s+([A-Za-z0-9\\\\\\[\\]<>\s,]+)\\s+\\$([A-Za-z_0-9]+)/m',
+            '/\*\s+@param\s+([A-Za-z0-9\\\[\]<>\s,]+)\s+\$([A-Za-z_0-9]+)/m',
             $docBlock,
             $matches,
             PREG_SET_ORDER
@@ -143,7 +143,6 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
             return false;
         }
 
-        $commentTypeMap = [];
         $parameterType = NULL;
 
         foreach ($matches as [, $type, $paramName]) {
@@ -152,8 +151,13 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
             }
             $type = $this->extractItemType(trim($type));
 
-            if (str_starts_with($type, '\\') || in_array($type, ['bool', 'boolean', 'int', 'integer', 'float', 'double', 'string', 'array', 'object', 'null', 'mixed'])) {
+            if (in_array(ltrim($type, '\\'), ['bool', 'boolean', 'int', 'integer', 'float', 'double', 'string', 'array', 'object', 'null', 'mixed'])) {
                 continue;
+            }
+
+            if (class_exists($type)) {
+                $parameterType = $type;
+                goto found;
             }
 
             $base = $type;
@@ -174,6 +178,7 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
             return false;
         }
 
+        found:
         $reflectionClass = new ReflectionClass($parameterType);
 
         return PropertyType::collectionContaining($reflectionClass);
@@ -181,11 +186,15 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
 
     private function extractItemType(string $type): string
     {
+        if ($type === 'array') {
+            return 'mixed';
+        }
+
         if (str_ends_with($type, '[]')) {
             return substr($type, 0, -2);
         }
 
-        if (preg_match('/array<(?:(int(?:eger)?|string|mixed),\\s*)?([A-Za-z0-9\\\\]+)>/', $type, $matches)) {
+        if (preg_match('/array<(?:(int(?:eger)?|string|mixed),\s*)?([A-Za-z0-9\\\]+)>/', $type, $matches)) {
             return $matches[2];
         }
 
