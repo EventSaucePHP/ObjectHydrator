@@ -54,6 +54,10 @@ final class CastListToType implements PropertyCaster, PropertySerializer
     private function castToObjectType(array $value, ObjectMapper $hydrator): array
     {
         foreach ($value as $i => $item) {
+            if(enum_exists($this->propertyType)){
+                $value[$i] = $this->propertyType::from($item);
+                continue;
+            }
             $value[$i] = $hydrator->hydrateObject($this->propertyType, $item);
         }
 
@@ -73,6 +77,10 @@ final class CastListToType implements PropertyCaster, PropertySerializer
         }
 
         foreach ($value as $i => $item) {
+            if(enum_exists($this->propertyType)){
+                $value[$i] = $item->value;
+                continue;
+            }
             $value[$i] = $hydrator->serializeObject($item);
         }
 
