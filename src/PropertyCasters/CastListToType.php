@@ -9,6 +9,7 @@ use EventSauce\ObjectHydrator\ObjectMapper;
 use EventSauce\ObjectHydrator\PropertyCaster;
 use EventSauce\ObjectHydrator\PropertySerializer;
 use function assert;
+use function enum_exists;
 use function in_array;
 use function is_array;
 use function settype;
@@ -19,12 +20,15 @@ final class CastListToType implements PropertyCaster, PropertySerializer
     public const NATIVE_TYPES = ['bool', 'boolean', 'int', 'integer', 'float', 'double', 'string', 'array', 'object', 'null'];
 
     private bool $nativePropertyType;
+    private bool $isEnum;
 
     public function __construct(
         private string $propertyType,
         private ?string $serializedType = null,
-    ) {
+    )
+    {
         $this->nativePropertyType = in_array($this->propertyType, self::NATIVE_TYPES);
+        $this->isEnum = enum_exists($this->propertyType);
     }
 
     public function cast(mixed $value, ObjectMapper $hydrator): mixed
@@ -33,6 +37,9 @@ final class CastListToType implements PropertyCaster, PropertySerializer
 
         if ($this->nativePropertyType) {
             return $this->castToNativeType($value, $this->propertyType);
+        }
+        if ($this->isEnum) {
+            return $this->castToEnums($value);
         } else {
             return $this->castToObjectType($value, $hydrator);
         }
@@ -54,11 +61,16 @@ final class CastListToType implements PropertyCaster, PropertySerializer
     private function castToObjectType(array $value, ObjectMapper $hydrator): array
     {
         foreach ($value as $i => $item) {
-            if(enum_exists($this->propertyType)){
-                $value[$i] = $this->propertyType::from($item);
-                continue;
-            }
             $value[$i] = $hydrator->hydrateObject($this->propertyType, $item);
+        }
+
+        return $value;
+    }
+
+    private function castToEnums(array $value): array
+    {
+        foreach ($value as $i => $item) {
+            $value[$i] = $this->propertyType::from($item);
         }
 
         return $value;
@@ -76,11 +88,15 @@ final class CastListToType implements PropertyCaster, PropertySerializer
             return $value;
         }
 
-        foreach ($value as $i => $item) {
-            if(enum_exists($this->propertyType)){
+        if ($this->isEnum) {
+            foreach ($value as $i => $item) {
                 $value[$i] = $item->value;
-                continue;
             }
+
+            return $value;
+        }
+
+        foreach ($value as $i => $item) {
             $value[$i] = $hydrator->serializeObject($item);
         }
 
