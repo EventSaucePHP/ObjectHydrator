@@ -24,6 +24,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithUnionProperty;
 use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Animal;
 use EventSauce\ObjectHydrator\Fixtures\TypeMapping\ClassThatMapsTypes;
 use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Dog;
+use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumListProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\CustomEnum;
 use PHPUnit\Framework\TestCase;
@@ -227,6 +228,20 @@ abstract class ObjectSerializationTestCase extends TestCase
         $payload = $serializer->serializeObject($object);
 
         self::assertEquals(['enum' => 'one'], $payload);
+    }
+
+    /**
+     * @test
+     * @requires PHP >= 8.1
+     */
+    public function serializing_a_class_with_a_list_of_enums(): void
+    {
+        $serializer = $this->objectMapperFor81();
+        $object = new ClassWithEnumListProperty([CustomEnum::VALUE_ONE, CustomEnum::VALUE_TWO]);
+
+        $payload = $serializer->serializeObject($object);
+
+        self::assertEquals(['enums' => ['one', 'two']], $payload);
     }
 
     /**

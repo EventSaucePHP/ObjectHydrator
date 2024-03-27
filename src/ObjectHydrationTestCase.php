@@ -34,6 +34,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithUuidProperty;
 use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Animal;
 use EventSauce\ObjectHydrator\Fixtures\TypeMapping\ClassThatMapsTypes;
 use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Frog;
+use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumListProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumPropertyWithDefault;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithNullableEnumProperty;
@@ -439,6 +440,19 @@ abstract class ObjectHydrationTestCase extends TestCase
 
         self::assertNull($object->enum);
         self::assertNull($object->enumFromEmptyString);
+    }
+
+    /**
+     * @test
+     * @requires PHP >= 8.1
+     */
+    public function hydrating_an_object_with_an_list_of_enums(): void
+    {
+        $hydrator = $this->createObjectHydratorFor81();
+
+        $object = $hydrator->hydrateObject(ClassWithEnumListProperty::class, ['enums' => ['one', 'two']]);
+
+        self::assertEquals([CustomEnum::VALUE_ONE, CustomEnum::VALUE_TWO], $object->enums);
     }
 
     /**
