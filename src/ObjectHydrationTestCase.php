@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
-use Cassandra\Custom;
 use EventSauce\ObjectHydrator\Fixtures\CastersOnClasses\ClassWithClassLevelMapFrom;
 use EventSauce\ObjectHydrator\Fixtures\CastersOnClasses\ClassWithClassLevelMapFromMultiple;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToDifferentTypes;
