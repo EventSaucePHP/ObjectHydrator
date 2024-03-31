@@ -31,7 +31,7 @@ final class CastListToType implements PropertyCaster, PropertySerializer
         $this->isEnum = enum_exists($this->propertyType);
     }
 
-    public function cast(mixed $value, ObjectMapper $hydrator): mixed
+    public function cast(mixed $value, ObjectMapper $hydrator, ?string $expectedTypeName): mixed
     {
         assert(is_array($value), 'value is expected to be an array');
 

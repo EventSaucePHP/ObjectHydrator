@@ -19,7 +19,7 @@ final class CastToType implements PropertyCaster, PropertySerializer
     ) {
     }
 
-    public function cast(mixed $value, ObjectMapper $hydrator): mixed
+    public function cast(mixed $value, ObjectMapper $hydrator, ?string $expectedTypeName): mixed
     {
         settype($value, $this->propertyType);
 
