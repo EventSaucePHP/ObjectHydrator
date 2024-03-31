@@ -401,7 +401,7 @@ class CastToMoney implements PropertyCaster
         private string $currency
     ) {}
 
-    public function cast(mixed $value, ObjectMapper $mapper) : mixed
+    public function cast(mixed $value, ObjectMapper $mapper, ?string $expectedTypeName) : mixed
     {
         return new Money($value, Currency::fromString($this->currency));
     }
@@ -416,7 +416,7 @@ class CastUnionToType implements PropertyCaster
         private array $typeToClassMap
     ) {}
 
-    public function cast(mixed $value, ObjectMapper $mapper) : mixed
+    public function cast(mixed $value, ObjectMapper $mapper, ?string $expectedTypeName) : mixed
     {
         assert(is_array($value));
 
