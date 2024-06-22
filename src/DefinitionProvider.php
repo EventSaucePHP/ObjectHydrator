@@ -28,18 +28,21 @@ final class DefinitionProvider
     private DefaultSerializerRepository $defaultSerializers;
 
     private PropertyTypeResolver $propertyTypeResolver;
+    private bool $serializePublicMethods;
 
     public function __construct(
         DefaultCasterRepository     $defaultCasterRepository = null,
         KeyFormatter                $keyFormatter = null,
         DefaultSerializerRepository $defaultSerializerRepository = null,
         PropertyTypeResolver        $propertyTypeResolver = null,
+        bool                        $serializePublicMethods = true,
     )
     {
         $this->defaultCasters = $defaultCasterRepository ?? DefaultCasterRepository::builtIn();
         $this->keyFormatter = $keyFormatter ?? new KeyFormatterForSnakeCasing();
         $this->defaultSerializers = $defaultSerializerRepository ?? DefaultSerializerRepository::builtIn();
         $this->propertyTypeResolver = $propertyTypeResolver ?? new NaivePropertyTypeResolver();
+        $this->serializePublicMethods = $serializePublicMethods;
     }
 
     /**
@@ -160,9 +163,13 @@ final class DefinitionProvider
     {
         $reflection = new ReflectionClass($className);
         $objectSettings = $this->resolveObjectSettings($reflection);
-        $publicMethods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
         $classAttributes = $reflection->getAttributes();
         $properties = [];
+        $publicMethods = [];
+
+        if ($this->serializePublicMethods) {
+            $publicMethods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
+        }
 
         foreach ($publicMethods as $method) {
             if ($objectSettings->serializePublicMethods === false
