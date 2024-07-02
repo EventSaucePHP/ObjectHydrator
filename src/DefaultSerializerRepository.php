@@ -17,7 +17,7 @@ class DefaultSerializerRepository
     /**
      * @param array<string, array{0: class-string<PropertySerializer>, 1: array<mixed>}> $serializersPerType
      */
-    public function __construct(private array $serializersPerType)
+    public function __construct(private array $serializersPerType = [])
     {
     }
 
