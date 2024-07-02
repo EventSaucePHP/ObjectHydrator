@@ -13,9 +13,11 @@ use Ramsey\Uuid\UuidInterface;
 final class DefaultCasterRepository
 {
     /**
-     * @var array<class-string, array<class-string|<|PropertyCaster>, array<mixed>>>
+     * @param array<class-string, array{0: class-string<PropertyCaster>, 1: array<mixed>}> $casters
      */
-    private array $casters = [];
+    public function __construct(private array $casters = [])
+    {
+    }
 
     /**
      * BC forwarding function.
