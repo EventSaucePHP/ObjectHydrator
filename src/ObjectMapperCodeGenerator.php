@@ -127,7 +127,7 @@ class $shortName implements ObjectMapper
         try {
             return match(\$className) {
                 $serializationMapCode
-                default => throw new \\LogicException('No serialization defined for \$className'),
+                default => throw new \\LogicException("No serialization defined for \$className"),
             };
         } catch (\\Throwable \$exception) {
             throw UnableToSerializeObject::dueToError(\$className, \$exception);
