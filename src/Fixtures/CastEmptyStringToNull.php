@@ -9,7 +9,7 @@ use EventSauce\ObjectHydrator\PropertyCaster;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class CastEmptyStringToNull implements PropertyCaster
 {
-    public function cast(mixed $value, ObjectMapper $hydrator): mixed
+    public function cast(mixed $value, ObjectMapper $hydrator, ?string $expectedTypeName): mixed
     {
         if ($value === '') {
             return null;
