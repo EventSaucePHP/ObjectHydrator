@@ -24,9 +24,12 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithUnionProperty;
 use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Animal;
 use EventSauce\ObjectHydrator\Fixtures\TypeMapping\ClassThatMapsTypes;
 use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Dog;
+use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumArrayProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumListProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\ClassWithEnumProperty;
 use EventSauce\ObjectHydrator\FixturesFor81\CustomEnum;
+use EventSauce\ObjectHydrator\FixturesFor81\IntegerEnum;
+use EventSauce\ObjectHydrator\FixturesFor81\OptionUnitEnum;
 use PHPUnit\Framework\TestCase;
 use function array_keys;
 use function PHPUnit\Framework\assertEquals;
@@ -308,5 +311,21 @@ abstract class ObjectSerializationTestCase extends TestCase
 
         $payload = $serializer->serializeObject($object);
         self::assertEquals(['mapped_age' => 34, 'name' => 'Frank'], $payload);
+    }
+
+    /**
+     * @test
+     * @requires PHP >= 8.1
+     */
+    public function serializing_enum_array_items(): void
+    {
+        $serializer = $this->objectMapperFor81();
+        $object = new ClassWithEnumArrayProperty([
+            IntegerEnum::One,
+            OptionUnitEnum::OptionA,
+        ]);
+
+        $payload = $serializer->serializeObject($object);
+        self::assertSame(['values' => [1, 'OptionA']], $payload);
     }
 }
