@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator\PropertySerializers;
 
 use Attribute;
+use BackedEnum;
 use EventSauce\ObjectHydrator\ObjectMapper;
 use EventSauce\ObjectHydrator\PropertySerializer;
+use UnitEnum;
 use function assert;
 use function is_array;
 use function is_object;
@@ -20,7 +22,11 @@ class SerializeArrayItems implements PropertySerializer
 
         foreach ($value as $index => $item) {
             if (is_object($item)) {
-                $value[$index] = $hydrator->serializeObject($item);
+                $value[$index] = match (true) {
+                    $item instanceof BackedEnum => $item->value,
+                    $item instanceof UnitEnum => $item->name,
+                    default => $hydrator->serializeObject($item),
+                };
             }
         }
 
