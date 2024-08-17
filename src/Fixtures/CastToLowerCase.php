@@ -12,7 +12,7 @@ use function strtolower;
 #[Attribute(Attribute::TARGET_PARAMETER)]
 final class CastToLowerCase implements PropertyCaster
 {
-    public function cast(mixed $value, ObjectMapper $hydrator): mixed
+    public function cast(mixed $value, ObjectMapper $hydrator, ?string $expectedTypeName): mixed
     {
         return strtolower((string) $value);
     }
