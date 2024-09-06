@@ -42,12 +42,12 @@ final class ClassExpander
                 $className = (string) $propertyDefinition->firstTypeName;
 
                 if ( ! in_array($className, $classes) && static::isClass($className)) {
-                    $classes[] = $className;
+                    array_push($classes, ...static::expandClassesForSerialization([$className], $definitionProvider));
                 }
             }
         }
 
-        return $classes;
+        return array_unique($classes);
     }
 
     private static function isClass(string $className): bool
@@ -75,8 +75,7 @@ final class ClassExpander
                 $type = $property->propertyType->firstTypeName();
 
                 if ( ! in_array($type, $classes) && self::isClass($type)) {
-                    $nested = static::expandClassesForSerialization([$type], $definitionProvider);
-                    array_push($classes, ...$nested);
+                    array_push($classes, ...static::expandClassesForSerialization([$type], $definitionProvider));
                 }
             }
         }
