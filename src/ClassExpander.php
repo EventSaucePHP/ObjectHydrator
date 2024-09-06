@@ -81,6 +81,6 @@ final class ClassExpander
             }
         }
 
-        return $classes;
+        return array_unique($classes);
     }
 }
