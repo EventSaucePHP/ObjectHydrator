@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator;
 
 use function array_key_exists;
+use function array_push;
 use function array_unique;
 use function array_values;
 use function class_exists;
@@ -71,10 +72,11 @@ final class ClassExpander
 
             /** @var PropertySerializationDefinition $property */
             foreach ($classDefinition->properties as $property) {
-                $type = $property->type;
+                $type = $property->propertyType->firstTypeName();
 
                 if ( ! in_array($type, $classes) && self::isClass($type)) {
-                    $classes[] = $type;
+                    $nested = static::expandClassesForSerialization([$type], $definitionProvider);
+                    array_push($classes, ...$nested);
                 }
             }
         }
