@@ -33,6 +33,10 @@ class Issue75Test extends TestCase
                     'name' => 'name',
                     'value' => 'value',
                 ],
+                'items' => [
+                    ['value' => 'one'],
+                    ['value' => 'two'],
+                ],
             ],
         ]);
 
