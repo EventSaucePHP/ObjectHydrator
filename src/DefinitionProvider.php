@@ -4,40 +4,23 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator;
 
-use ReflectionAttribute;
-use ReflectionClass;
-use ReflectionMethod;
-use ReflectionNamedType;
-use ReflectionParameter;
-use ReflectionProperty;
-use ReflectionUnionType;
-use function array_key_exists;
-use function array_reverse;
-use function count;
-use function is_a;
-
 final class DefinitionProvider
 {
     /** @var array<class-string, ClassHydrationDefinition> */
     private array $definitionCache = [];
-
     private DefaultCasterRepository $defaultCasters;
-
     private KeyFormatter $keyFormatter;
-
     private DefaultSerializerRepository $defaultSerializers;
-
     private PropertyTypeResolver $propertyTypeResolver;
     private bool $serializePublicMethods;
 
     public function __construct(
-        DefaultCasterRepository     $defaultCasterRepository = null,
-        KeyFormatter                $keyFormatter = null,
+        DefaultCasterRepository $defaultCasterRepository = null,
+        KeyFormatter $keyFormatter = null,
         DefaultSerializerRepository $defaultSerializerRepository = null,
-        PropertyTypeResolver        $propertyTypeResolver = null,
-        bool                        $serializePublicMethods = true,
-    )
-    {
+        PropertyTypeResolver $propertyTypeResolver = null,
+        bool $serializePublicMethods = true,
+    ) {
         $this->defaultCasters = $defaultCasterRepository ?? DefaultCasterRepository::builtIn();
         $this->keyFormatter = $keyFormatter ?? new KeyFormatterForSnakeCasing();
         $this->defaultSerializers = $defaultSerializerRepository ?? DefaultSerializerRepository::builtIn();
@@ -57,11 +40,11 @@ final class DefinitionProvider
 
     public function provideHydrationDefinition(string $className): ClassHydrationDefinition
     {
-        if (array_key_exists($className, $this->definitionCache)) {
+        if (\array_key_exists($className, $this->definitionCache)) {
             return $this->definitionCache[$className];
         }
 
-        $reflectionClass = new ReflectionClass($className);
+        $reflectionClass = new \ReflectionClass($className);
         $constructor = $this->resolveConstructor($reflectionClass);
         $classAttributes = $reflectionClass->getAttributes();
 
@@ -69,7 +52,7 @@ final class DefinitionProvider
         $definitions = [];
 
         $constructionStyle = match (true) {
-            $constructor instanceof ReflectionMethod => $constructor->isConstructor() ? 'new' : 'static',
+            $constructor instanceof \ReflectionMethod => $constructor->isConstructor() ? 'new' : 'static',
             ! $reflectionClass->isInstantiable() => 'none',
             default => 'new',
         };
@@ -80,8 +63,8 @@ final class DefinitionProvider
             $constructorName = '';
         }
 
-        /** @var ReflectionParameter[] $parameters */
-        $parameters = $constructor instanceof ReflectionMethod ? $constructor->getParameters() : [];
+        /** @var \ReflectionParameter[] $parameters */
+        $parameters = $constructor instanceof \ReflectionMethod ? $constructor->getParameters() : [];
 
         foreach ($parameters as $parameter) {
             $accessorName = $parameter->getName();
@@ -99,14 +82,14 @@ final class DefinitionProvider
                     $keys = $attribute->newInstance()->keys;
                 }
 
-                if (is_a($attributeName, PropertyCaster::class, true)) {
+                if (\is_a($attributeName, PropertyCaster::class, true)) {
                     $casters[] = [$attributeName, $attribute->getArguments()];
                 }
             }
 
-            if ($firstTypeName && count($casters) === 0 && $defaultCaster = $this->defaultCasters->casterFor(
-                    $firstTypeName
-                )) {
+            if ($firstTypeName && \count($casters) === 0 && $defaultCaster = $this->defaultCasters->casterFor(
+                $firstTypeName
+            )) {
                 $casters = [$defaultCaster];
             }
 
@@ -139,14 +122,14 @@ final class DefinitionProvider
         );
     }
 
-    private function resolveConstructor(ReflectionClass $reflectionClass): ?ReflectionMethod
+    private function resolveConstructor(\ReflectionClass $reflectionClass): ?\ReflectionMethod
     {
-        $methods = $reflectionClass->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
+        $methods = $reflectionClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
 
         foreach ($methods as $method) {
             $isConstructor = $method->getAttributes(Constructor::class);
 
-            if (count($isConstructor) !== 0) {
+            if (\count($isConstructor) !== 0) {
                 return $method;
             }
         }
@@ -154,35 +137,40 @@ final class DefinitionProvider
         return $reflectionClass->getConstructor();
     }
 
-    private function stringifyConstructor(ReflectionMethod $constructor): string
+    private function stringifyConstructor(\ReflectionMethod $constructor): string
     {
         return $constructor->getDeclaringClass()->getName() . '::' . $constructor->getName();
     }
 
     public function provideSerializationDefinition(string $className): ClassSerializationDefinition
     {
-        $reflection = new ReflectionClass($className);
+        $reflection = new \ReflectionClass($className);
         $objectSettings = $this->resolveObjectSettings($reflection);
         $classAttributes = $reflection->getAttributes();
         $properties = [];
         $publicMethods = [];
 
         if ($this->serializePublicMethods) {
-            $publicMethods = $reflection->getMethods(ReflectionMethod::IS_PUBLIC);
+            $publicMethods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
         }
 
         foreach ($publicMethods as $method) {
             if ($objectSettings->serializePublicMethods === false
                 || $method->isStatic()
+                || $method->isConstructor()
                 || $method->getNumberOfParameters() !== 0
-                || count($method->getAttributes(DoNotSerialize::class)) === 1) {
+                || \count($method->getAttributes(DoNotSerialize::class)) === 1) {
                 continue;
             }
 
             $methodName = $method->getShortName();
             $key = $this->keyFormatter->propertyNameToKey($methodName);
-            /** @var ReflectionNamedType|ReflectionUnionType $returnType */
             $returnType = $method->getReturnType();
+
+            if ($returnType === null) {
+                continue;
+            }
+
             $attributes = $method->getAttributes();
             $typeSpecifier = $this->typeSpecifier($attributes);
             $properties[] = new PropertySerializationDefinition(
@@ -197,12 +185,12 @@ final class DefinitionProvider
             );
         }
 
-        $publicProperties = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
+        $publicProperties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
 
         foreach ($publicProperties as $property) {
             if ($property->isStatic()
                 || $objectSettings->serializePublicProperties === false
-                || count($property->getAttributes(DoNotSerialize::class)) === 1) {
+                || \count($property->getAttributes(DoNotSerialize::class)) === 1) {
                 continue;
             }
 
@@ -212,7 +200,7 @@ final class DefinitionProvider
             $serializers = $this->resolveSerializers($propertyType, $attributes);
 
             if ($property->isPromoted()) {
-                $serializers = array_reverse($serializers);
+                $serializers = \array_reverse($serializers);
             }
 
             $typeSpecifier = $this->typeSpecifier($attributes);
@@ -239,7 +227,7 @@ final class DefinitionProvider
     }
 
     /**
-     * @param ReflectionAttribute[] $attributes
+     * @param \ReflectionAttribute[] $attributes
      */
     private function typeSpecifier(array $attributes): ?MapToType
     {
@@ -256,7 +244,7 @@ final class DefinitionProvider
     {
         $serializers = $this->resolveSerializersFromAttributes($attributes);
 
-        if (count($serializers) === 0 && $default = $this->defaultSerializers->serializerForType($type)) {
+        if (\count($serializers) === 0 && $default = $this->defaultSerializers->serializerForType($type)) {
             $serializers[] = $default;
         }
 
@@ -274,19 +262,19 @@ final class DefinitionProvider
     }
 
     /**
-     * @param ReflectionAttribute[] $attributes
+     * @param \ReflectionAttribute[] $attributes
      *
      * @return array<string, array{0: class-string<PropertySerializer>, 1: array<mixed>}>|array<array{0: class-string<PropertySerializer>, 1: array<mixed>}>
      */
-    private function resolveSerializers(ReflectionUnionType|ReflectionNamedType $type, array $attributes): array
+    private function resolveSerializers(\ReflectionUnionType|\ReflectionNamedType $type, array $attributes): array
     {
         $attributeSerializer = $this->resolveSerializersFromAttributes($attributes);
 
-        if (count($attributeSerializer) !== 0) {
+        if (\count($attributeSerializer) !== 0) {
             return $attributeSerializer;
         }
 
-        if ($type instanceof ReflectionNamedType) {
+        if ($type instanceof \ReflectionNamedType) {
             return [$this->defaultSerializers->serializerForType($type->getName())];
         }
 
@@ -301,7 +289,7 @@ final class DefinitionProvider
     }
 
     /**
-     * @param ReflectionAttribute[] $attributes
+     * @param \ReflectionAttribute[] $attributes
      */
     private function resolveSerializersFromAttributes(array $attributes): array
     {
@@ -310,7 +298,7 @@ final class DefinitionProvider
         foreach ($attributes as $attribute) {
             $name = $attribute->getName();
 
-            if (is_a($name, PropertySerializer::class, true)) {
+            if (\is_a($name, PropertySerializer::class, true)) {
                 $serializers[] = [$attribute->getName(), $attribute->getArguments()];
             }
         }
@@ -324,7 +312,7 @@ final class DefinitionProvider
     }
 
     /**
-     * @param ReflectionAttribute[] $attributes
+     * @param \ReflectionAttribute[] $attributes
      *
      * @return array<string, array<string>>
      */
@@ -334,7 +322,7 @@ final class DefinitionProvider
     }
 
     /**
-     * @param ReflectionAttribute[] $attributes
+     * @param \ReflectionAttribute[] $attributes
      */
     private function resolveMapFrom(array $attributes): array|false
     {
@@ -350,7 +338,7 @@ final class DefinitionProvider
         return false;
     }
 
-    private function resolveObjectSettings(ReflectionClass $reflection): MapperSettings
+    private function resolveObjectSettings(\ReflectionClass $reflection): MapperSettings
     {
         $attributes = $this->getMapperAttributes($reflection);
 
@@ -362,9 +350,9 @@ final class DefinitionProvider
     }
 
     /**
-     * @return ReflectionAttribute[]
+     * @return \ReflectionAttribute[]
      */
-    private function getMapperAttributes(ReflectionClass $reflection): array
+    private function getMapperAttributes(\ReflectionClass $reflection): array
     {
         $attributes = $reflection->getAttributes(MapperSettings::class);
 
