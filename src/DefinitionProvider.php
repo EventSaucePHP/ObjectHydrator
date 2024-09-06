@@ -168,7 +168,7 @@ final class DefinitionProvider
             $returnType = $method->getReturnType();
 
             if ($returnType === null) {
-                throw new \Exception("Method {$method->class}::{$method->name} does not have a return type");
+                continue;
             }
 
             $attributes = $method->getAttributes();
