@@ -82,6 +82,10 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
 
             $token = $this->tokenAfterWhitespace($tokens);
 
+            if ( ! is_array($token)) {
+                continue;
+            }
+
             if ($token[0] === T_FUNCTION || $token[0] === T_CONST) {
                 continue;
             }
