@@ -14,4 +14,17 @@ final class ClassWithPropertyThatUsesListCastingToClasses
         public array $children,
     ) {
     }
+
+    public function closure(): bool
+    {
+        $localVariable = false;
+
+        $localFunction = function () use (&$localVariable) {
+            $localVariable = true;
+        };
+
+        $localFunction();
+
+        return $localVariable;
+    }
 }
