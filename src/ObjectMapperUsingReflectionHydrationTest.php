@@ -6,7 +6,7 @@ namespace EventSauce\ObjectHydrator;
 
 class ObjectMapperUsingReflectionHydrationTest extends ObjectHydrationTestCase
 {
-    protected function createObjectHydrator(DefinitionProvider $definitionProvider = null): ObjectMapper
+    protected function createObjectHydrator(?DefinitionProvider $definitionProvider = null): ObjectMapper
     {
         $definitionProvider ??= new DefinitionProvider(
             keyFormatter: new KeyFormatterWithoutConversion()

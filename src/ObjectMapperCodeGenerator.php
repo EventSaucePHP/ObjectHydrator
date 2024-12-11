@@ -19,7 +19,7 @@ final class ObjectMapperCodeGenerator
 {
     private DefinitionProvider $definitionProvider;
 
-    public function __construct(DefinitionProvider $definitionProvider = null)
+    public function __construct(?DefinitionProvider $definitionProvider = null)
     {
         $this->definitionProvider = $definitionProvider ?? new DefinitionProvider();
     }

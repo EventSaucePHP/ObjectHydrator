@@ -655,5 +655,5 @@ abstract class ObjectHydrationTestCase extends TestCase
         return $this->createObjectHydrator();
     }
 
-    abstract protected function createObjectHydrator(DefinitionProvider $definitionProvider = null): ObjectMapper;
+    abstract protected function createObjectHydrator(?DefinitionProvider $definitionProvider = null): ObjectMapper;
 }

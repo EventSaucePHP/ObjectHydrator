@@ -64,7 +64,7 @@ class ObjectMapperCodeGeneratorSerializationTest extends ObjectSerializationTest
         return $objectHydrator;
     }
 
-    protected function createObjectHydrator(DefinitionProvider $definitionProvider = null): ObjectMapper
+    protected function createObjectHydrator(?DefinitionProvider $definitionProvider = null): ObjectMapper
     {
         $definitionProvider ??= $this->defaultDefinitionProvider;
         $className = 'AcmeCorp\\DumpedHydrator' . spl_object_hash($definitionProvider);

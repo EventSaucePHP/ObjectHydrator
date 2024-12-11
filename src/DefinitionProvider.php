@@ -32,12 +32,12 @@ final class DefinitionProvider
     private ConstructorResolver $constructorResolver;
 
     public function __construct(
-        DefaultCasterRepository     $defaultCasterRepository = null,
-        KeyFormatter                $keyFormatter = null,
-        DefaultSerializerRepository $defaultSerializerRepository = null,
-        PropertyTypeResolver        $propertyTypeResolver = null,
+        ?DefaultCasterRepository     $defaultCasterRepository = null,
+        ?KeyFormatter                $keyFormatter = null,
+        ?DefaultSerializerRepository $defaultSerializerRepository = null,
+        ?PropertyTypeResolver        $propertyTypeResolver = null,
         bool                        $serializePublicMethods = true,
-        ConstructorResolver         $constructorResolver = null,
+        ?ConstructorResolver         $constructorResolver = null,
     )
     {
         $this->defaultCasters = $defaultCasterRepository ?? DefaultCasterRepository::builtIn();
