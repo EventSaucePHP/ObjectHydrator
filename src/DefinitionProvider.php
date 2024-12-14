@@ -20,13 +20,9 @@ final class DefinitionProvider
 {
     /** @var array<class-string, ClassHydrationDefinition> */
     private array $definitionCache = [];
-
     private DefaultCasterRepository $defaultCasters;
-
     private KeyFormatter $keyFormatter;
-
     private DefaultSerializerRepository $defaultSerializers;
-
     private PropertyTypeResolver $propertyTypeResolver;
     private bool $serializePublicMethods;
     private ConstructorResolver $constructorResolver;
@@ -36,7 +32,7 @@ final class DefinitionProvider
         ?KeyFormatter                $keyFormatter = null,
         ?DefaultSerializerRepository $defaultSerializerRepository = null,
         ?PropertyTypeResolver        $propertyTypeResolver = null,
-        bool                        $serializePublicMethods = true,
+        bool                         $serializePublicMethods = true,
         ?ConstructorResolver         $constructorResolver = null,
     )
     {
