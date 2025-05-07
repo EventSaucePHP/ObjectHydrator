@@ -17,7 +17,7 @@ class SerializeUuidToString implements PropertySerializer
     {
     }
 
-    public function serialize(mixed $value, ObjectMapper $hydrator): mixed
+    public function serialize(mixed $value, ObjectMapper $hydrator): string
     {
         assert($value instanceof UuidInterface);
 
