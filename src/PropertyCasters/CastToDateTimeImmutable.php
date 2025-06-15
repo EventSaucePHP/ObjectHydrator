@@ -36,7 +36,7 @@ final class CastToDateTimeImmutable implements PropertyCaster, PropertySerialize
         return new DateTimeImmutable($value, $timeZone);
     }
 
-    public function serialize(mixed $value, ObjectMapper $hydrator): mixed
+    public function serialize(mixed $value, ObjectMapper $hydrator): string
     {
         assert($value instanceof DateTimeInterface);
 
