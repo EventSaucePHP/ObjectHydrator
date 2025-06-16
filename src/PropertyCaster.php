@@ -6,5 +6,5 @@ namespace EventSauce\ObjectHydrator;
 
 interface PropertyCaster
 {
-    public function cast(mixed $value, ObjectMapper $hydrator): mixed;
+    public function cast(mixed $value, ObjectMapper $hydrator, ?string $expectedTypeName): mixed;
 }
