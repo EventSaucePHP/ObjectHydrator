@@ -20,6 +20,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithCustomDateTimeSerialization;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithListOfObjects;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMultipleProperties;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithNullableProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithUnionProperty;
 use EventSauce\ObjectHydrator\Fixtures\TypeMapping\Animal;
 use EventSauce\ObjectHydrator\Fixtures\TypeMapping\ClassThatMapsTypes;
@@ -36,7 +37,7 @@ use function PHPUnit\Framework\assertEquals;
 
 abstract class ObjectSerializationTestCase extends TestCase
 {
-    abstract public function objectMapper(): ObjectMapper;
+    abstract public function objectMapper(bool $omitNullValuesOnSerialization = false): ObjectMapper;
 
     abstract protected function objectMapperFor81(): ObjectMapper;
 
@@ -285,6 +286,19 @@ abstract class ObjectSerializationTestCase extends TestCase
             'nullable_mixed_union' => null,
             'nullable_via_union' => ['number' => 1234],
         ], $payload2);
+    }
+
+    /**
+     * @test
+     */
+    public function serialize_omitting_null_values(): void
+    {
+        $serializer = $this->objectMapper(true);
+        $object1 = new ClassWithNullableProperty(null);
+
+        $payload1 = $serializer->serializeObject($object1);
+
+        self::assertEquals([], $payload1);
     }
 
     /**

@@ -37,15 +37,19 @@ class ObjectMapperCodeGeneratorSerializationTest extends ObjectSerializationTest
         self::assertInstanceOf(ClassWithMappedStringProperty::class, $object);
     }
 
-    private function createDumpedObjectHydrator(string $directory, string $className, DefinitionProvider $definitionProvider): ObjectMapper
-    {
+    private function createDumpedObjectHydrator(
+        string $directory,
+        string $className,
+        DefinitionProvider $definitionProvider,
+        bool $omitNullValuesOnSerialization,
+    ): ObjectMapper {
         if (class_exists($className, false)) {
             goto create_object_hydrator;
         }
 
         $classes = ConstructFinder::locatedIn($directory)->findClassNames();
         $interfaces = ConstructFinder::locatedIn($directory)->findInterfaceNames();
-        $dumper = new ObjectMapperCodeGenerator($definitionProvider);
+        $dumper = new ObjectMapperCodeGenerator($definitionProvider, $omitNullValuesOnSerialization);
 
         $dumpedDefinition = $dumper->dump(
             [...$classes, ...$interfaces],
@@ -69,16 +73,26 @@ class ObjectMapperCodeGeneratorSerializationTest extends ObjectSerializationTest
         $definitionProvider ??= $this->defaultDefinitionProvider;
         $className = 'AcmeCorp\\DumpedHydrator' . spl_object_hash($definitionProvider);
 
-        return $this->createDumpedObjectHydrator(__DIR__ . '/Fixtures', $className, $definitionProvider);
+        return $this->createDumpedObjectHydrator(__DIR__ . '/Fixtures', $className, $definitionProvider, false);
     }
 
-    public function objectMapper(): ObjectMapper
+    public function objectMapper(bool $omitNullValuesOnSerialization = false): ObjectMapper
     {
-        return $this->createDumpedObjectHydrator(__DIR__ . '/Fixtures', 'AcmeCorp\\DumpedHydrator', $this->defaultDefinitionProvider);
+        return $this->createDumpedObjectHydrator(
+            __DIR__ . '/Fixtures',
+            'AcmeCorp\\DumpedHydrator' . ($omitNullValuesOnSerialization ? 'SkippingNullOnSerialization' : ''),
+            $this->defaultDefinitionProvider,
+            $omitNullValuesOnSerialization,
+        );
     }
 
     protected function objectMapperFor81(): ObjectMapper
     {
-        return $this->createDumpedObjectHydrator(__DIR__ . '/FixturesFor81', 'AcmeCorp\\DumpedHydratorFor81', $this->defaultDefinitionProvider);
+        return $this->createDumpedObjectHydrator(
+            __DIR__ . '/FixturesFor81',
+            'AcmeCorp\\DumpedHydratorFor81',
+            $this->defaultDefinitionProvider,
+            false,
+        );
     }
 }

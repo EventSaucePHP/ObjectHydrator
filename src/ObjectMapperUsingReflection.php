@@ -37,10 +37,14 @@ class ObjectMapperUsingReflection implements ObjectMapper
     /** @var string[] */
     private array $hydrationStack = [];
 
+    private bool $omitNullValuesOnSerialization;
+
     public function __construct(
         ?DefinitionProvider $definitionProvider = null,
+        bool $omitNullValuesOnSerialization = false,
     ) {
         $this->definitionProvider = $definitionProvider ?? new DefinitionProvider();
+        $this->omitNullValuesOnSerialization = $omitNullValuesOnSerialization;
     }
 
     private function extractPayloadViaMap(array $payload, array $inputMap): mixed
@@ -324,6 +328,12 @@ class ObjectMapperUsingReflection implements ObjectMapper
             foreach ($toPath as $to) {
                 $r[$to] ??= [];
                 $r = &$r[$to];
+            }
+
+            $resolvedValue = $mapFromSingleKey ? $value : $value[$payloadKey];
+
+            if ($resolvedValue === null && $this->omitNullValuesOnSerialization) {
+                continue;
             }
 
             $r[$lastKey] = $mapFromSingleKey ? $value : $value[$payloadKey];
