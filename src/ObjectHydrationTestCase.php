@@ -15,6 +15,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassThatUsesClassWithMultipleProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatUsesMutipleCastersWithoutOptions;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCaseProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithComplexTypeThatIsMapped;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithDefaultValueProvidingCaster;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithDocblockAndArrayFollowingScalar;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithDefaultValue;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithDocblockArrayVariants;
@@ -478,6 +479,17 @@ abstract class ObjectHydrationTestCase extends TestCase
 
         self::assertInstanceOf(ClassWithNullableProperty::class, $object);
         self::assertNull($object->defaultsToNull);
+    }
+
+    /** @test */
+    public function hydrating_a_class_with_a_default_value_providing_caster(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $object = $hydrator->hydrateObject(ClassWithDefaultValueProvidingCaster::class, []);
+
+        self::assertInstanceOf(ClassWithDefaultValueProvidingCaster::class, $object);
+        self::assertEquals('some_default_value', $object->valueProvidedFromCaster);
     }
 
     /**
