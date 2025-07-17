@@ -38,13 +38,16 @@ class ObjectMapperUsingReflection implements ObjectMapper
     private array $hydrationStack = [];
 
     private bool $omitNullValuesOnSerialization;
+    private bool $serializeMapsAsObjects;
 
     public function __construct(
         ?DefinitionProvider $definitionProvider = null,
         bool $omitNullValuesOnSerialization = false,
+        bool $serializeMapsAsObjects = false,
     ) {
         $this->definitionProvider = $definitionProvider ?? new DefinitionProvider();
         $this->omitNullValuesOnSerialization = $omitNullValuesOnSerialization;
+        $this->serializeMapsAsObjects = $serializeMapsAsObjects;
     }
 
     private function extractPayloadViaMap(array $payload, array $inputMap): mixed
@@ -135,6 +138,10 @@ class ObjectMapperUsingReflection implements ObjectMapper
 
                 if ($definition->typeKey && is_array($value)) {
                     $value = $this->hydrateViaTypeMap($definition, $value);
+                }
+
+                if (is_object($value) && ($definition->propertyType->isCollection() || $definition->firstTypeName === 'array')) {
+                    $value = (array) $value;
                 }
 
                 $typeName = $definition->firstTypeName;
@@ -298,6 +305,8 @@ class ObjectMapperUsingReflection implements ObjectMapper
                     $value = $value->name;
                 } elseif (is_object($value)) {
                     $value = $defaults + $this->serializeObject($value);
+                } elseif ($this->serializeMapsAsObjects && ($property->propertyType->isAssociativeArray() || (is_array($value) && !array_is_list($value)))) {
+                    $value = (object) $value;
                 }
 
                 $this->assignToResult($keys, $result, $value);

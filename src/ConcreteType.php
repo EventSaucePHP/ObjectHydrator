@@ -14,6 +14,8 @@ use function is_a;
  */
 final class ConcreteType
 {
+    public bool $associative = false;
+
     public function __construct(public string $name, public bool $isBuiltIn)
     {
     }
