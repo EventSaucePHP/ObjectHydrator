@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator\IntegrationTests;
 
+use EventSauce\ObjectHydrator\DefinitionProvider;
 use EventSauce\ObjectHydrator\ObjectMapper;
 use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
 
 class HydratingSerializedObjectsUsingReflectionTest extends HydratingSerializedObjectsTestCase
 {
-    public function objectMapper(): ObjectMapper
+    public function objectMapper(bool $serializeMapsAsObjects = false): ObjectMapper
     {
-        return new ObjectMapperUsingReflection();
+        return new ObjectMapperUsingReflection(
+            $serializeMapsAsObjects ? new DefinitionProvider(serializeMapsAsObjects: true) : null
+        );
     }
 }

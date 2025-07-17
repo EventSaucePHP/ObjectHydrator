@@ -137,6 +137,10 @@ class ObjectMapperUsingReflection implements ObjectMapper
                     $value = $this->hydrateViaTypeMap($definition, $value);
                 }
 
+                if (is_object($value) && ($definition->propertyType->isCollection() || $definition->firstTypeName === 'array')) {
+                    $value = (array) $value;
+                }
+
                 $typeName = $definition->firstTypeName;
 
                 if ($definition->isBackedEnum()) {
@@ -298,6 +302,8 @@ class ObjectMapperUsingReflection implements ObjectMapper
                     $value = $value->name;
                 } elseif (is_object($value)) {
                     $value = $defaults + $this->serializeObject($value);
+                } elseif ($property->enforceObject) {
+                    $value = (object) $value;
                 }
 
                 $this->assignToResult($keys, $result, $value);

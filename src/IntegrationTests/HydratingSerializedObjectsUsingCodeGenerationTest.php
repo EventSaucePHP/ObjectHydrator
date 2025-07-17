@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EventSauce\ObjectHydrator\IntegrationTests;
 
 use const PHP_VERSION;
+use EventSauce\ObjectHydrator\DefinitionProvider;
 use EventSauce\ObjectHydrator\ObjectMapper;
 use EventSauce\ObjectHydrator\ObjectMapperCodeGenerator;
 use League\ConstructFinder\ConstructFinder;
@@ -16,21 +17,26 @@ use function version_compare;
 
 class HydratingSerializedObjectsUsingCodeGenerationTest extends HydratingSerializedObjectsTestCase
 {
-    public function objectMapper(): ObjectMapper
+    public function objectMapper(bool $serializeMapsAsObjects = false): ObjectMapper
     {
-        $className = 'AcmeCorp\\GeneratedHydrator';
+        $shortClassName = $serializeMapsAsObjects ? 'GeneratedObjectModeHydrator' : 'GeneratedArrayModeHydrator';
+        $className = 'AcmeCorp\\' . $shortClassName;
 
         if (class_exists($className)) {
             goto make_it;
         }
 
         $classes = $this->findClasses();
-        $dumper = new ObjectMapperCodeGenerator();
+        $dumper = new ObjectMapperCodeGenerator(
+            $serializeMapsAsObjects ? new DefinitionProvider(serializeMapsAsObjects: true) : null,
+        );
         $code = $dumper->dump($classes, $className);
 
-        file_put_contents(__DIR__ . '/testHydrator.php', $code);
-        include __DIR__ . '/testHydrator.php';
-        unlink(__DIR__ . '/testHydrator.php');
+        $path = __DIR__ . '/' . $shortClassName . '.php';
+
+        file_put_contents($path, $code);
+        include_once $path;
+        unlink($path);
 
         make_it:
 
