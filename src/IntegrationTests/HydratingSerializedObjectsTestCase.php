@@ -167,16 +167,24 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
                     'frank' => ['snake_case' => 'Frank'],
                     'renske' => ['snake_case' => 'Renske'],
                 ],
-                'map_with_scalars' => (object) [
-                    'one' => 1,
-                    'two' => 2,
-                ],
+                'map_with_scalars' => (object) ['one' => 1, 'two' => 2],
                 'map_with_associative_arrays' => (object) [
                     'one' => ['key' => 'value'],
                     'two' => ['another_key' => 'another_value'],
                 ],
                 'list_without_type_hint' => ['Frank', 'Renske'],
                 'list_with_type_hint' => ['Frank', 'Renske'],
+                'method_map_with_objects' => (object) [
+                    'frank' => ['snake_case' => 'Frank'],
+                    'renske' => ['snake_case' => 'Renske'],
+                ],
+                'method_map_with_scalars' => (object) ['one' => 1, 'two' => 2 ],
+                'method_map_with_associative_arrays' => (object) [
+                    'one' => ['key' => 'value'],
+                    'two' => ['another_key' => 'another_value'],
+                ],
+                'method_list_without_type_hint' => ['Frank', 'Renske'],
+                'method_list_with_type_hint' => ['Frank', 'Renske'],
             ],
             [
                 'mapWithObjects' => ['type' => 'map', 'values' => ClassWithCamelCaseProperty::class],
@@ -184,6 +192,11 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
                 'mapWithAssociativeArrays' => ['type' => 'map', 'values' => 'array'],
                 'listWithoutTypeHint' => ['type' => 'list', 'values' => 'string'],
                 'listWithTypeHint' => ['type' => 'list', 'values' => 'string'],
+                'methodMapWithObjects' => ['type' => 'map', 'values' => ClassWithCamelCaseProperty::class],
+                'methodMapWithScalars' => ['type' => 'map', 'values' => 'integer'],
+                'methodMapWithAssociativeArrays' => ['type' => 'map', 'values' => 'array'],
+                'methodListWithoutTypeHint' => ['type' => 'list', 'values' => 'string'],
+                'methodListWithTypeHint' => ['type' => 'list', 'values' => 'string'],
             ]
         ];
 
@@ -194,16 +207,24 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
                     'frank' => ['snake_case' => 'Frank'],
                     'renske' => ['snake_case' => 'Renske'],
                 ],
-                'map_with_scalars' => [
-                    'one' => 1,
-                    'two' => 2,
-                ],
+                'map_with_scalars' => ['one' => 1, 'two' => 2],
                 'map_with_associative_arrays' => [
                     'one' => ['key' => 'value'],
                     'two' => ['another_key' => 'another_value'],
                 ],
                 'list_without_type_hint' => ['Frank', 'Renske'],
                 'list_with_type_hint' => ['Frank', 'Renske'],
+                'method_map_with_objects' => [
+                    'frank' => ['snake_case' => 'Frank'],
+                    'renske' => ['snake_case' => 'Renske'],
+                ],
+                'method_map_with_scalars' => ['one' => 1, 'two' => 2 ],
+                'method_map_with_associative_arrays' => [
+                    'one' => ['key' => 'value'],
+                    'two' => ['another_key' => 'another_value'],
+                ],
+                'method_list_without_type_hint' => ['Frank', 'Renske'],
+                'method_list_with_type_hint' => ['Frank', 'Renske'],
             ],
             [
                 'mapWithObjects' => ['type' => 'map', 'values' => ClassWithCamelCaseProperty::class],
@@ -211,6 +232,11 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
                 'mapWithAssociativeArrays' => ['type' => 'map', 'values' => 'array'],
                 'listWithoutTypeHint' => ['type' => 'list', 'values' => 'string'],
                 'listWithTypeHint' => ['type' => 'list', 'values' => 'string'],
+                'methodMapWithObjects' => ['type' => 'map', 'values' => ClassWithCamelCaseProperty::class],
+                'methodMapWithScalars' => ['type' => 'map', 'values' => 'integer'],
+                'methodMapWithAssociativeArrays' => ['type' => 'map', 'values' => 'array'],
+                'methodListWithoutTypeHint' => ['type' => 'list', 'values' => 'string'],
+                'methodListWithTypeHint' => ['type' => 'list', 'values' => 'string'],
             ]
         ];
     }
@@ -263,7 +289,7 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
     private static function assertExpectedTypes(array $types, object $object): void
     {
         foreach ($types as $property => $type) {
-            $value = $object->$property;
+            $value = property_exists($object, $property) ? $object->{$property} : $object->$property();
 
             self::assertExpectedType($type['type'], $value);
 

@@ -172,16 +172,20 @@ final class DefinitionProvider
             /** @var ReflectionNamedType|ReflectionUnionType $returnType */
             $returnType = $method->getReturnType();
             $attributes = $method->getAttributes();
+
             $typeSpecifier = $this->typeSpecifier($attributes);
+            $resolvedPropertyType = $this->propertyTypeResolver->typeFromMethod($method);
+
             $properties[] = new PropertySerializationDefinition(
                 PropertySerializationDefinition::TYPE_METHOD,
                 $methodName,
                 $this->resolveSerializers($returnType, $attributes),
-                PropertyType::fromReflectionType($returnType),
+                $resolvedPropertyType,
                 $returnType->allowsNull(),
                 $this->resolveKeys($key, $attributes),
                 $typeSpecifier?->key,
                 $typeSpecifier?->map ?: [],
+                $this->serializeMapsAsObjects && $resolvedPropertyType->isAssociativeArray(),
             );
         }
 
@@ -204,7 +208,6 @@ final class DefinitionProvider
             }
 
             $typeSpecifier = $this->typeSpecifier($attributes);
-
             $resolvedPropertyType = $this->propertyTypeResolver->typeFromProperty($property, $constructor);
 
             $properties[] = new PropertySerializationDefinition(

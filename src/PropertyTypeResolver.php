@@ -19,4 +19,6 @@ interface PropertyTypeResolver
         ReflectionProperty $property,
         ?ReflectionMethod $constructor
     ): PropertyType;
+
+    public function typeFromMethod(ReflectionMethod $method): PropertyType;
 }

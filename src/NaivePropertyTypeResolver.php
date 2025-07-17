@@ -81,6 +81,22 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
         return $resolvedType;
     }
 
+    public function typeFromMethod(ReflectionMethod $method): PropertyType
+    {
+        $returnType = $method->getReturnType();
+
+        $resolvedType = PropertyType::fromReflectionType($returnType);
+        $concreteType = $resolvedType->firstType();
+
+        if (!$returnType instanceof ReflectionNamedType || !$concreteType) {
+            return $resolvedType;
+        }
+
+        $concreteType->associative = $this->isAssociativeBasedOnReturnDocComment($method);
+
+        return $resolvedType;
+    }
+
     private function resolveUseStatementMap(ReflectionClass $declaringClass): array
     {
         static $cache = [];
@@ -252,5 +268,15 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
         }
 
         return (bool) preg_match('/\*\s+@var\s+[^*]*?\barray\s*<\s*string\s*,\s*[^>]+\s*>/m', $docBlock);
+    }
+
+    private function isAssociativeBasedOnReturnDocComment(ReflectionMethod $method): bool
+    {
+        $docBlock = $method->getDocComment();
+        if (!$docBlock) {
+            return false;
+        }
+
+        return (bool) preg_match('/\*\s+@return\s+[^*]*?\barray\s*<\s*string\s*,\s*[^>]+\s*>/m', $docBlock);
     }
 }

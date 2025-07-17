@@ -22,4 +22,41 @@ final class ClassThatSpecifiesArraysWithDocComments
         public array $listWithTypeHint,
     ) {
     }
+
+    /**
+     * @return array<string, CamelClass>
+     */
+    public function methodMapWithObjects(): array
+    {
+        return $this->mapWithObjects;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function methodMapWithScalars(): array
+    {
+        return $this->mapWithScalars;
+    }
+
+    /**
+     * @return array<string, array<string, string>>
+     */
+    public function methodMapWithAssociativeArrays(): array
+    {
+        return $this->mapWithAssociativeArrays;
+    }
+
+    public function methodListWithoutTypeHint(): array
+    {
+        return $this->listWithoutTypeHint;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function methodListWithTypeHint(): array
+    {
+        return $this->listWithTypeHint;
+    }
 }
