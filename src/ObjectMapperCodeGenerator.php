@@ -18,10 +18,14 @@ use function var_export;
 final class ObjectMapperCodeGenerator
 {
     private DefinitionProvider $definitionProvider;
+    private bool $omitNullValuesOnSerialization;
 
-    public function __construct(?DefinitionProvider $definitionProvider = null)
-    {
+    public function __construct(
+        ?DefinitionProvider $definitionProvider = null,
+        bool $omitNullValuesOnSerialization = false,
+    ) {
         $this->definitionProvider = $definitionProvider ?? new DefinitionProvider();
+        $this->omitNullValuesOnSerialization = $omitNullValuesOnSerialization;
     }
 
     public function dump(array $classes, string $dumpedClassName): string
@@ -755,7 +759,6 @@ CODE;
         }
 
 CODE;
-
         return $code;
     }
 
@@ -767,19 +770,18 @@ CODE;
         if (count($keys) === 1) {
             $key = '[\'' . implode('\'][\'', array_pop($keys)) . '\']';
 
-            return <<<CODE
-        \$result$key = $tempVariable;
-
-CODE;
+            return $this->omitNullValuesOnSerialization
+                ? "        if ($tempVariable !== null) \$result$key = $tempVariable;\n"
+                : "        \$result$key = $tempVariable;\n";
         }
 
         $code = '';
 
         foreach ($keys as $tempKey => $resultKey) {
             $key = '[\'' . implode('\'][\'', $resultKey) . '\']';
-            $code .= <<<CODE
-        \$result$key = {$tempVariable}['$tempKey'];
-CODE;
+            $code .= $this->omitNullValuesOnSerialization
+                ? "        if ({$tempVariable}['$tempKey'] !== null) \$result$key = {$tempVariable}['$tempKey'];"
+                : "        \$result$key = {$tempVariable}['$tempKey'];";
         }
 
         return $code;
