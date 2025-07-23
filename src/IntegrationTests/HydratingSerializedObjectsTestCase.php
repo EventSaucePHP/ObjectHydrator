@@ -51,7 +51,7 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
         yield 'class with list type resolve from doc comment' => [
             ClassThatCastsListsToBasedOnDocComments::class,
             [
-                'list' => [
+                'short_list' => [
                     ['snake_case' => 'Frank'],
                     ['snake_case' => 'Renske'],
                 ],
@@ -63,9 +63,13 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
                     1 => ['snake_case' => 'Frank'],
                     '2' => ['snake_case' => 'Renske'],
                 ],
+                'list' => [
+                    ['snake_case' => 'Frank'],
+                    ['snake_case' => 'Renske'],
+                ],
             ],
             [
-                'list' => [
+                'shortList' => [
                     'type' => 'list',
                     'values' => ClassWithCamelCaseProperty::class,
                 ],
@@ -75,6 +79,10 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
                 ],
                 'array' => [
                     'type' => 'array',
+                    'values' => ClassWithCamelCaseProperty::class,
+                ],
+                'list' => [
+                    'type' => 'list',
                     'values' => ClassWithCamelCaseProperty::class,
                 ],
             ],

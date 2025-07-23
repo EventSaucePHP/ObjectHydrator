@@ -175,6 +175,7 @@ The library supports the following formats:
 - `@param array<Type> $name`
 - `@param array<string, Type> $name`
 - `@param array<int, Type> $name`
+- `@param list<Type> $name`
 
 ### Custom mapping key
 
