@@ -14,7 +14,7 @@ use EventSauce\ObjectHydrator\PropertySerializer;
 use function assert;
 use function is_int;
 
-#[Attribute(Attribute::TARGET_PARAMETER | Attribute::IS_REPEATABLE)]
+#[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 final class CastToDateTimeImmutable implements PropertyCaster, PropertySerializer
 {
     public function __construct(private ?string $format = null, private ?string $timeZone = null)
