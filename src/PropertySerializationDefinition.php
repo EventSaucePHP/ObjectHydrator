@@ -20,6 +20,7 @@ class PropertySerializationDefinition
         public array $keys = [],
         public ?string $typeSpecifier = null,
         public array $typeMap = [],
+        public bool $enforceObject = false,
     ) {
         $this->serializers = array_filter($this->serializers);
     }

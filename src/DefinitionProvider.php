@@ -26,6 +26,7 @@ final class DefinitionProvider
     private PropertyTypeResolver $propertyTypeResolver;
     private bool $serializePublicMethods;
     private ConstructorResolver $constructorResolver;
+    private bool $serializeMapsAsObjects;
 
     public function __construct(
         ?DefaultCasterRepository     $defaultCasterRepository = null,
@@ -34,6 +35,7 @@ final class DefinitionProvider
         ?PropertyTypeResolver        $propertyTypeResolver = null,
         bool                         $serializePublicMethods = true,
         ?ConstructorResolver         $constructorResolver = null,
+        bool                         $serializeMapsAsObjects = false,
     )
     {
         $this->defaultCasters = $defaultCasterRepository ?? DefaultCasterRepository::builtIn();
@@ -42,6 +44,7 @@ final class DefinitionProvider
         $this->propertyTypeResolver = $propertyTypeResolver ?? new NaivePropertyTypeResolver();
         $this->serializePublicMethods = $serializePublicMethods;
         $this->constructorResolver = $constructorResolver ?? new AttributeConstructorResolver();
+        $this->serializeMapsAsObjects = $serializeMapsAsObjects;
     }
 
     /**
@@ -146,6 +149,7 @@ final class DefinitionProvider
     public function provideSerializationDefinition(string $className): ClassSerializationDefinition
     {
         $reflection = new ReflectionClass($className);
+        $constructor = $this->constructorResolver->resolveConstructor($reflection);
         $objectSettings = $this->resolveObjectSettings($reflection);
         $classAttributes = $reflection->getAttributes();
         $properties = [];
@@ -168,16 +172,20 @@ final class DefinitionProvider
             /** @var ReflectionNamedType|ReflectionUnionType $returnType */
             $returnType = $method->getReturnType();
             $attributes = $method->getAttributes();
+
             $typeSpecifier = $this->typeSpecifier($attributes);
+            $resolvedPropertyType = $this->propertyTypeResolver->typeFromMethod($method);
+
             $properties[] = new PropertySerializationDefinition(
                 PropertySerializationDefinition::TYPE_METHOD,
                 $methodName,
                 $this->resolveSerializers($returnType, $attributes),
-                PropertyType::fromReflectionType($returnType),
+                $resolvedPropertyType,
                 $returnType->allowsNull(),
                 $this->resolveKeys($key, $attributes),
                 $typeSpecifier?->key,
                 $typeSpecifier?->map ?: [],
+                $this->serializeMapsAsObjects && $resolvedPropertyType->isAssociativeArray(),
             );
         }
 
@@ -200,15 +208,18 @@ final class DefinitionProvider
             }
 
             $typeSpecifier = $this->typeSpecifier($attributes);
+            $resolvedPropertyType = $this->propertyTypeResolver->typeFromProperty($property, $constructor);
+
             $properties[] = new PropertySerializationDefinition(
                 PropertySerializationDefinition::TYPE_PROPERTY,
                 $property->getName(),
                 $serializers,
-                PropertyType::fromReflectionType($propertyType),
+                $resolvedPropertyType,
                 $propertyType->allowsNull(),
                 $this->resolveKeys($key, $attributes),
                 $typeSpecifier?->key,
                 $typeSpecifier?->map ?: [],
+                $this->serializeMapsAsObjects && $resolvedPropertyType->isAssociativeArray(),
             );
         }
 

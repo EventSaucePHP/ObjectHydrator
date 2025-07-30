@@ -60,6 +60,7 @@ resolving steps using [code generation](#maximizing-performance).
     - [**Creating your own property casters**](#creating-your-own-property-casters)
     - [**Static constructors**](#static-constructors)
     - [**Key formatters**](#key-formatters)
+    - [**Serializing maps as objects**](#serializing-maps-as-objects)
 - [**Maximizing performance**](#maximizing-performance)
 
 ## Design goals
@@ -596,6 +597,59 @@ class Shout
 $payload = $mapper->serializeObject(new Shout('Hello, World!');
 
 $payload['what'] === 'HELLO, WORLD!';
+```
+
+### Serializing maps as objects
+By default, associative arrays are serialized as arrays in the payload. Since associative arrays represent 
+unstructured key-value maps that are typically treated as objects in many data formats, you may want to serialize 
+them as objects for better cross-platform compatibility.
+
+You can configure the mapper to serialize associative arrays as objects by enabling the `serializeMapsAsObjects` option:
+
+```php
+use EventSauce\ObjectHydrator\DefinitionProvider;
+use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
+
+$mapper = new ObjectMapperUsingReflection(
+    new DefinitionProvider(serializeMapsAsObjects: true),
+);
+```
+
+Maps are serialized as objects based on their doc-comment type hints. Arrays with `array<string, T>` type hints 
+are treated as maps and serialized as objects.
+
+```php
+class ExampleCommand
+{
+    /**
+     * @param array<string, mixed> $changedFields
+     */
+    public function __construct(
+        public readonly array $changedFields,
+    ) {}
+
+    /**
+     * @return array<string, string>
+     */
+    public function metadata(): array
+    {
+        return [
+            'source' => 'api',
+        ];
+    }
+}
+
+$command = new ExampleCommand(['email' => 'new@example.com', 'name' => 'John']);
+
+$payload = $mapper->serializeObject($command);
+```
+
+Serialized payload:
+```
+[
+    'changed_fields' => {"email": "new@example.com", "name": "John"},
+    'metadata' => {"source": "api"}
+]
 ```
 
 ## Symmetrical conversion

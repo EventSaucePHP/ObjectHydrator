@@ -255,6 +255,14 @@ $isNullBody
             }
 
 CODE;
+                if ($definition->propertyType->isCollection() || $definition->firstTypeName === 'array') {
+                    $body .= <<<CODE
+            if (is_object(\$value)) {
+                \$value = (array) \$value;
+            }
+
+CODE;
+                }
             } else {
                 $collectKeys = '';
 
@@ -769,10 +777,11 @@ CODE;
 
         if (count($keys) === 1) {
             $key = '[\'' . implode('\'][\'', array_pop($keys)) . '\']';
+            $cast = $definition->enforceObject ? '(object) ' : '';
 
             return $this->omitNullValuesOnSerialization
-                ? "        if ($tempVariable !== null) \$result$key = $tempVariable;\n"
-                : "        \$result$key = $tempVariable;\n";
+                ? "        if ($tempVariable !== null) \$result$key = {$cast}$tempVariable;\n"
+                : "        \$result$key = {$cast}$tempVariable;\n";
         }
 
         $code = '';

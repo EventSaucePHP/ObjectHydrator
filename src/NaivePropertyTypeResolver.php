@@ -16,6 +16,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
+use ReflectionProperty;
 use RuntimeException;
 use function array_key_exists;
 use function array_shift;
@@ -54,6 +55,46 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
         }
 
         return PropertyType::fromReflectionType($type);
+    }
+
+    public function typeFromProperty(ReflectionProperty $property, ?ReflectionMethod $constructor): PropertyType
+    {
+        $propertyType = $property->getType();
+
+        $resolvedType = PropertyType::fromReflectionType($propertyType);
+        $concreteType = $resolvedType->firstType();
+
+        if (!$propertyType instanceof ReflectionNamedType || !$concreteType) {
+            return $resolvedType;
+        }
+
+        if (!$property->isPromoted()) {
+            $associative = $this->isAssociativeBasedOnPropertyDocComment($property);
+        } elseif ($constructor) {
+            $associative = $this->isAssociativeBasedOnConstructorDocComment($property, $constructor);
+        } else {
+            $associative = false;
+        }
+
+        $concreteType->associative = $associative;
+
+        return $resolvedType;
+    }
+
+    public function typeFromMethod(ReflectionMethod $method): PropertyType
+    {
+        $returnType = $method->getReturnType();
+
+        $resolvedType = PropertyType::fromReflectionType($returnType);
+        $concreteType = $resolvedType->firstType();
+
+        if (!$returnType instanceof ReflectionNamedType || !$concreteType) {
+            return $resolvedType;
+        }
+
+        $concreteType->associative = $this->isAssociativeBasedOnReturnDocComment($method);
+
+        return $resolvedType;
     }
 
     private function resolveUseStatementMap(ReflectionClass $declaringClass): array
@@ -204,5 +245,38 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
         }
 
         throw new LogicException('Unable to resolve item type for type: ' . $type);
+    }
+
+    private function isAssociativeBasedOnConstructorDocComment(ReflectionProperty $parameter, ReflectionMethod $constructor): bool
+    {
+        $docBlock = $constructor->getDocComment();
+        if (!$docBlock) {
+            return false;
+        }
+
+        return (bool) preg_match(
+            '/\*\s+@param\s+[^$]*array<\s*string\s*,\s*[^>]+\s*>[^$]*\$' . preg_quote($parameter->name, '/') . '\b/m',
+            $docBlock
+        );
+    }
+
+    private function isAssociativeBasedOnPropertyDocComment(ReflectionProperty $property): bool
+    {
+        $docBlock = $property->getDocComment();
+        if (!$docBlock) {
+            return false;
+        }
+
+        return (bool) preg_match('/\*\s+@var\s+[^*]*?\barray\s*<\s*string\s*,\s*[^>]+\s*>/m', $docBlock);
+    }
+
+    private function isAssociativeBasedOnReturnDocComment(ReflectionMethod $method): bool
+    {
+        $docBlock = $method->getDocComment();
+        if (!$docBlock) {
+            return false;
+        }
+
+        return (bool) preg_match('/\*\s+@return\s+[^*]*?\barray\s*<\s*string\s*,\s*[^>]+\s*>/m', $docBlock);
     }
 }
