@@ -102,18 +102,6 @@ class ObjectMapperUsingReflection implements ObjectMapper
                 $property = $definition->accessorName;
                 $value = $this->extractPayloadViaMap($payload, $keys);
 
-                // same code as two sections below
-                if ($value === null) {
-                    if ($definition->hasDefaultValue) {
-                        continue;
-                    } elseif ($definition->nullable) {
-                        $properties[$property] = null;
-                    } else {
-                        $missingFields[] = implode('.', end($keys));
-                    }
-                    continue;
-                }
-
                 foreach ($definition->casters as [$caster, $options]) {
                     $key = $className . '-' . $caster . '-' . json_encode($options);
                     /** @var PropertyCaster $propertyCaster */
@@ -121,7 +109,6 @@ class ObjectMapperUsingReflection implements ObjectMapper
                     $value = $propertyCaster->cast($value, $this);
                 }
 
-                // same code as two sections above
                 if ($value === null) {
                     if ($definition->hasDefaultValue) {
                         continue;

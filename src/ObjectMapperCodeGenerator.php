@@ -249,11 +249,6 @@ CODE;
                 $body .= <<<CODE
 
             \$value = \$payload['$from'] ?? null;
-
-            if (\$value === null) {
-$isNullBody
-            }
-
 CODE;
             } else {
                 $collectKeys = '';
@@ -299,14 +294,19 @@ CODE;
             }
 
             \$value = \${$casterName}->cast(\$value, \$this);
-
-            if (\$value === null) {
-                $isNullBody
-            }
-
 CODE;
                 }
             }
+
+            if(isset($isNullBody)){
+                $body .= <<<CODE
+            if (\$value === null) {
+                $isNullBody
+            }
+CODE;
+            }
+
+
 
             if ($definition->isBackedEnum()) {
                 $body .= <<<CODE
