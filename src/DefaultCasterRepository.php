@@ -6,7 +6,9 @@ namespace EventSauce\ObjectHydrator;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use DateTimeZone;
 use EventSauce\ObjectHydrator\PropertyCasters\CastToDateTimeImmutable;
+use EventSauce\ObjectHydrator\PropertyCasters\CastToDateTimeZone;
 use EventSauce\ObjectHydrator\PropertyCasters\CastToUuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -32,6 +34,7 @@ final class DefaultCasterRepository
         $repository = new static();
         $repository->registerDefaultCaster(DateTimeImmutable::class, CastToDateTimeImmutable::class);
         $repository->registerDefaultCaster(DateTimeInterface::class, CastToDateTimeImmutable::class);
+        $repository->registerDefaultCaster(DateTimeZone::class, CastToDateTimeZone::class);
         $repository->registerDefaultCaster(UuidInterface::class, CastToUuid::class);
 
         return $repository;

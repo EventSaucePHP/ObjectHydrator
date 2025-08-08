@@ -19,6 +19,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithDocblockAndArrayFollowingScalar;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithDefaultValue;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithDocblockArrayVariants;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeZoneInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithNotCastedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithNullableInput;
@@ -341,6 +342,19 @@ abstract class ObjectHydrationTestCase extends TestCase
         self::assertInstanceOf(ClassWithFormattedDateTimeInput::class, $object);
         self::assertEquals('1987-11-24 00:00:00', $object->date->format('Y-m-d H:i:s'));
         self::assertEquals('Europe/Amsterdam', $object->date->getTimezone()->getName());
+    }
+
+    /**
+     * @test
+     */
+    public function hydrating_a_class_with_a_formatted_timezone(): void
+    {
+        $hydrator = $this->createObjectHydrator();
+
+        $object = $hydrator->hydrateObject(ClassWithFormattedDateTimeZoneInput::class, ['timezone' => 'Europe/Amsterdam']);
+
+        self::assertInstanceOf(ClassWithFormattedDateTimeZoneInput::class, $object);
+        self::assertEquals('Europe/Amsterdam', $object->timezone->getName());
     }
 
     /**
