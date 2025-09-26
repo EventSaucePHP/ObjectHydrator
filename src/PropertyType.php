@@ -14,9 +14,6 @@ use function enum_exists;
 use function function_exists;
 use function is_a;
 
-/**
- * @internal
- */
 final class PropertyType
 {
     /** @var ConcreteType[] */
