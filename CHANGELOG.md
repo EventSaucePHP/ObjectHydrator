@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Be able to filter out NULL values.
+- Default caster for DateTimeZone
+
+### Fixed
+
+- Be able to assign more casters to promoted properties
 
 ## [1.6.1] 2024-12-15
 
