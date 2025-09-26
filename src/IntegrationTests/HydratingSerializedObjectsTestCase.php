@@ -7,7 +7,10 @@ namespace EventSauce\ObjectHydrator\IntegrationTests;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToBasedOnDocComments;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToDifferentTypes;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListToScalarType;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatHasMultipleCastersOnMapProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatHasMultipleCastersOnSingleProperty;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatSpecifiesArraysWithDocComments;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatSpecifiesArrayWithIntegerKeys;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithCamelCaseProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithPropertyCasting;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithStaticConstructor;
@@ -22,7 +25,7 @@ use PHPUnit\Framework\TestCase;
 
 abstract class HydratingSerializedObjectsTestCase extends TestCase
 {
-    abstract public function objectMapper(): ObjectMapper;
+    abstract public function objectMapper(bool $serializeMapsAsObjects = false): ObjectMapper;
 
     /**
      * @test
@@ -137,10 +140,204 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
         }
     }
 
+    /**
+     * @test
+     * @dataProvider arrayDataProvider
+     */
+    public function serializes_associative_arrays_as_objects_based_on_configuration(
+        string $class,
+        bool $serializeMapsAsObjects,
+        array $input,
+        array $types,
+    ): void {
+        $mapper = $this->objectMapper(serializeMapsAsObjects: $serializeMapsAsObjects);
+
+        $object = $mapper->hydrateObject($class, $input);
+        $payload = $mapper->serializeObject($object);
+
+        self::assertInstanceOf($class, $object);
+        self::assertEquals($input, $payload);
+        self::assertExpectedTypes($types, $object);
+    }
+
+    public function arrayDataProvider(): iterable
+    {
+        yield 'associative arrays as objects when casting enabled' => [
+            ClassThatSpecifiesArraysWithDocComments::class,
+            true,
+            [
+                'map_with_objects' => (object) [
+                    'frank' => ['snake_case' => 'Frank'],
+                    'renske' => ['snake_case' => 'Renske'],
+                ],
+                'map_with_scalars' => (object) ['one' => 1, 'two' => 2],
+                'map_with_associative_arrays' => (object) [
+                    'one' => ['key' => 'value'],
+                    'two' => ['another_key' => 'another_value'],
+                ],
+                'list_without_type_hint' => ['Frank', 'Renske'],
+                'list_with_type_hint' => ['Frank', 'Renske'],
+                'method_map_with_objects' => (object) [
+                    'frank' => ['snake_case' => 'Frank'],
+                    'renske' => ['snake_case' => 'Renske'],
+                ],
+                'method_map_with_scalars' => (object) ['one' => 1, 'two' => 2 ],
+                'method_map_with_associative_arrays' => (object) [
+                    'one' => ['key' => 'value'],
+                    'two' => ['another_key' => 'another_value'],
+                ],
+                'method_list_without_type_hint' => ['Frank', 'Renske'],
+                'method_list_with_type_hint' => ['Frank', 'Renske'],
+            ],
+            [
+                'mapWithObjects' => ['type' => 'map', 'values' => ClassWithCamelCaseProperty::class],
+                'mapWithScalars' => ['type' => 'map', 'values' => 'integer'],
+                'mapWithAssociativeArrays' => ['type' => 'map', 'values' => 'array'],
+                'listWithoutTypeHint' => ['type' => 'list', 'values' => 'string'],
+                'listWithTypeHint' => ['type' => 'list', 'values' => 'string'],
+                'methodMapWithObjects' => ['type' => 'map', 'values' => ClassWithCamelCaseProperty::class],
+                'methodMapWithScalars' => ['type' => 'map', 'values' => 'integer'],
+                'methodMapWithAssociativeArrays' => ['type' => 'map', 'values' => 'array'],
+                'methodListWithoutTypeHint' => ['type' => 'list', 'values' => 'string'],
+                'methodListWithTypeHint' => ['type' => 'list', 'values' => 'string'],
+            ]
+        ];
+
+        yield 'associative arrays as arrays when casting disabled' => [
+            ClassThatSpecifiesArraysWithDocComments::class,
+            false,
+            [
+                'map_with_objects' => [
+                    'frank' => ['snake_case' => 'Frank'],
+                    'renske' => ['snake_case' => 'Renske'],
+                ],
+                'map_with_scalars' => ['one' => 1, 'two' => 2],
+                'map_with_associative_arrays' => [
+                    'one' => ['key' => 'value'],
+                    'two' => ['another_key' => 'another_value'],
+                ],
+                'list_without_type_hint' => ['Frank', 'Renske'],
+                'list_with_type_hint' => ['Frank', 'Renske'],
+                'method_map_with_objects' => [
+                    'frank' => ['snake_case' => 'Frank'],
+                    'renske' => ['snake_case' => 'Renske'],
+                ],
+                'method_map_with_scalars' => ['one' => 1, 'two' => 2 ],
+                'method_map_with_associative_arrays' => [
+                    'one' => ['key' => 'value'],
+                    'two' => ['another_key' => 'another_value'],
+                ],
+                'method_list_without_type_hint' => ['Frank', 'Renske'],
+                'method_list_with_type_hint' => ['Frank', 'Renske'],
+            ],
+            [
+                'mapWithObjects' => ['type' => 'map', 'values' => ClassWithCamelCaseProperty::class],
+                'mapWithScalars' => ['type' => 'map', 'values' => 'integer'],
+                'mapWithAssociativeArrays' => ['type' => 'map', 'values' => 'array'],
+                'listWithoutTypeHint' => ['type' => 'list', 'values' => 'string'],
+                'listWithTypeHint' => ['type' => 'list', 'values' => 'string'],
+                'methodMapWithObjects' => ['type' => 'map', 'values' => ClassWithCamelCaseProperty::class],
+                'methodMapWithScalars' => ['type' => 'map', 'values' => 'integer'],
+                'methodMapWithAssociativeArrays' => ['type' => 'map', 'values' => 'array'],
+                'methodListWithoutTypeHint' => ['type' => 'list', 'values' => 'string'],
+                'methodListWithTypeHint' => ['type' => 'list', 'values' => 'string'],
+            ]
+        ];
+
+        yield 'non-sequential lists serialized as objects when casting enabled' => [
+            ClassThatSpecifiesArrayWithIntegerKeys::class,
+            true,
+            [
+                'array_with_integer_keys' => (object) [0 => 'zero', 2 => 'two'],
+            ],
+            [
+                'arrayWithIntegerKeys' => ['type' => 'map', 'values' => 'string'],
+            ],
+        ];
+
+        yield 'non-sequential lists serialized as arrays when casting disabled' => [
+            ClassThatSpecifiesArrayWithIntegerKeys::class,
+            false,
+            [
+                'array_with_integer_keys' => [0 => 'zero', 2 => 'two'],
+            ],
+            [
+                'arrayWithIntegerKeys' => ['type' => 'map', 'values' => 'string'],
+            ],
+        ];
+
+        yield 'sequential arrays serialized as arrays when casting enabled' => [
+            ClassThatSpecifiesArrayWithIntegerKeys::class,
+            true,
+            [
+                'array_with_integer_keys' => [0 => 'zero', 1 => 'one'],
+            ],
+            [
+                'arrayWithIntegerKeys' => ['type' => 'list', 'values' => 'string'],
+            ],
+        ];
+
+        yield 'sequential arrays serialized as arrays when casting disabled' => [
+            ClassThatSpecifiesArrayWithIntegerKeys::class,
+            false,
+            [
+                'array_with_integer_keys' => [0 => 'zero', 1 => 'one'],
+            ],
+            [
+                'arrayWithIntegerKeys' => ['type' => 'list', 'values' => 'string'],
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider associativeArraysWithPropertySerializersDataProvider
+     */
+    public function serializes_associative_arrays_with_property_serializers_as_objects(
+        bool $serializeMapsAsObjects,
+        ClassThatHasMultipleCastersOnMapProperty $expectedObject,
+        array $input,
+    ): void {
+        $mapper = $this->objectMapper($serializeMapsAsObjects);
+
+        $object = $mapper->hydrateObject(ClassThatHasMultipleCastersOnMapProperty::class, $input);
+        self::assertEquals($expectedObject, $object);
+
+        $payload = $mapper->serializeObject($object);
+        self::assertEquals($input, $payload);
+    }
+
+    private function associativeArraysWithPropertySerializersDataProvider(): iterable
+    {
+        yield 'associative arrays as objects' => [
+            true,
+            new ClassThatHasMultipleCastersOnMapProperty([
+                'first_level' => [
+                    'second_level' => ['one' => 1, 'two' => 2, 'three' => 3],
+                ],
+            ]),
+            [
+                'map' => (object) ['one' => 1, 'two' => 2, 'three' => 3],
+            ],
+        ];
+
+        yield 'associative arrays as arrays' => [
+            false,
+            new ClassThatHasMultipleCastersOnMapProperty([
+                'first_level' => [
+                    'second_level' => ['one' => 1, 'two' => 2, 'three' => 3],
+                ],
+            ]),
+            [
+                'map' => ['one' => 1, 'two' => 2, 'three' => 3],
+            ],
+        ];
+    }
+
     private static function assertExpectedTypes(array $types, object $object): void
     {
         foreach ($types as $property => $type) {
-            $value = $object->$property;
+            $value = property_exists($object, $property) ? $object->{$property} : $object->$property();
 
             self::assertExpectedType($type['type'], $value);
 
@@ -200,8 +397,10 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
     {
         self::assertIsArray($value);
 
+        self::assertFalse(array_is_list($value));
+
         foreach (array_keys($value) as $key) {
-            self::assertIsString($key);
+            self::assertIsScalar($key);
         }
     }
 }

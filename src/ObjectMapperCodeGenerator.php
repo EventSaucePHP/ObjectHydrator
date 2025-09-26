@@ -19,13 +19,16 @@ final class ObjectMapperCodeGenerator
 {
     private DefinitionProvider $definitionProvider;
     private bool $omitNullValuesOnSerialization;
+    private bool $serializeMapsAsObjects;
 
     public function __construct(
         ?DefinitionProvider $definitionProvider = null,
         bool $omitNullValuesOnSerialization = false,
+        bool $serializeMapsAsObjects = false,
     ) {
         $this->definitionProvider = $definitionProvider ?? new DefinitionProvider();
         $this->omitNullValuesOnSerialization = $omitNullValuesOnSerialization;
+        $this->serializeMapsAsObjects = $serializeMapsAsObjects;
     }
 
     public function dump(array $classes, string $dumpedClassName): string
@@ -255,6 +258,14 @@ $isNullBody
             }
 
 CODE;
+                if ($definition->propertyType->isCollection() || $definition->firstTypeName === 'array') {
+                    $body .= <<<CODE
+            if (is_object(\$value)) {
+                \$value = (array) \$value;
+            }
+
+CODE;
+                }
             } else {
                 $collectKeys = '';
 
@@ -766,22 +777,26 @@ CODE;
     {
         $tempVariable = '$' . $definition->accessorName;
         $keys = $definition->keys;
+        $condition = $this->omitNullValuesOnSerialization ? "if ($tempVariable !== null) " : '';
 
         if (count($keys) === 1) {
             $key = '[\'' . implode('\'][\'', array_pop($keys)) . '\']';
+            $associativeArray = $definition->propertyType->isAssociativeArray();
 
-            return $this->omitNullValuesOnSerialization
-                ? "        if ($tempVariable !== null) \$result$key = $tempVariable;\n"
-                : "        \$result$key = $tempVariable;\n";
+            if ($this->serializeMapsAsObjects && !$associativeArray && $definition->propertyType->firstTypeName() === 'array') {
+                return "        $condition\$result$key = is_array($tempVariable) && !array_is_list($tempVariable) ? (object) $tempVariable : $tempVariable;\n";
+            }
+
+            $cast = $this->serializeMapsAsObjects && $associativeArray ? '(object) ' : '';
+
+            return "        $condition\$result$key = {$cast}$tempVariable;\n";
         }
 
         $code = '';
 
         foreach ($keys as $tempKey => $resultKey) {
             $key = '[\'' . implode('\'][\'', $resultKey) . '\']';
-            $code .= $this->omitNullValuesOnSerialization
-                ? "        if ({$tempVariable}['$tempKey'] !== null) \$result$key = {$tempVariable}['$tempKey'];"
-                : "        \$result$key = {$tempVariable}['$tempKey'];";
+            $code .= "        $condition\$result$key = {$tempVariable}['$tempKey'];";
         }
 
         return $code;
