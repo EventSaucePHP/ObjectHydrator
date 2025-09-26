@@ -21,7 +21,7 @@ final class CastToDateTimeImmutable implements PropertyCaster, PropertySerialize
     {
     }
 
-    public function cast(mixed $value, ObjectMapper $hydrator): mixed
+    public function cast(mixed $value, ObjectMapper $hydrator, ?string $expectedTypeName): mixed
     {
         $timeZone = $this->timeZone ? new DateTimeZone($this->timeZone) : $this->timeZone;
 

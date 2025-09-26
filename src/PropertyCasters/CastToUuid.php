@@ -20,7 +20,7 @@ final class CastToUuid implements PropertyCaster, PropertySerializer
     {
     }
 
-    public function cast(mixed $value, ObjectMapper $hydrator): UuidInterface
+    public function cast(mixed $value, ObjectMapper $hydrator, ?string $expectedTypeName): UuidInterface
     {
         $value = (string) $value;
 
