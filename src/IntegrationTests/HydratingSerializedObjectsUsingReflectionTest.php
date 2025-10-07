@@ -9,8 +9,8 @@ use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
 
 class HydratingSerializedObjectsUsingReflectionTest extends HydratingSerializedObjectsTestCase
 {
-    public function objectMapper(): ObjectMapper
+    public function objectMapper(bool $serializeMapsAsObjects = false): ObjectMapper
     {
-        return new ObjectMapperUsingReflection();
+        return new ObjectMapperUsingReflection(serializeMapsAsObjects: $serializeMapsAsObjects);
     }
 }

@@ -8,6 +8,7 @@ use BackedEnum;
 use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
+use ReflectionProperty;
 use ReflectionUnionType;
 use function count;
 use function enum_exists;
@@ -75,6 +76,13 @@ final class PropertyType
             && ($this->concreteTypes[0]->isBuiltIn === false);
     }
 
+    public function isAssociativeArray(): bool
+    {
+        return count($this->concreteTypes) === 1
+            && $this->concreteTypes[0]->name === 'array'
+            && $this->concreteTypes[0]->associative;
+    }
+
     public static function fromReflectionType(
         ReflectionUnionType|ReflectionIntersectionType|ReflectionNamedType|null $type
     ): PropertyType {
@@ -127,6 +135,11 @@ final class PropertyType
     public static function mixed(): static
     {
         return new static(true, new ConcreteType('mixed', true));
+    }
+
+    public function firstType(): ?ConcreteType
+    {
+        return $this->concreteTypes[0] ?? null;
     }
 
     public function firstTypeName(): ?string

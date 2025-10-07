@@ -146,6 +146,7 @@ final class DefinitionProvider
     public function provideSerializationDefinition(string $className): ClassSerializationDefinition
     {
         $reflection = new ReflectionClass($className);
+        $constructor = $this->constructorResolver->resolveConstructor($reflection);
         $objectSettings = $this->resolveObjectSettings($reflection);
         $classAttributes = $reflection->getAttributes();
         $properties = [];
@@ -173,7 +174,7 @@ final class DefinitionProvider
                 PropertySerializationDefinition::TYPE_METHOD,
                 $methodName,
                 $this->resolveSerializers($returnType, $attributes),
-                PropertyType::fromReflectionType($returnType),
+                $this->propertyTypeResolver->typeFromMethod($method),
                 $returnType->allowsNull(),
                 $this->resolveKeys($key, $attributes),
                 $typeSpecifier?->key,
@@ -204,7 +205,7 @@ final class DefinitionProvider
                 PropertySerializationDefinition::TYPE_PROPERTY,
                 $property->getName(),
                 $serializers,
-                PropertyType::fromReflectionType($propertyType),
+                $this->propertyTypeResolver->typeFromProperty($property, $constructor),
                 $propertyType->allowsNull(),
                 $this->resolveKeys($key, $attributes),
                 $typeSpecifier?->key,
