@@ -6,6 +6,9 @@ namespace EventSauce\ObjectHydrator;
 
 use EventSauce\ObjectHydrator\Fixtures\CastersOnClasses\ClassWithClassLevelMapFrom;
 use EventSauce\ObjectHydrator\Fixtures\CastersOnClasses\ClassWithClassLevelMapFromMultiple;
+use EventSauce\ObjectHydrator\Fixtures\CastToExpectedType\AuthorId;
+use EventSauce\ObjectHydrator\Fixtures\CastToExpectedType\BlogId;
+use EventSauce\ObjectHydrator\Fixtures\CastToExpectedType\ClassWithIds;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToDifferentTypes;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatContainsAnotherClass;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatHasMultipleCastersOnSingleProperty;
@@ -635,6 +638,23 @@ abstract class ObjectHydrationTestCase extends TestCase
         $object = $hydrator->hydrateObject(ClassWithDocblockAndArrayFollowingScalar::class, $payload);
 
         self::assertInstanceOf(ClassWithDocblockAndArrayFollowingScalar::class, $object);
+    }
+
+    /**
+     * @test
+     */
+    public function hydrating_a_class_casting_expected_types(): void {
+        $hydrator = $this->createObjectHydrator();
+        $payload = [
+            'authorId' => 'a',
+            'blogId' => 'b',
+        ];
+
+        $object = $hydrator->hydrateObject(ClassWithIds::class, $payload);
+
+        self::assertInstanceOf(ClassWithIds::class, $object);
+        self::assertInstanceOf(AuthorId::class, $object->authorId);
+        self::assertInstanceOf(BlogId::class, $object->blogId);
     }
 
     /**

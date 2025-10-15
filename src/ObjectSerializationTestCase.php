@@ -8,6 +8,7 @@ use DateTime;
 use DateTimeImmutable;
 use EventSauce\ObjectHydrator\Fixtures\CastersOnClasses\ClassWithClassLevelMapFrom;
 use EventSauce\ObjectHydrator\Fixtures\CastersOnClasses\ClassWithClassLevelMapFromMultiple;
+use EventSauce\ObjectHydrator\Fixtures\CastToExpectedType\ClassWithIds;
 use EventSauce\ObjectHydrator\Fixtures\ClassReferencedByUnionOne;
 use EventSauce\ObjectHydrator\Fixtures\ClassReferencedByUnionTwo;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatOmitsPublicMethods;
