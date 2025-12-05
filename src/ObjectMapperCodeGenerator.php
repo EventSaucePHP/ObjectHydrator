@@ -322,7 +322,7 @@ CODE;
                 if ($definition->propertyType->isCollection()) {
                     $body .= <<<CODE
 
-            if (is_array(\$value[array_key_first(\$value)] ?? false)) {
+            if (count(\$value) > 0 && is_array(\$value[array_key_first(\$value)] ?? false)) {
                 try {
                     \$this->hydrationStack[] = '$definition->accessorName';
                     \$value = \$this->hydrateObjects('{$definition->firstTypeName}', \$value)->toArray();

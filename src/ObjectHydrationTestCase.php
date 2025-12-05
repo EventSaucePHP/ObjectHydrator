@@ -8,6 +8,7 @@ use EventSauce\ObjectHydrator\Fixtures\CastersOnClasses\ClassWithClassLevelMapFr
 use EventSauce\ObjectHydrator\Fixtures\CastersOnClasses\ClassWithClassLevelMapFromMultiple;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToDifferentTypes;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatContainsAnotherClass;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatCreatesClassesFromAPath;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatHasMultipleCastersOnSingleProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatRenamesInputForClassWithMultipleProperties;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatTriggersUseStatementLookup;
@@ -20,6 +21,7 @@ use EventSauce\ObjectHydrator\Fixtures\ClassWithDefaultValue;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithDocblockArrayVariants;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithFormattedDateTimeZoneInput;
+use EventSauce\ObjectHydrator\Fixtures\ClassWithListOfObjects;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithMappedStringProperty;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithNotCastedDateTimeInput;
 use EventSauce\ObjectHydrator\Fixtures\ClassWithNullableInput;
@@ -635,6 +637,49 @@ abstract class ObjectHydrationTestCase extends TestCase
         $object = $hydrator->hydrateObject(ClassWithDocblockAndArrayFollowingScalar::class, $payload);
 
         self::assertInstanceOf(ClassWithDocblockAndArrayFollowingScalar::class, $object);
+    }
+
+    /**
+     * @test
+     */
+    public function hydrate_a_class_with_a_path_and_subclasses_using_a_docblock_as_typehint(): void {
+        $payload = [
+            'root' => [
+                'list' => [
+                    'classes' => [
+                        ['subClassName' => 'TheSubMarine'],
+                        ['subClassName' => 'TheMainMarine'],
+                    ]
+                ]
+            ]
+        ];
+
+        $object = $this
+            ->createObjectHydrator()
+            ->hydrateObject(ClassThatCreatesClassesFromAPath::class, $payload);
+
+        self::assertInstanceOf(ClassThatCreatesClassesFromAPath::class, $object);
+        self::assertSame('{"subClasses":[{"subClassName":"TheSubMarine"},{"subClassName":"TheMainMarine"}]}', json_encode($object));
+    }
+
+    /**
+     * @test
+     */
+    public function hydrate_a_class_with_a_path_and_subclasses_in_an_empty_array_set_using_a_docblock_as_typehint(): void {
+        $payload = [
+            'root' => [
+                'list' => [
+                    'classes' => []
+                ]
+            ]
+        ];
+
+        $object = $this
+            ->createObjectHydrator()
+            ->hydrateObject(ClassThatCreatesClassesFromAPath::class, $payload);
+
+        self::assertInstanceOf(ClassThatCreatesClassesFromAPath::class, $object);
+        self::assertSame('{"subClasses":[]}', json_encode($object));
     }
 
     /**
