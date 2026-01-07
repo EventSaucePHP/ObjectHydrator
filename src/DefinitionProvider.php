@@ -146,6 +146,7 @@ final class DefinitionProvider
     public function provideSerializationDefinition(string $className): ClassSerializationDefinition
     {
         $reflection = new ReflectionClass($className);
+        $constructor = $this->constructorResolver->resolveConstructor($reflection);
         $objectSettings = $this->resolveObjectSettings($reflection);
         $classAttributes = $reflection->getAttributes();
         $properties = [];
@@ -159,7 +160,8 @@ final class DefinitionProvider
             if ($objectSettings->serializePublicMethods === false
                 || $method->isStatic()
                 || $method->getNumberOfParameters() !== 0
-                || count($method->getAttributes(DoNotSerialize::class)) === 1) {
+                || count($method->getAttributes(DoNotSerialize::class)) === 1
+                || $method->getReturnType() === null) {
                 continue;
             }
 
@@ -191,9 +193,15 @@ final class DefinitionProvider
             }
 
             $key = $this->keyFormatter->propertyNameToKey($property->getName());
-            $propertyType = $property->getType();
+
+            if ($property->isPromoted()) {
+                $propertyType = $this->propertyTypeResolver->typeFromConstructorParameter($property, $constructor);
+            } else {
+                $propertyType = $property->getType();
+            }
+
             $attributes = $property->getAttributes();
-            $serializers = $this->resolveSerializers($propertyType, $attributes);
+            $serializers = $this->resolveSerializers($property->getType(), $attributes);
 
             if ($property->isPromoted()) {
                 $serializers = array_reverse($serializers);
@@ -204,7 +212,7 @@ final class DefinitionProvider
                 PropertySerializationDefinition::TYPE_PROPERTY,
                 $property->getName(),
                 $serializers,
-                PropertyType::fromReflectionType($propertyType),
+                $propertyType instanceof PropertyType ? $propertyType : PropertyType::fromReflectionType($propertyType),
                 $propertyType->allowsNull(),
                 $this->resolveKeys($key, $attributes),
                 $typeSpecifier?->key,

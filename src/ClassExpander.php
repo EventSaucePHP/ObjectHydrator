@@ -71,10 +71,14 @@ final class ClassExpander
 
             /** @var PropertySerializationDefinition $property */
             foreach ($classDefinition->properties as $property) {
-                $type = $property->type;
-
-                if ( ! in_array($type, $classes) && self::isClass($type)) {
-                    $classes[] = $type;
+                $types = [$property->type];
+                foreach ($property->propertyType->concreteTypes() as $concreteType) {
+                    $types[] = $concreteType->name;
+                }
+                foreach ($types as $type) {
+                    if (!in_array($type, $classes) && self::isClass($type)) {
+                        $classes[] = $type;
+                    }
                 }
             }
         }

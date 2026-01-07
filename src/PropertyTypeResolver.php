@@ -6,11 +6,12 @@ namespace EventSauce\ObjectHydrator;
 
 use ReflectionMethod;
 use ReflectionParameter;
+use ReflectionProperty;
 
 interface PropertyTypeResolver
 {
     public function typeFromConstructorParameter(
-        ReflectionParameter $parameter,
+        ReflectionParameter|ReflectionProperty $parameter,
         ReflectionMethod $constructor
     ): PropertyType;
 }
