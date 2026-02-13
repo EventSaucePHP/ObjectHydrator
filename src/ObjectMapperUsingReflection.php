@@ -150,7 +150,10 @@ class ObjectMapperUsingReflection implements ObjectMapper
                         $this->hydrationStack[] = $property;
 
                         if ($propertyType->isCollection()) {
-                            if (is_array($value[array_key_first($value)] ?? false)) {
+                            if (
+                                count($value) > 0 &&
+                                is_array($value[array_key_first($value)] ?? false)
+                            ) {
                                 $value = $this->hydrateObjects($propertyType->firstTypeName(), $value)->toArray();
                             }
                         } else {
