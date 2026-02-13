@@ -13,6 +13,7 @@ use const T_USE;
 use const T_WHITESPACE;
 use LogicException;
 use ReflectionClass;
+use ReflectionProperty;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
@@ -37,7 +38,7 @@ use function trim;
 class NaivePropertyTypeResolver implements PropertyTypeResolver
 {
     public function typeFromConstructorParameter(
-        ReflectionParameter $parameter,
+        ReflectionParameter|ReflectionProperty $parameter,
         ReflectionMethod $constructor
     ): PropertyType {
         $type = $parameter->getType();
@@ -124,7 +125,7 @@ class NaivePropertyTypeResolver implements PropertyTypeResolver
     }
 
     private function resolveFromConstructorDocComment(
-        ReflectionParameter $parameter,
+        ReflectionParameter|ReflectionProperty $parameter,
         ReflectionMethod $constructor,
         array $useMap,
     ): false|PropertyType {
