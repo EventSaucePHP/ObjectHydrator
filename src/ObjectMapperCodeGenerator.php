@@ -191,6 +191,7 @@ CODE;
 
     private function dumpClassHydrator(string $className, ClassHydrationDefinition $classDefinition)
     {
+        $gotoPropertySuffix = '_' . str_replace('\\', '⚡️', $className);
         $body = '';
 
         if ($mapFrom = $classDefinition->mapFrom) {
@@ -229,19 +230,19 @@ CODE;
             if (count($keys) === 1) {
                 $from = array_values($keys)[0];
                 $isNullBody = <<<CODE
-                goto after_$property;
+                goto after_$property$gotoPropertySuffix;
 CODE;
 
                 if ($definition->nullable === false && ! $definition->hasDefaultValue) {
                     $fromConcatted = implode('.', $from);
                     $isNullBody = <<<CODE
                 \$missingFields[] = '$fromConcatted';
-                goto after_$property;
+                goto after_$property$gotoPropertySuffix;
 CODE;
                 } elseif ($definition->nullable && ! $definition->hasDefaultValue) {
                     $isNullBody = <<<CODE
                 \$properties['$property'] = null;
-                goto after_$property;
+                goto after_$property$gotoPropertySuffix;
 CODE;
 
                 }
@@ -278,7 +279,7 @@ CODE;
                 $collectKeys
     
             if (\$value === []) {
-                goto after_$property;
+                goto after_$property$gotoPropertySuffix;
             }
 
 CODE;
@@ -384,7 +385,7 @@ CODE;
 
             \$properties['$property'] = \$value;
 
-            after_$property:
+            after_$property$gotoPropertySuffix:
 
 CODE;
         }
@@ -486,6 +487,7 @@ CODE;
 
     private function dumpClassSerializer(string $class, ClassSerializationDefinition $definition): string
     {
+        $gotoPropertySuffix = '_' . str_replace('\\', '⚡️', $class);
         $methodName = 'serializeObject' . str_replace('\\', '⚡️', $class);
         $typeMapCode = '';
         $propertiesCode = '';
@@ -508,7 +510,7 @@ CODE;
 
 CODE;
 
-            $properties = array_map([$this, 'dumpClassProperty'], $definition->properties);
+            $properties = array_map(fn (PropertySerializationDefinition $definition) => $this->dumpClassProperty($gotoPropertySuffix, $definition), $definition->properties);
             $propertiesCode .= implode("\n        ", $properties);
         }
 
@@ -526,7 +528,7 @@ $typeMapCode$propertiesCode$mapFrom
 CODE;
     }
 
-    private function dumpClassProperty(PropertySerializationDefinition $definition): string
+    private function dumpClassProperty(string $gotoPropertySuffix, PropertySerializationDefinition $definition): string
     {
         $propertyType = $definition->propertyType;
         $accessorName = $definition->accessorName;
@@ -541,7 +543,7 @@ CODE;
             $code .= <<<CODE
 
         if (\$$definition->accessorName === null) {
-            goto after_$accessorName;
+            goto after_$accessorName$gotoPropertySuffix;
         }
 
 CODE;
@@ -556,7 +558,7 @@ CODE;
         }
 
         $code .= <<<CODE
-        after_$accessorName:
+        after_$accessorName$gotoPropertySuffix:
 CODE;
         $code .= $this->dumpResultHydrator($definition);
 
