@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace EventSauce\ObjectHydrator\IntegrationTests;
 
+use DateTimeImmutable;
+use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsOfTypesWithCustomCasters;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToBasedOnDocComments;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListsToDifferentTypes;
 use EventSauce\ObjectHydrator\Fixtures\ClassThatCastsListToScalarType;
@@ -103,6 +105,20 @@ abstract class HydratingSerializedObjectsTestCase extends TestCase
             [
                 'first' => ['type' => 'list', 'values' => ClassWithCamelCaseProperty::class],
                 'second' => ['type' => 'list', 'values' => ClassWithPropertyCasting::class],
+            ],
+        ];
+
+        yield 'class with list of dates' => [
+            ClassThatCastsListsOfTypesWithCustomCasters::class,
+            [
+                'dates' => [
+                    '2026-01-01 00:00:00.000000+0000',
+                    '2026-01-02 00:00:00.000000+0000',
+                    '2026-01-03 00:00:00.000000+0000',
+                ],
+            ],
+            [
+                'dates' => ['type' => 'list', 'values' => DateTimeImmutable::class],
             ],
         ];
 

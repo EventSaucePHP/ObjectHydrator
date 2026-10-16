@@ -12,6 +12,7 @@ use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
 use function array_key_exists;
+use function array_key_first;
 use function array_reverse;
 use function count;
 use function is_a;
@@ -99,7 +100,19 @@ final class DefinitionProvider
                 }
 
                 if (is_a($attributeName, PropertyCaster::class, true)) {
-                    $casters[] = [$attributeName, $attribute->getArguments()];
+                    $args = $attribute->getArguments();
+
+                    if (is_a($attributeName, PropertyCasters\CastListToType::class, true)   ) {
+                        $casterForItemList = $this->defaultCasters->casterFor($args[0] ?? $args['propertyType']);
+
+                        if ($casterForItemList !== null) {
+                            $args['itemCasterConfig'] = $casterForItemList;
+                        } else {
+                            unset($args[2], $args['itemCasterConfig']);
+                        }
+                    }
+
+                    $casters[] = [$attributeName, $args];
                 }
             }
 

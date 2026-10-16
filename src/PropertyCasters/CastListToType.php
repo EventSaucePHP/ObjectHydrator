@@ -21,10 +21,12 @@ final class CastListToType implements PropertyCaster, PropertySerializer
 
     private bool $nativePropertyType;
     private bool $isEnum;
+    private ?PropertyCaster $itemCaster = null;
 
     public function __construct(
         private string $propertyType,
         private ?string $serializedType = null,
+        private ?array $itemCasterConfig = null,
     )
     {
         $this->nativePropertyType = in_array($this->propertyType, self::NATIVE_TYPES);
@@ -40,9 +42,12 @@ final class CastListToType implements PropertyCaster, PropertySerializer
         }
         if ($this->isEnum) {
             return $this->castToEnums($value);
-        } else {
-            return $this->castToObjectType($value, $hydrator);
         }
+        if ($this->itemCaster() instanceof PropertyCaster) {
+            return $this->castViaCustomLogic($value, $hydrator);
+        }
+
+        return $this->castToObjectType($value, $hydrator);
     }
 
     /**
@@ -65,6 +70,27 @@ final class CastListToType implements PropertyCaster, PropertySerializer
         }
 
         return $value;
+    }
+
+    private function castViaCustomLogic(array $value, ObjectMapper $hydrator): array
+    {
+        $itemCaster = $this->itemCaster();
+        assert($itemCaster instanceof PropertyCaster);
+
+        foreach ($value as $i => $item) {
+            $value[$i] = $itemCaster->cast($item, $hydrator);
+        }
+
+        return $value;
+    }
+
+    private function itemCaster(): ?PropertyCaster
+    {
+        if ($this->itemCasterConfig === null) {
+            return null;
+        }
+
+        return $this->itemCaster ??= new ($this->itemCasterConfig[0])(...$this->itemCasterConfig[1]);
     }
 
     private function castToEnums(array $value): array
